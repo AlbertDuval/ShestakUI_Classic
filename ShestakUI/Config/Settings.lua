@@ -244,14 +244,14 @@ C["actionbar"] = {
 	["stancebar_horizontal"] = true,			-- Enable horizontal stance bar
 	["stancebar_mouseover"] = true,				-- Stance bar on mouseover (only for horizontal stance bar)
 	-- MicroMenu
-	["micromenu"] = false,						-- Enable micro menu
-	["micromenu_mouseover"] = false,			-- Micro menu on mouseover
+	["micromenu"] = true,						-- Enable micro menu
+	["micromenu_mouseover"] = true,			-- Micro menu on mouseover
 }
 
-if T.classic then
-	C["actionbar"]["rightbars_mouseover"] = false
-	C["actionbar"]["stancebar_mouseover"] = false
-end
+-- if T.classic then
+-- 	C["actionbar"]["rightbars_mouseover"] = false
+-- 	C["actionbar"]["stancebar_mouseover"] = false
+-- end
 
 ----------------------------------------------------------------------------------------
 --	Tooltip options
@@ -283,7 +283,7 @@ C["tooltip"] = {
 }
 
 if T.classic then
-	C["tooltip"]["realm"] = false
+	C["tooltip"]["realm"] = true
 	C["tooltip"]["item_count"] = true
 	C["tooltip"]["vendor_price"] = true
 end
@@ -415,7 +415,7 @@ C["bag"] = {
 ----------------------------------------------------------------------------------------
 C["minimap"] = {
 	["enable"] = true,							-- Enable minimap
-	["tracking_icon"] = false,					-- Tracking icon
+	["tracking_icon"] = true,					-- Tracking icon
 	["garrison_icon"] = false,					-- Garrison icon
 	["size"] = 130,								-- Minimap size
 	["hide_combat"] = false,					-- Hide minimap in combat
@@ -425,10 +425,10 @@ C["minimap"] = {
 	["fog_of_war"] = false,						-- Remove fog of war on World Map
 }
 
-if T.classic then
-	C["minimap"]["tracking_icon"] = true
-	C["minimap"]["fog_of_war"] = true
-end
+-- if T.classic then
+-- 	C["minimap"]["tracking_icon"] = true
+-- 	C["minimap"]["fog_of_war"] = true
+-- end
 
 ----------------------------------------------------------------------------------------
 --	Loot options
@@ -522,9 +522,9 @@ C["reminder"] = {
 	["raid_buffs_alpha"] = 0,					-- Transparent icons when the buff is present
 }
 
-if T.classic then
-	C["reminder"]["raid_buffs_size"] = 16
-end
+-- if T.classic then
+-- 	C["reminder"]["raid_buffs_size"] = 16
+-- end
 
 ----------------------------------------------------------------------------------------
 --	Raid cooldowns options
