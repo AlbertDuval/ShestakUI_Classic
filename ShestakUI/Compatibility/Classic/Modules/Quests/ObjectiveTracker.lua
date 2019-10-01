@@ -117,7 +117,7 @@ hooksecurefunc("QuestWatch_Update", function()
 	if GetNumQuestWatches() > 0 then
 		ObjectiveTracker:Show()
 
-		local questIndex, numObjectives, title, level, color, hex, watchText, objectivesGroup, objectivesCompleted, finished
+		local questIndex, numObjectives, title, level, color, hex, text, watchText, objectivesGroup, objectivesCompleted, finished
 		local watchTextIndex = 1
 		for i = 1, GetNumQuestWatches() do
 			questIndex = GetQuestIndexForWatch(i)
@@ -271,5 +271,14 @@ ObjectiveTimer:SetWidth(120)
 
 QuestTimerFrame:StripTextures()
 QuestTimerFrame:SetParent(ObjectiveTimer)
-QuestTimerFrame:ClearAllPoints()
-QuestTimerFrame:SetAllPoints(ObjectiveTimer)
+
+QuestTimerFrame:CreateBackdrop("Transparent")
+QuestTimerFrame.backdrop:SetPoint("TOPLEFT", 18, 6)
+QuestTimerFrame.backdrop:SetPoint("BOTTOMRIGHT", -19, -6)
+
+hooksecurefunc(QuestTimerFrame, "SetPoint", function(_, _, parent)
+	if parent ~= ObjectiveTimer then
+		QuestTimerFrame:ClearAllPoints()
+		QuestTimerFrame:SetPoint("TOP", ObjectiveTimer, "TOP")
+	end
+end)

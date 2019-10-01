@@ -443,7 +443,7 @@ function Filger:OnEvent(event, unit, _, castID)
 					end
 					if T.classic and HasWandEquipped() then
 						local wandID = GetInventoryItemID("player", 18)
-						local wandSpeed = GetItemCooldown(wandID)
+						local wandSpeed = select(2, GetItemCooldown(wandID)) or 0
 						if wandSpeed < 1.5 then wandSpeed = 1.5 end
 						if name and (duration or 0) > wandSpeed then
 							found = true
@@ -610,7 +610,7 @@ if C["filger_spells"] and C["filger_spells"][T.class] then
 
 	for i = 1, #SpellGroups, 1 do
 		local data = SpellGroups[i].data
-		local frame = CreateFrame("Frame", "FilgerFrame"..i.."_"..data.Name, T_PetBattleFrameHider)
+		local frame = CreateFrame("Frame", "FilgerFrame"..i.."_"..data.Name, T_PetBattleFrameHider or UIParent)
 		frame.Id = i
 		frame.Name = data.Name
 		frame.Direction = data.Direction or "DOWN"
