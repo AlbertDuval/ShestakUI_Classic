@@ -1295,7 +1295,11 @@ if friends.enabled then
 			if b == "MiddleButton" then
 				ToggleIgnorePanel()
 			elseif b == "LeftButton" then
-				ToggleFriendsFrame(1)
+				if T.classic then
+					ToggleFrame(FriendsFrame)
+				else
+					ToggleFriendsFrame(1)
+				end
 			elseif b == "RightButton" then
 				HideTT(self)
 
@@ -1571,7 +1575,7 @@ end
 ----------------------------------------------------------------------------------------
 --	Talents
 ----------------------------------------------------------------------------------------
-if talents.enabled then
+if not T.classic and talents.enabled then
 	local lootSpecName, specName
 	local specList = {
 		{text = SPECIALIZATION, isTitle = true, notCheckable = true},
@@ -1590,11 +1594,7 @@ if talents.enabled then
 	}
 	Inject("Talents", {
 		OnLoad = function(self)
-			if not T.classic then
-				RegEvents(self, "PLAYER_ENTERING_WORLD PLAYER_TALENT_UPDATE PLAYER_LOOT_SPEC_UPDATED")
-			else
-				RegEvents(self, "PLAYER_ENTERING_WORLD CHARACTER_POINTS_CHANGED UNIT_INVENTORY_CHANGED UPDATE_BONUS_ACTIONBAR")
-			end
+			RegEvents(self, "PLAYER_ENTERING_WORLD PLAYER_TALENT_UPDATE PLAYER_LOOT_SPEC_UPDATED")
 		end,
 		OnEvent = function(self)
 			if UnitLevel(P) < SHOW_SPEC_LEVEL then
@@ -1602,53 +1602,32 @@ if talents.enabled then
 				return
 			end
 
-			local lootSpec
-			if not T.classic then
-				lootSpec = GetLootSpecialization()
-				lootSpecName = lootSpec and select(2, GetSpecializationInfoByID(lootSpec)) or NO
-			end
+			local lootSpec = GetLootSpecialization()
+			local spec = GetSpecialization()
 
-			local spec
-			if T.classic then
-				spec = T.GetSpecialization()
-				specName = spec and select(2, T.GetSpecializationInfo(spec)) or NO
-			else
-				spec = GetSpecialization()
-				specName = spec and select(2, GetSpecializationInfo(spec)) or NO
-			end
+			lootSpecName = lootSpec and select(2, GetSpecializationInfoByID(lootSpec)) or NO
+			specName = spec and select(2, GetSpecializationInfo(spec)) or NO
 
 			local specIcon, lootIcon = "", ""
 			local lootText = LOOT
 
-			local specTex
-			if T.classic then
-				specTex = select(4, T.GetSpecializationInfo(spec))
-			else
-				specTex = select(4, GetSpecializationInfo(spec))
-			end
-
+			local _, _, _, specTex = GetSpecializationInfo(spec)
 			if specTex then
 				specIcon = format("|T%s:14:14:0:0:64:64:5:59:5:59|t", specTex)
 			end
 
-			if not T.classic then
-				if lootSpec == 0 then
-					lootIcon = specIcon
-					lootText = "|cff55ff55"..lootText.."|r"
-					lootSpecName = "|cff55ff55"..specName.."|r"
-				else
-					local _, _, _, texture = GetSpecializationInfoByID(lootSpec)
-					if texture then
-						lootIcon = format("|T%s:14:14:0:0:64:64:5:59:5:59|t", texture)
-					end
+			if lootSpec == 0 then
+				lootIcon = specIcon
+				lootText = "|cff55ff55"..lootText.."|r"
+				lootSpecName = "|cff55ff55"..specName.."|r"
+			else
+				local _, _, _, texture = GetSpecializationInfoByID(lootSpec)
+				if texture then
+					lootIcon = format("|T%s:14:14:0:0:64:64:5:59:5:59|t", texture)
 				end
 			end
 
-			if not T.classic then
-				self.text:SetText(format("%s:%s  %s:%s", L_STATS_SPEC, specIcon, lootText, lootIcon))
-			else
-				self.text:SetText(format("%s:%s", L_STATS_SPEC, specIcon))
-			end
+			self.text:SetText(format("%s:%s  %s:%s", L_STATS_SPEC, specIcon, lootText, lootIcon))
 			if specIcon and C.font.stats_font_size ~= 15 and C.font.stats_font_size ~= 17 then
 				local point, relativeTo, relativePoint, xOfs = self.text:GetPoint()
 				self.text:SetPoint(point, relativeTo, relativePoint, xOfs, -1)
@@ -1662,16 +1641,10 @@ if talents.enabled then
 				GameTooltip:ClearAllPoints()
 				GameTooltip:SetPoint(modules.Talents.tip_anchor, modules.Talents.tip_frame, modules.Talents.tip_x, modules.Talents.tip_y)
 				GameTooltip:ClearLines()
-				if not T.classic then
-					GameTooltip:AddLine(SPECIALIZATION.."/"..LOOT, tthead.r, tthead.g, tthead.b)
-					GameTooltip:AddLine(" ")
-					GameTooltip:AddDoubleLine(SPECIALIZATION, specName, ttsubh.r, ttsubh.g, ttsubh.b, 1, 1, 1)
-					GameTooltip:AddDoubleLine(LOOT, lootSpecName, ttsubh.r, ttsubh.g, ttsubh.b, 1, 1, 1)
-				else
-					GameTooltip:AddLine(SPECIALIZATION, tthead.r, tthead.g, tthead.b)
-					GameTooltip:AddLine(" ")
-					GameTooltip:AddDoubleLine(SPECIALIZATION, specName, ttsubh.r, ttsubh.g, ttsubh.b, 1, 1, 1)
-				end
+				GameTooltip:AddLine(SPECIALIZATION.."/"..LOOT, tthead.r, tthead.g, tthead.b)
+				GameTooltip:AddLine(" ")
+				GameTooltip:AddDoubleLine(SPECIALIZATION, specName, ttsubh.r, ttsubh.g, ttsubh.b, 1, 1, 1)
+				GameTooltip:AddDoubleLine(LOOT, lootSpecName, ttsubh.r, ttsubh.g, ttsubh.b, 1, 1, 1)
 				GameTooltip:Show()
 			end
 		end,
@@ -1683,54 +1656,48 @@ if talents.enabled then
 				print("|cffffff00"..format(FEATURE_BECOMES_AVAILABLE_AT_LEVEL, SHOW_SPEC_LEVEL).."|r")
 				return
 			end
-			if not T.classic then
-				if b == "LeftButton" then
-					if not PlayerTalentFrame then
-						LoadAddOn("Blizzard_TalentUI")
-					end
-					if IsShiftKeyDown() then
-						ToggleTalentFrame()
-					else
-						for index = 1, 4 do
-							local id, name, _, texture = GetSpecializationInfo(index)
-							if id then
-								if GetSpecializationInfo(GetSpecialization()) == id then
-									name = "|cff55ff55"..name.."|r"
-								end
-								specList[index + 1].text = format("|T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59|t  %s", texture, name)
-								specList[index + 1].func = function() SetSpecialization(index) end
-							else
-								specList[index + 1] = nil
-							end
-						end
-						EasyMenu(specList, LSMenus, self, 0, 24, "MENU")
-					end
-				elseif b == "RightButton" and GetSpecialization() then
-					local lootSpec = GetLootSpecialization()
-					local _, specName = GetSpecializationInfo(GetSpecialization())
-					local specDefault = format(LOOT_SPECIALIZATION_DEFAULT, specName)
-					if lootSpec == 0 then
-						specDefault = "|cff55ff55"..format(LOOT_SPECIALIZATION_DEFAULT, specName).."|r"
-					end
-					lootList[2].text = specDefault
+			if b == "LeftButton" then
+				if not PlayerTalentFrame then
+					LoadAddOn("Blizzard_TalentUI")
+				end
+				if IsShiftKeyDown() then
+					PlayerTalentFrame_Toggle()
+				else
 					for index = 1, 4 do
 						local id, name, _, texture = GetSpecializationInfo(index)
 						if id then
-							if lootSpec == id then
+							if GetSpecializationInfo(GetSpecialization()) == id then
 								name = "|cff55ff55"..name.."|r"
 							end
-							lootList[index + 2].text = format("|T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59|t  %s", texture, name)
-							lootList[index + 2].func = function() SetLootSpecialization(id) end
+							specList[index + 1].text = format("|T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59|t  %s", texture, name)
+							specList[index + 1].func = function() SetSpecialization(index) end
 						else
-							lootList[index + 2] = nil
+							specList[index + 1] = nil
 						end
 					end
-					EasyMenu(lootList, LSMenus, self, 0, 40, "MENU")
+					EasyMenu(specList, LSMenus, self, 0, 24, "MENU")
 				end
-			else
-				if b == "LeftButton" then
-					ToggleTalentFrame()
+			elseif b == "RightButton" and GetSpecialization() then
+				local lootSpec = GetLootSpecialization()
+				local _, specName = GetSpecializationInfo(GetSpecialization())
+				local specDefault = format(LOOT_SPECIALIZATION_DEFAULT, specName)
+				if lootSpec == 0 then
+					specDefault = "|cff55ff55"..format(LOOT_SPECIALIZATION_DEFAULT, specName).."|r"
 				end
+				lootList[2].text = specDefault
+				for index = 1, 4 do
+					local id, name, _, texture = GetSpecializationInfo(index)
+					if id then
+						if lootSpec == id then
+							name = "|cff55ff55"..name.."|r"
+						end
+						lootList[index + 2].text = format("|T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59|t  %s", texture, name)
+						lootList[index + 2].func = function() SetLootSpecialization(id) end
+					else
+						lootList[index + 2] = nil
+					end
+				end
+				EasyMenu(lootList, LSMenus, self, 0, 40, "MENU")
 			end
 		end
 	})
@@ -1739,6 +1706,16 @@ end
 ----------------------------------------------------------------------------------------
 --	Character Stats
 ----------------------------------------------------------------------------------------
+local function IsWearingShield()
+	local slotID = GetInventorySlotInfo("SecondaryHandSlot")
+	local itemID = GetInventoryItemID('player', slotID)
+
+	if itemID then
+		local itemEquipLoc = select(9, GetItemInfo(itemID))
+		return itemEquipLoc == "INVTYPE_SHIELD"
+	end
+end
+
 if stats.enabled then
 	local function tags(sub)
 		local percent, string = true
@@ -1750,9 +1727,7 @@ if stats.enabled then
 			local range = RangedBase + RangedPosBuff + RangedNegBuff
 			local heal = GetSpellBonusHealing()
 			local spell
-			if not T.classic then
-				spell = GetSpellBonusDamage(7)
-			else
+			if T.classic then
 				local current = {}
 				local best = 1
 				for i = 1, 7 do
@@ -1762,6 +1737,8 @@ if stats.enabled then
 					end
 				end
 				spell = best
+			else
+				spell = GetSpellBonusDamage(7)
 			end
 			local attack = Effective
 			if heal > spell then
@@ -1777,22 +1754,107 @@ if stats.enabled then
 				value = power
 			end
 			string = value
-		elseif not T.classic and sub == "mastery" then
-			string = GetMasteryEffect()
+			if T.classic then
+				return format("%.0f", string)
+			end
+		elseif sub == "mastery" then
+			string = not T.classic and GetMasteryEffect() or 0
+		elseif sub == "hit" then
+			local value, physical, spell = 0, GetHitModifier(), GetSpellHitModifier()
+			if physical > spell then
+				value = physical
+			else
+				value = spell
+			end
+			string = value
 		elseif sub == "haste" then
 			string = GetHaste()
-		elseif not T.classic and sub == "resilience" then
-			string, percent = GetCombatRating(16)
+		elseif sub == "resilience" then
+			string, percent = not T.classic and GetCombatRating(16) or 0
 		elseif sub == "crit" then
-			string = GetCritChance()
+			if T.classic then
+				local value, crit
+				local melee, ranged = GetCritChance(), GetRangedCritChance()
+				local spell
+				local current = {}
+				local best = 1
+				for i = 1, 7 do
+					current[i] = GetSpellCritChance(i)
+					if current[i] > current[best] then
+						best = i
+					end
+					spell = best
+				end
+				crit = spell
+				if melee > crit and T.class ~= "HUNTER" then
+					value = melee
+				elseif T.class == "HUNTER" then
+					value = ranged
+				else
+					value = crit
+				end
+				string = value
+			else
+				string = GetCritChance()
+			end
 		elseif sub == "dodge" then
 			string = GetDodgeChance()
 		elseif sub == "parry" then
-			string = GetParryChance()
+			if T.class == "DRUID" and GetBonusBarOffset() == 3 then
+				string = 0
+			else
+				string = GetParryChance()
+			end
 		elseif sub == "block" then
-			string = GetBlockChance()
+			string = IsWearingShield() and GetBlockChance() or 0
 		elseif sub == "avoidance" then
-			string = GetDodgeChance() + GetParryChance()
+			if T.classic then
+				local targetLevel, playerLevel, levelDiff = UnitLevel("target"), T.level, 0
+				local dodge, parry, block = GetDodgeChance(), GetParryChance(), GetBlockChance()
+				local baseMissChance = T.race == "NightElf" and 7 or 5
+
+				if targetLevel == -1 then
+					levelDiff = 3
+				elseif targetLevel > playerLevel then
+					levelDiff = (targetLevel - playerLevel)
+				elseif targetLevel < playerLevel and targetLevel > 0 then
+					levelDiff = (targetLevel - playerLevel)
+				else
+					levelDiff = 0
+				end
+
+				if levelDiff >= 0 then
+					dodge = dodge - levelDiff * 1.5
+					parry = parry - levelDiff * 1.5
+					block = block - levelDiff * 1.5
+					baseMissChance = baseMissChance - levelDiff * 1.5
+				else
+					dodge = dodge + abs(levelDiff * 1.5)
+					parry = parry + abs(levelDiff * 1.5)
+					block = block + abs(levelDiff * 1.5)
+					baseMissChance = baseMissChance + abs(levelDiff * 1.5)
+				end
+
+				if dodge <= 0 then dodge = 0 end
+				if parry <= 0 then parry = 0 end
+				if block <= 0 then block = 0 end
+
+				if T.class == "DRUID" and GetBonusBarOffset() == 3 then
+					parry = 0
+				end
+
+				if not IsWearingShield() then
+					block = 0
+				end
+
+				local avoided = dodge + parry + baseMissChance
+				local blocked = (100 - avoided) * block / 100
+				local avoidance = avoided + blocked
+
+				string = avoidance
+			else
+				string = GetDodgeChance() + GetParryChance()
+			end
 		elseif sub == "manaregen" then
 			local I5SR = true
 			if T.class == "ROGUE" or T.class == "WARRIOR" or T.class == "DEATHKNIGHT" then
@@ -1804,10 +1866,10 @@ if stats.enabled then
 		elseif sub == "armor" then
 			local _, eff = UnitArmor(P)
 			string, percent = eff
-		elseif not T.classic and sub == "versatility" then
-			string = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) + GetVersatilityBonus(CR_VERSATILITY_DAMAGE_DONE)
-		elseif not T.classic and sub == "leech" then
-			string = GetCombatRating(17)
+		elseif sub == "versatility" then
+			string = not T.classic and GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) + GetVersatilityBonus(CR_VERSATILITY_DAMAGE_DONE) or 0
+		elseif sub == "leech" then
+			string = not T.classic and GetCombatRating(17) or 0
 		else
 			string, percent = format("[%s]", sub)
 		end
@@ -1816,7 +1878,7 @@ if stats.enabled then
 	end
 	Inject("Stats", {
 		OnLoad = function(self)
-			RegEvents(self, "PLAYER_LOGIN UNIT_STATS UNIT_DAMAGE UNIT_RANGEDDAMAGE PLAYER_DAMAGE_DONE_MODS UNIT_ATTACK_SPEED UNIT_ATTACK_POWER UNIT_RANGED_ATTACK_POWER")
+			RegEvents(self, "PLAYER_LOGIN PLAYER_TARGET_CHANGED PLAYER_EQUIPMENT_CHANGED UNIT_STATS UNIT_AURA UNIT_DAMAGE UNIT_RANGEDDAMAGE PLAYER_DAMAGE_DONE_MODS UNIT_ATTACK_SPEED UNIT_ATTACK_POWER UNIT_RANGED_ATTACK_POWER")
 		end,
 		OnEvent = function(self) self.fired = true end,
 		OnUpdate = function(self, u)
