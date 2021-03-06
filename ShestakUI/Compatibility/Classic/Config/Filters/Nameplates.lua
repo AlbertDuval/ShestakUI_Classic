@@ -35,6 +35,7 @@ T.DebuffWhiteList = {
 	[SpellName(9005)] = true,	-- Pounce
 	[SpellName(9007)] = true,	-- Pounce Bleed
 	[SpellName(1822)] = true,	-- Rake
+	[SpellName(1079)] = true,	-- Rip
 	[SpellName(2908)] = true,	-- Soothe Animal
 
 	-- Hunter
@@ -193,6 +194,10 @@ T.DebuffWhiteList = {
 	-- Racial
 	[SpellName(20549)] = true,	-- War Stomp
 }
+
+for _, spell in pairs(C.nameplate.debuffs_list) do
+	T.DebuffWhiteList[SpellName(spell)] = true
+end
 
 T.DebuffBlackList = {
 	-- [SpellName(spellID)] = true,	-- Spell Name
@@ -399,6 +404,10 @@ T.BuffWhiteList = {
 	[SpellName(20594)] = true,	-- Stoneform
 	[SpellName(7744)] = true,	-- Will of the Forsaken
 }
+
+for _, spell in pairs(C.nameplate.buffs_list) do
+	T.BuffWhiteList[SpellName(spell)] = true
+end
 
 T.BuffBlackList = {
 	-- [SpellName(spellID)] = true,	-- Spell Name

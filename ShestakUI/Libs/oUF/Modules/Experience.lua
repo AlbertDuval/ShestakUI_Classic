@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(select(2, ...))
 if C.unitframe.enable ~= true or C.unitframe.plugins_experience_bar ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -33,19 +33,14 @@ local function IsPlayerMaxHonorLevel()
 end
 
 local function ShouldShowHonor()
-	if(not oUF:IsClassic()) then
-		return IsPlayerMaxLevel() and (IsWatchingHonorAsXP() or InActiveBattlefield() or IsInActiveWorldPVP())
-	else
-		return false
-	end
+	return IsPlayerMaxLevel() and (IsWatchingHonorAsXP() or C_PvP.IsActiveBattlefield() or IsInActiveWorldPVP())
 end
 
 local function GetValues()
-	local isHonor = ShouldShowHonor()
+	local isHonor = not oUF:IsClassic() and ShouldShowHonor()
 	local cur = (isHonor and UnitHonor or UnitXP)('player')
 	local max = (isHonor and UnitHonorMax or UnitXPMax)('player')
 	local level = (isHonor and UnitHonorLevel or UnitLevel)('player')
-
 	local rested = not isHonor and (GetXPExhaustion() or 0) or 0
 
 	local perc = math_floor(cur / max * 100 + 0.5)
@@ -55,7 +50,7 @@ local function GetValues()
 end
 
 -- Changed tooltip for ShestakUI
-local function UpdateTooltip(element)
+local function UpdateTooltip()
 	local cur, max, perc, rested, restedPerc, level, isHonor = GetValues()
 
 	GameTooltip:SetText(isHonor and HONOR_LEVEL_LABEL:format(level) or COMBAT_XP_GAIN.." "..format(LEVEL_GAINED, T.level), 0.40, 0.78, 1)
@@ -85,16 +80,16 @@ local function OnMouseUp(element, btn)
 	if btn == "MiddleButton" then
 		if element.outAlpha == 0 then
 			element.outAlpha = 1
-			SavedOptions.Experience = true
+			ShestakUISettings.Experience = true
 		else
 			element.outAlpha = 0
-			SavedOptions.Experience = false
+			ShestakUISettings.Experience = false
 		end
 	end
 end
 
 local function CheckAlpha(element)
-	if SavedOptions and SavedOptions.Experience == true then
+	if ShestakUISettings and ShestakUISettings.Experience == true then
 		element.outAlpha = 1
 		element:SetAlpha(element.outAlpha or 1)
 	end
@@ -226,14 +221,13 @@ local function Enable(self, unit)
 		element.restedAlpha = element.restedAlpha or 0.15
 
 		self:RegisterEvent('PLAYER_LEVEL_UP', VisibilityPath, true)
-		if(not oUF:IsClassic()) then
-			self:RegisterEvent('HONOR_LEVEL_UPDATE', VisibilityPath, true)
-		end
 		self:RegisterEvent('DISABLE_XP_GAIN', VisibilityPath, true)
 		self:RegisterEvent('ENABLE_XP_GAIN', VisibilityPath, true)
 		self:RegisterEvent('UPDATE_EXPANSION_LEVEL', VisibilityPath, true)
 
 		if(not oUF:IsClassic()) then
+			self:RegisterEvent('HONOR_LEVEL_UPDATE', VisibilityPath, true)
+
 			hooksecurefunc('SetWatchingHonorAsXP', function()
 				if(self:IsElementEnabled('Experience')) then
 					VisibilityPath(self, 'SetWatchingHonorAsXP', 'player')

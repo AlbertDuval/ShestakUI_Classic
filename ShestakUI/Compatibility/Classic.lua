@@ -9,11 +9,16 @@ local hasShown = false
 local PvPMessage = CreateFrame("Frame")
 PvPMessage:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
 PvPMessage:SetScript("OnEvent", function()
-	if not hasShown and StaticPopup_Visible("CONFIRM_BATTLEFIELD_ENTRY") then
-		hasShown = true
-		print("|cffffff00".."There is an issue with entering BGs from the StaticPopupDialog. Please enter by right clicking the minimap icon.".."|r")
-	else
-		hasShown = false
+	for i = 1, MAX_BATTLEFIELD_QUEUES do
+		local status = GetBattlefieldStatus(i)
+		if status == "confirm" then
+			if not hasShown and StaticPopup_Visible("CONFIRM_BATTLEFIELD_ENTRY") then
+				hasShown = true
+				print("|cffffff00".."There is an issue with entering BGs from the StaticPopupDialog in WoW Classic. Please enter by right clicking the minimap icon.".."|r")
+			else
+				hasShown = false
+			end
+		end
 	end
 end)
 
@@ -34,7 +39,7 @@ LibClassicDurations:Register("ShestakUI")
 RAID_CLASS_COLORS.SHAMAN.r = 0
 RAID_CLASS_COLORS.SHAMAN.g = 0.44
 RAID_CLASS_COLORS.SHAMAN.b = 0.87
-RAID_CLASS_COLORS.SHAMAN.colorStr = "0070de"
+RAID_CLASS_COLORS.SHAMAN.colorStr = "ff0070de"
 
 ----------------------------------------------------------------------------------------
 --	Specialization Functions
@@ -286,23 +291,17 @@ end
 ----------------------------------------------------------------------------------------
 --	Threat Functions
 ----------------------------------------------------------------------------------------
-local ThreatLib = LibStub:GetLibrary("ThreatClassic-1.0")
-if not ThreatLib then return end
-
-local ThreatFrame = CreateFrame("Frame")
-
-ThreatLib.RegisterCallback(ThreatFrame, "Activate", T.dummy)
-ThreatLib.RegisterCallback(ThreatFrame, "Deactivate", T.dummy)
-ThreatLib:RequestActiveOnSolo(true)
+local threatColors = {
+	[0] = {0.69, 0.69, 0.69},
+	[1] = {1, 1, 0.47},
+	[2] = {1, 0.6, 0},
+	[3] = {1, 0, 0}
+}
 
 GetThreatStatusColor = _G.GetThreatStatusColor or function(statusIndex)
-	return ThreatLib:GetThreatStatusColor(statusIndex)
-end
+	if not (type(statusIndex) == "number" and statusIndex >= 0 and statusIndex < 4) then
+		statusIndex = 0
+	end
 
-UnitDetailedThreatSituation = _G.UnitDetailedThreatSituation or function(unit, target)
-	return ThreatLib:UnitDetailedThreatSituation(unit, target)
-end
-
-UnitThreatSituation = _G.UnitThreatSituation or function(unit, target)
-	return ThreatLib:UnitThreatSituation(unit, target)
+	return threatColors[statusIndex][1], threatColors[statusIndex][2], threatColors[statusIndex][3]
 end

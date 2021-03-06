@@ -7,7 +7,7 @@ if C.unitframe.enable ~= true and C.nameplate.enable ~= true then return end
 local _, ns = ...
 local oUF = ns.oUF
 
-oUF.Tags.Methods["Threat"] = function(unit)
+oUF.Tags.Methods["Threat"] = function()
 	local _, status, percent = UnitDetailedThreatSituation("player", "target")
 	if percent and percent > 0 then
 		return ("%s%d%%|r"):format(Hex(GetThreatStatusColor(status)), percent)
@@ -28,7 +28,7 @@ oUF.Tags.Methods["DiffColor"] = function(unit)
 			r, g, b = 0.71, 0.43, 0.27
 		elseif DiffColor >= -2 then
 			r, g, b = 0.84, 0.75, 0.65
-		elseif -DiffColor <= GetQuestGreenRange() then
+		elseif (T.classic and -DiffColor <= GetQuestGreenRange()) or -DiffColor <= 5 then
 			r, g, b = 0.33, 0.59, 0.33
 		else
 			r, g, b = 0.55, 0.57, 0.61
@@ -38,7 +38,7 @@ oUF.Tags.Methods["DiffColor"] = function(unit)
 end
 oUF.Tags.Events["DiffColor"] = "UNIT_LEVEL"
 
-oUF.Tags.Methods["PetNameColor"] = function(unit)
+oUF.Tags.Methods["PetNameColor"] = function()
 	if T.classic and T.class == "HUNTER" and C.unitframe.bar_color_happiness then
 		local mood = GetPetHappiness()
 		if mood then
@@ -123,21 +123,13 @@ oUF.Tags.Methods["AltPower"] = function(unit)
 end
 oUF.Tags.Events["AltPower"] = "UNIT_POWER_UPDATE"
 
-oUF.Tags.Methods["IncHeal"] = function(unit)
-	local incheal = UnitGetIncomingHeals(unit) or 0
-	local player = UnitGetIncomingHeals(unit, "player") or 0
-	incheal = incheal - player
-	if incheal > 0 then
-		return "|cff00FF00+"..T.ShortValue(incheal).."|r"
-	end
-end
-oUF.Tags.Events["IncHeal"] = "UNIT_HEAL_PREDICTION"
-
 oUF.Tags.Methods["NameplateLevel"] = function(unit)
 	local level = UnitLevel(unit)
 	local c = UnitClassification(unit)
-	if not T.classic and (UnitIsWildBattlePet(unit) or UnitIsBattlePetCompanion(unit)) then
-		level = UnitBattlePetLevel(unit)
+	if not T.classic then
+		if UnitIsWildBattlePet(unit) or UnitIsBattlePetCompanion(unit) then
+			level = UnitBattlePetLevel(unit)
+		end
 	end
 
 	if level == T.level and c == "normal" then return end
@@ -152,8 +144,12 @@ oUF.Tags.Events["NameplateLevel"] = "UNIT_LEVEL PLAYER_LEVEL_UP"
 oUF.Tags.Methods["NameplateNameColor"] = function(unit)
 	local reaction = UnitReaction(unit, "player")
 	if not UnitIsUnit("player", unit) and UnitIsPlayer(unit) and (reaction and reaction >= 5) then
-		local c = T.oUF_colors.power["MANA"]
-		return string.format("|cff%02x%02x%02x", c[1] * 255, c[2] * 255, c[3] * 255)
+		if C.nameplate.only_name then
+			return _TAGS["raidcolor"](unit)
+		else
+			local c = T.oUF_colors.power["MANA"]
+			return string.format("|cff%02x%02x%02x", c[1] * 255, c[2] * 255, c[3] * 255)
+		end
 	elseif UnitIsPlayer(unit) then
 		return _TAGS["raidcolor"](unit)
 	elseif reaction then
@@ -170,79 +166,22 @@ oUF.Tags.Methods["NameplateHealth"] = function(unit)
 	local hp = UnitHealth(unit)
 	local maxhp = UnitHealthMax(unit)
 
-	if T.classic and IsAddOnLoaded("RealMobHealth") then
-		local hpRMH, maxhpRMH = RealMobHealth.GetUnitHealth(unit, true)
-
-		if hpRMH and maxhpRMH then
-			hp, maxhp = hpRMH, maxhpRMH
-		end
-	end
-
 	if maxhp == 0 then
 		return 0
 	else
 		return ("%s - %d%%"):format(T.ShortValue(hp), hp / maxhp * 100 + 0.5)
 	end
 end
-oUF.Tags.Events["NameplateHealth"] = "UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH NAME_PLATE_UNIT_ADDED"
+if not T.classic then
+	oUF.Tags.Events["NameplateHealth"] = "UNIT_HEALTH UNIT_MAXHEALTH NAME_PLATE_UNIT_ADDED"
+else
+	oUF.Tags.Events["NameplateHealth"] = "UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH NAME_PLATE_UNIT_ADDED"
+end
 
 oUF.Tags.Methods["Absorbs"] = function(unit)
-    local absorb = UnitGetTotalAbsorbs(unit)
-    if absorb and absorb > 0 then
-        return T.ShortValue(absorb)
-    end
+	local absorb = UnitGetTotalAbsorbs(unit)
+	if absorb and absorb > 0 then
+		return T.ShortValue(absorb)
+	end
 end
 oUF.Tags.Events["Absorbs"] = "UNIT_ABSORB_AMOUNT_CHANGED"
-
-if T.classic and IsAddOnLoaded("RealMobHealth") then
-	oUF.Tags.Methods["curhp"] = function(unit)
-		local hp = UnitHealth(unit)
-		local hpRMH = RealMobHealth.GetUnitHealth(unit, true)
-
-		hp = hpRMH or hp
-
-		return hp
-	end
-	oUF.Tags.Events["curhp"] = "UNIT_HEALTH UNIT_MAXHEALTH"
-
-	oUF.Tags.Methods["maxhp"] = function(unit)
-		local maxhp = UnitHealthMax(unit)
-		local _, maxhpRMH = RealMobHealth.GetUnitHealth(unit, true)
-
-		maxhp = maxhpRMH or maxhp
-
-		return maxhp
-	end
-	oUF.Tags.Events["maxhp"] = "UNIT_MAXHEALTH"
-
-	oUF.Tags.Methods["missinghp"] = function(unit)
-		local hp, maxhp = UnitHealth(unit), UnitHealthMax(unit)
-		local hpRMH, maxhpRMH = RealMobHealth.GetUnitHealth(unit, true)
-
-		if hpRMH and maxhpRMH then
-			hp, maxhp = hpRMH, maxhpRMH
-		end
-
-		local current = maxhp - hp
-		if current > 0 then
-			return current
-		end
-	end
-	oUF.Tags.Events["missinghp"] = "UNIT_HEALTH UNIT_MAXHEALTH"
-
-	oUF.Tags.Methods["perhp"] = function(unit)
-		local hp, maxhp = UnitHealth(unit), UnitHealthMax(unit)
-		local hpRMH, maxhpRMH = RealMobHealth.GetUnitHealth(unit, true)
-
-		if hpRMH and maxhpRMH then
-			hp, maxhp = hpRMH, maxhpRMH
-		end
-
-		if maxhp == 0 then
-			return 0
-		else
-			return math.floor(hp / maxhp * 100 + 0.5)
-		end
-	end
-	oUF.Tags.Events["perhp"] = "UNIT_HEALTH UNIT_MAXHEALTH"
-end
