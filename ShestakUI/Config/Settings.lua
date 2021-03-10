@@ -47,9 +47,9 @@ C["general"] = {
 --	Skins options
 ----------------------------------------------------------------------------------------
 C["skins"] = {
-	["blizzard_frames"] = false,				-- Blizzard frames skin
+	["blizzard_frames"] = true,				-- Blizzard frames skin
 	["bubbles"] = true,							-- Skin Blizzard chat bubbles
-	["minimap_buttons"] = false,				-- Skin addons icons on minimap
+	["minimap_buttons"] = true,				-- Skin addons icons on minimap
 	["minimap_buttons_mouseover"] = true,		-- Addons icons on mouseover
 	-- Addons
 	["ace3"] = false,							-- Ace3 options elements skin
@@ -59,7 +59,7 @@ C["skins"] = {
 	["capping"] = false,						-- Capping skin
 	["clique"] = false,							-- Clique skin
 	["cool_line"] = false,						-- CoolLine skin
-	["dbm"] = false,							-- DBM skin
+	["dbm"] = true,							-- DBM skin
 	["dbm_movable"] = false,					-- Allow to move DBM bars
 	["details"] = false,						-- Details skin
 	["dominos"] = false,						-- Dominos skin
