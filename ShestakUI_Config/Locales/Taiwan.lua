@@ -72,6 +72,7 @@ L.font_subheader_bag = "背包"
 L.font_subheader_blizzard = "系統"
 L.font_tooltip_header_font_size = "滑鼠提示標題"
 L.font_tooltip_font_size = "滑鼠提示信息"
+L.font_global_font = "禁用像素字體"
 
 -- Skins options
 L_GUI_SKINS = "界面美化"
@@ -143,8 +144,8 @@ L.unitframe_extra_height_auto = "血量/能量框架自動增高"
 L.unitframe_extra_height_auto_desc = "按字體大小智能調節框架高度"
 L.unitframe_extra_health_height = "血量框架額外增高"
 L.unitframe_extra_power_height = "能量框架額外增高"
-L.unitframe_subheader_castbar = "Size of player and target castbar" -- Need review
-L.unitframe_castbar_height = "Height" -- Need review
+L.unitframe_subheader_castbar = "玩家/目標施法條大小"
+L.unitframe_castbar_height = "高度"
 
 -- Unit Frames Class bar options
 L_GUI_UF_PLUGINS_CLASS_BAR = "職業資源欄"
@@ -167,6 +168,8 @@ L_GUI_UF_AGGRO_BORDER = "邊框按仇恨值著色"
 L_GUI_UF_DEFICIT_HEALTH = "團隊生命值虧減模式"
 L_GUI_UF_SHOW_PARTY = "隊伍框架"
 L_GUI_UF_SHOW_RAID = "團隊框架"
+L.raidframe_show_target = "目標框架"
+L.raidframe_show_pet = "寵物框架"
 L.raidframe_vertical_health = "垂直顯示團隊框架生命值"
 L.raidframe_vertical_health_desc = "僅在HPS佈局中生效"
 L_GUI_UF_ALPHA_HEALTH = "滿血時淡化單位框架"
@@ -322,11 +325,14 @@ L_GUI_NAMEPLATE_HEALER_ICON = "戰場中顯示治療職業圖標"
 L_GUI_NAMEPLATE_TOTEM_ICONS = "顯示敵對圖騰圖標"
 L.nameplate_target_glow = "目標邊框高亮"
 L.nameplate_only_name = "友方玩家只顯示名稱"
+L.nameplate_low_health_value = "Health value" -- Need review
+L.nameplate_low_health = "Low health highlight" -- Need review
 L_GUI_NAMEPLATE_THREAT = "仇恨情況"
 L_GUI_NAMEPLATE_GOOD_COLOR = "安全仇恨顏色"
 L_GUI_NAMEPLATE_NEAR_COLOR = "臨界仇恨顏色"
 L_GUI_NAMEPLATE_BAD_COLOR = "危險仇恨顏色"
 L_GUI_NAMEPLATE_OFFTANK_COLOR = "副坦仇恨顏色"
+L.nameplate_extra_color = "Explosive and Spiteful affix color" -- Need review
 
 -- Combat text options
 L_GUI_COMBATTEXT = "戰鬥文字"
@@ -338,6 +344,7 @@ L.combattext_damage_style = "改變默認的顯示風格"
 L.combattext_damage_style_desc = "改變模型頂部/玩家頭像的傷害/治療字體"
 L_GUI_COMBATTEXT_DAMAGE = "獨立顯示傷害輸出"
 L_GUI_COMBATTEXT_HEALING = "獨立顯示治療輸出"
+L.combattext_incoming = "Show incoming damage and healing" -- Need review
 L_GUI_COMBATTEXT_HOTS = "Hot造成的治療"
 L_GUI_COMBATTEXT_OVERHEALING = "過量治療輸出"
 L_GUI_COMBATTEXT_PET_DAMAGE = "寵物傷害輸出"

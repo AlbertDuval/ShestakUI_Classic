@@ -1,8 +1,10 @@
-## Interface: 11306
+## Interface: 20501
 ## Title: ShestakUI (Classic) Config
 ## Notes: In-game configuration for ShestakUI
 ## Author: Shestak
-## Version: 1.03
+## Version: 1.05
+## X-Curse-Project-ID:
+## X-WoWI-ID: 25916
 ## RequiredDeps: ShestakUI
 ## SavedVariables: ShestakUIOptionsGlobal, ShestakUIOptions
 ## SavedVariablesPerCharacter: ShestakUIOptionsPerChar

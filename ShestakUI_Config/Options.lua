@@ -10,6 +10,10 @@ local function IsClassicBuild()
 	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
 end
 
+local function IsBCCBuild()
+	return IsClassicBuild() and select(4, GetBuildInfo() > 20500)
+end
+
 local function HideOptions(list)
 	for i = 1, #list do
 		local frame = list[i]
@@ -248,7 +252,7 @@ SpellList.makeSpellsList = function(_, db, double)
 			if not isFilger or isFilger and spell[2] == T.class then
 				local sp = (double or ShestakUIOptionsPanelfilger:IsShown()) and spell[1] or spell
 				local name, _, icon = GetSpellInfo(sp)
-				local bf = _G["SpellList"..i.."_cbs"] or CreateFrame("Button", "SpellList"..i.."_cbs", scroll, not IsClassicBuild() and "BackdropTemplate" or nil)
+				local bf = _G["SpellList"..i.."_cbs"] or CreateFrame("Button", "SpellList"..i.."_cbs", scroll, (not IsClassicBuild() or IsBCCBuild()) and "BackdropTemplate" or nil)
 
 				if i == 1 then
 					bf:SetPoint("TOPLEFT", scroll, "TOPLEFT", 10, -5)
@@ -762,6 +766,9 @@ do
 
 	local cooldown_timers_font_shadow = ns.CreateCheckBox(parent, "cooldown_timers_font_shadow", L.font_stats_font_shadow)
 	cooldown_timers_font_shadow:SetPoint("LEFT", cooldown_timers_font_size, "RIGHT", 160, 0)
+
+	local global_font = ns.CreateCheckBox(parent, "global_font")
+	global_font:SetPoint("TOPLEFT", cooldown_timers_font_size, "BOTTOMLEFT", 0, -30)
 
 	-- Panel 2
 	local parent = ShestakUIOptionsPanel.font2
@@ -1392,8 +1399,14 @@ do
 	local show_raid = ns.CreateCheckBox(parent, "show_raid", L_GUI_UF_SHOW_RAID)
 	show_raid:SetPoint("LEFT", show_party, "RIGHT", 248, 0)
 
+	local show_target = ns.CreateCheckBox(parent, "show_target")
+	show_target:SetPoint("TOPLEFT", show_party, "BOTTOMLEFT", 0, 0)
+
+	local show_pet = ns.CreateCheckBox(parent, "show_pet")
+	show_pet:SetPoint("LEFT", show_target, "RIGHT", 248, 0)
+
 	local raid_tanks = ns.CreateCheckBox(parent, "raid_tanks", L_GUI_UF_SHOW_TANK)
-	raid_tanks:SetPoint("TOPLEFT", show_party, "BOTTOMLEFT", 0, 0)
+	raid_tanks:SetPoint("TOPLEFT", show_target, "BOTTOMLEFT", 0, 0)
 
 	local raid_tanks_tt = ns.CreateCheckBox(parent, "raid_tanks_tt", L_GUI_UF_SHOW_TANK_TT)
 	raid_tanks_tt:SetPoint("LEFT", raid_tanks, "RIGHT", 248, 0)
@@ -1402,10 +1415,10 @@ do
 	solo_mode:SetPoint("TOPLEFT", raid_tanks, "BOTTOMLEFT", 0, 0)
 
 	local player_in_party = ns.CreateCheckBox(parent, "player_in_party", L_GUI_UF_PLAYER_PARTY)
-	player_in_party:SetPoint("TOPLEFT", solo_mode, "BOTTOMLEFT", 0, 0)
+	player_in_party:SetPoint("LEFT", solo_mode, "RIGHT", 248, 0)
 
 	local raid_groups = ns.CreateNumberSlider(parent, "raid_groups", nil, nil, 1, 8, 1, true, L_GUI_UF_RAID_GROUP)
-	raid_groups:SetPoint("TOPLEFT", player_in_party, "BOTTOMLEFT", 0, -20)
+	raid_groups:SetPoint("TOPLEFT", solo_mode, "BOTTOMLEFT", 0, -20)
 
 	local auto_position = ns.CreateDropDown(parent, "auto_position", true, L.raidframe_auto_position, {"DYNAMIC", "STATIC", "NONE"})
 	auto_position:SetPoint("TOPLEFT", raid_groups, "BOTTOMLEFT", -16, -10)
@@ -2083,6 +2096,12 @@ do
 	local only_name = ns.CreateCheckBox(parent, "only_name")
 	only_name:SetPoint("TOPLEFT", target_glow, "BOTTOMLEFT", 0, 0)
 
+	local low_health_value = ns.CreateNumberSlider(parent, "low_health_value", nil, nil, 0.1, 1, 0.05, true)
+	low_health_value:SetPoint("TOPLEFT", only_name, "BOTTOMLEFT", 0, -20)
+
+	local low_health = ns.CreateCheckBox(parent, "low_health")
+	low_health:SetPoint("LEFT", low_health_value, "RIGHT", 70, 0)
+
 	-- Panel 2
 	local parent = ShestakUIOptionsPanel.nameplate2
 
@@ -2100,6 +2119,9 @@ do
 
 	local offtank_color = ns.CreateColourPicker(parent, "offtank_color", true, L_GUI_NAMEPLATE_OFFTANK_COLOR)
 	offtank_color:SetPoint("TOPLEFT", bad_color, "BOTTOMLEFT", 0, -8)
+
+	local extra_color = ns.CreateColourPicker(parent, "extra_color", true)
+	extra_color:SetPoint("TOPLEFT", offtank_color, "BOTTOMLEFT", 0, -8)
 
 	local classic = {
 		distance, -- broken in Classic
@@ -2132,8 +2154,11 @@ do
 	local healing = ns.CreateCheckBox(parent, "healing", L_GUI_COMBATTEXT_HEALING)
 	healing:SetPoint("TOPLEFT", damage, "BOTTOMLEFT", 0, 0)
 
+	local incoming = ns.CreateCheckBox(parent, "incoming", L.combattext_incoming)
+	incoming:SetPoint("TOPLEFT", healing, "BOTTOMLEFT", 0, 0)
+
 	local show_hots = ns.CreateCheckBox(parent, "show_hots", L_GUI_COMBATTEXT_HOTS)
-	show_hots:SetPoint("TOPLEFT", healing, "BOTTOMLEFT", 0, 0)
+	show_hots:SetPoint("TOPLEFT", incoming, "BOTTOMLEFT", 0, 0)
 
 	local show_overhealing = ns.CreateCheckBox(parent, "show_overhealing", L_GUI_COMBATTEXT_OVERHEALING)
 	show_overhealing:SetPoint("TOPLEFT", show_hots, "BOTTOMLEFT", 0, 0)

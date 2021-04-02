@@ -1341,11 +1341,14 @@ function Stuffing:ADDON_LOADED(addon)
 	CloseBackpack = Stuffing_Close
 
 	OpenAllBagsMatchingContext = function()
+		local count = 0
 		for i = 0, NUM_BAG_FRAMES do
 			if ItemButtonUtil.GetItemContextMatchResultForContainer(i) == ItemButtonUtil.ItemContextMatchResult.Match then
 				Stuffing_Open()
+				count = count + 1
 			end
 		end
+		return count
 	end
 
 	BankFrame:UnregisterAllEvents()
@@ -1832,7 +1835,7 @@ function Stuffing.Menu(self, level)
 
 	if T.classic then
 		wipe(info)
-		info.text = "Show Keyring" --TODO: L_BAG_SHOW_KEYRING
+		info.text = L_BAG_SHOW_KEYRING
 		info.notCheckable = 1
 		info.func = function()
 			if InCombatLockdown() then
@@ -1869,5 +1872,4 @@ StaticPopupDialogs.BUY_BANK_SLOT = {
 -- Kill Blizzard functions
 LootWonAlertFrame_OnClick = T.dummy
 LootUpgradeFrame_OnClick = T.dummy
-StorePurchaseAlertFrame_OnClick = T.dummy
 LegendaryItemAlertFrame_OnClick = T.dummy

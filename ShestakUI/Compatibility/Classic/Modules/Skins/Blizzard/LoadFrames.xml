@@ -1,13 +1,14 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Others.lua"/>
+	<Script file="AddonList.lua"/>
 	<Script file="Auction.lua"/>
 	<Script file="Character.lua"/>
 	<Script file="ChatConfig.lua"/>
 	<Script file="Communities.lua"/>
-	<Script file="Container.lua"/>			<!-- TODO -->
+	<Script file="Container.lua"/>
 	<Script file="DressUp.lua"/>
 	<Script file="Friends.lua"/>
-	<Script file="Gossip.lua"/>
+	<Script file="Gossip.lua"/>				<!-- TODO -->
 	<Script file="GuildRegistrar.lua"/>
 	<Script file="Inspect.lua"/>
 	<Script file="Interface.lua"/>
@@ -15,7 +16,7 @@
 	<Script file="Options.lua"/>
 	<Script file="Petition.lua"/>
 	<Script file="PetStable.lua"/>
-	<Script file="Quest.lua"/>
+	<Script file="Quest.lua"/>				<!-- TODO -->
 	<Script file="QuestLog.lua"/>
 	<Script file="SpellBook.lua"/>
 	<Script file="Tabard.lua"/>

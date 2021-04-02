@@ -72,6 +72,7 @@ L.font_subheader_bag = "Bags font" -- Need review
 L.font_subheader_blizzard = "System font size" -- Need review
 L.font_tooltip_header_font_size = "Tooltip header" -- Need review
 L.font_tooltip_font_size = "Tooltip text" -- Need review
+L.font_global_font = "Disable Pixel font" -- Need review
 
 -- Skins options
 L_GUI_SKINS = "Estilización"
@@ -167,6 +168,8 @@ L_GUI_UF_AGGRO_BORDER = "Borde de aggro"
 L_GUI_UF_DEFICIT_HEALTH = "Déficit de vida de la banda"
 L_GUI_UF_SHOW_PARTY = "Mostrar marcos de grupo en la banda"
 L_GUI_UF_SHOW_RAID = "Mostrar marcos de banda"
+L.raidframe_show_target = "Show target frames" -- Needs review
+L.raidframe_show_pet = "Show pet frames" -- Needs review
 L.raidframe_vertical_health = "Orientación vertical de la vida"
 L.raidframe_vertical_health_desc = "Only for heal layout" -- Needs review
 L_GUI_UF_ALPHA_HEALTH = "Opacidad de las barras de vida cuando están al 100%"
@@ -322,11 +325,14 @@ L_GUI_NAMEPLATE_HEALER_ICON = "Show icon above enemy healers nameplate in battle
 L_GUI_NAMEPLATE_TOTEM_ICONS = "Show icon above enemy totems nameplate" -- Need review
 L.nameplate_target_glow = "Show glow texture for target" -- Need review
 L.nameplate_only_name = "Show only name for friendly units" -- Need review
+L.nameplate_low_health_value = "Health value" -- Need review
+L.nameplate_low_health = "Low health highlight" -- Need review
 L_GUI_NAMEPLATE_THREAT = "Activar visor de amenaza, cambia automáticamente según tu rol"
 L_GUI_NAMEPLATE_GOOD_COLOR = "Color de alta amenaza, varía dependiendo si eres tanque o dps/sanador"
 L_GUI_NAMEPLATE_NEAR_COLOR = "Color de perdiendo/ganando amenaza"
 L_GUI_NAMEPLATE_BAD_COLOR = "Color de baja amenaza, varía dependiendo si eres tanque o dps/sanador"
 L_GUI_NAMEPLATE_OFFTANK_COLOR = "Offtank threat color" -- Need review
+L.nameplate_extra_color = "Explosive and Spiteful affix color" -- Need review
 
 -- Combat text options
 L_GUI_COMBATTEXT = "Texto de Combate"
@@ -338,6 +344,7 @@ L.combattext_damage_style = "Change default combat font" -- Need review
 L.combattext_damage_style_desc = "Cambiar la fuente de daño/sanación por defecto de encima de los monstruos/jugadores (tendrás que reiniciar WoW para ver los cambios)"
 L_GUI_COMBATTEXT_DAMAGE = "Mostrar daño saliente en su propio marco"
 L_GUI_COMBATTEXT_HEALING = "Mostrar sanación saliente en su propio marco"
+L.combattext_incoming = "Show incoming damage and healing" -- Need review
 L_GUI_COMBATTEXT_HOTS = "Mostrar efectos de cura periódicos en el marco de curas"
 L_GUI_COMBATTEXT_OVERHEALING = "Mostrar la sobrecuracion saliente"
 L_GUI_COMBATTEXT_PET_DAMAGE = "Mostrar el daño de tu mascota"

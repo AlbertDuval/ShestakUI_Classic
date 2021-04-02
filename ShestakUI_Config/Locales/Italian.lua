@@ -72,6 +72,7 @@ L.font_subheader_bag = "Bags font" -- Need review
 L.font_subheader_blizzard = "System font size" -- Need review
 L.font_tooltip_header_font_size = "Tooltip header" -- Need review
 L.font_tooltip_font_size = "Tooltip text" -- Need review
+L.font_global_font = "Disable Pixel font" -- Need review
 
 -- Skins options
 L_GUI_SKINS = "Restyling"
@@ -166,6 +167,8 @@ L_GUI_UF_AGGRO_BORDER = "Cambio di colore dei bordi in base al grado di aggressi
 L_GUI_UF_DEFICIT_HEALTH = "Deficit salute in incursione"
 L_GUI_UF_SHOW_PARTY = "Mostra i riquadri del gruppo"
 L_GUI_UF_SHOW_RAID = "Mostra i riquadri d'incursione"
+L.raidframe_show_target = "Show target frames" -- Needs review
+L.raidframe_show_pet = "Show pet frames" -- Needs review
 L.raidframe_vertical_health = "Orientamento verticale della salute"
 L.raidframe_vertical_health_desc = "Only for heal layout" -- Needs review
 L_GUI_UF_ALPHA_HEALTH = "Trasparenza delle barre della salute quando i punti sono al 100%"
@@ -321,11 +324,14 @@ L_GUI_NAMEPLATE_HEALER_ICON = "Nei Campi di Battaglia, mostra un'icona 'guaritor
 L_GUI_NAMEPLATE_TOTEM_ICONS = "Mostra un’icona sopra la barra dei totem nemici"
 L.nameplate_target_glow = "Show glow texture for target" -- Need review
 L.nameplate_only_name = "Show only name for friendly units" -- Need review
+L.nameplate_low_health_value = "Health value" -- Need review
+L.nameplate_low_health = "Low health highlight" -- Need review
 L_GUI_NAMEPLATE_THREAT = "Attiva il sensore di rilevamento minaccia (si adatta automaticamente al tuo ruolo)"
 L_GUI_NAMEPLATE_GOOD_COLOR = "Colore se il PG è minacciato (in base a difensore o assaltatore/guaritore)"
 L_GUI_NAMEPLATE_NEAR_COLOR = "Colore per perdita/guadagno minaccia"
 L_GUI_NAMEPLATE_BAD_COLOR = "Colore se il PG non è minacciato (se difensore o assaltatore/guaritore)"
 L_GUI_NAMEPLATE_OFFTANK_COLOR = "Colore della minaccia per il difensore secondario"
+L.nameplate_extra_color = "Explosive and Spiteful affix color" -- Need review
 
 -- Combat text options
 L_GUI_COMBATTEXT = "Testo di combattimento"
@@ -337,6 +343,7 @@ L.combattext_damage_style = "Change default combat font" -- Need review
 L.combattext_damage_style_desc = "Cambia il carattere di base per danni/cure (è necessario riavviare il gioco)"
 L_GUI_COMBATTEXT_DAMAGE = "Mostra i danni in un proprio riquadro dedicato"
 L_GUI_COMBATTEXT_HEALING = "Mostra le cure in un proprio riquadro dedicato"
+L.combattext_incoming = "Show incoming damage and healing" -- Need review
 L_GUI_COMBATTEXT_HOTS = "Mostra gli effetti delle cure periodiche nel riquadro delle cure"
 L_GUI_COMBATTEXT_OVERHEALING = "Mostra le cure in eccesso"
 L_GUI_COMBATTEXT_PET_DAMAGE = "Mostra i danni del tuo famiglio"

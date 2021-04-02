@@ -72,6 +72,7 @@ L.font_subheader_bag = "Police des Sacs"
 L.font_subheader_blizzard = "System font size" -- Need review
 L.font_tooltip_header_font_size = "Tooltip header" -- Need review
 L.font_tooltip_font_size = "Tooltip text" -- Need review
+L.font_global_font = "Disable Pixel font" -- Need review
 
 -- Skins options
 L_GUI_SKINS = "Personnalisation d'addon"
@@ -167,6 +168,8 @@ L_GUI_UF_AGGRO_BORDER = "Aggro signalée en bordure"
 L_GUI_UF_DEFICIT_HEALTH = "Déficit en vie du raid"
 L_GUI_UF_SHOW_PARTY = "Afficher les barres du groupe"
 L_GUI_UF_SHOW_RAID = "Afficher les barres du raid"
+L.raidframe_show_target = "Show target frames" -- Needs review
+L.raidframe_show_pet = "Show pet frames" -- Needs review
 L.raidframe_vertical_health = "Orientation vertical des barres de vie"
 L.raidframe_vertical_health_desc = "Only for heal layout" -- Needs review
 L_GUI_UF_ALPHA_HEALTH = "Opacité des barres de vie quand 100%hp"
@@ -322,11 +325,14 @@ L_GUI_NAMEPLATE_HEALER_ICON = "Affiche une icône de soigneur sur toutes les bar
 L_GUI_NAMEPLATE_TOTEM_ICONS = "Afficher une icone au dessus des barres de vie des totems ennemis"
 L.nameplate_target_glow = "Show glow texture for target" -- Need review
 L.nameplate_only_name = "Show only name for friendly units" -- Need review
+L.nameplate_low_health_value = "Health value" -- Need review
+L.nameplate_low_health = "Low health highlight" -- Need review
 L_GUI_NAMEPLATE_THREAT = "Activer la gestion de la menace, change automatiquement selon votre rôle"
 L_GUI_NAMEPLATE_GOOD_COLOR = "Bonne couleur de menace, dépend de si vous êtes un tank ou dps/heal"
 L_GUI_NAMEPLATE_NEAR_COLOR = "Perte/Gain de couleur de menace"
 L_GUI_NAMEPLATE_BAD_COLOR = "Mauvaise couleur de menace, dépend de si vous êtes un tank ou dps/heal"
 L_GUI_NAMEPLATE_OFFTANK_COLOR = "Coloration de la menace du tank secondaire"
+L.nameplate_extra_color = "Explosive and Spiteful affix color" -- Need review
 
 -- Combat text options
 L_GUI_COMBATTEXT = "Texte de combat"
@@ -338,6 +344,7 @@ L.combattext_damage_style = "Change default combat font" -- Need review
 L.combattext_damage_style_desc = "Change la police par défaut des dégâts/soins au dessus de la tête de la cible (Vous devez redémarrer WoW pour valider le changement)"
 L_GUI_COMBATTEXT_DAMAGE = "Afficher les dégâts dans une fenêtre dédiée"
 L_GUI_COMBATTEXT_HEALING = "Afficher les soins dans une fenêtre dédiée"
+L.combattext_incoming = "Show incoming damage and healing" -- Need review
 L_GUI_COMBATTEXT_HOTS = "Afficher les effets des soins périodiques dans la fenêtre de soin"
 L_GUI_COMBATTEXT_OVERHEALING = "Afficher les excès de soins sortants"
 L_GUI_COMBATTEXT_PET_DAMAGE = "Afficher les dégâts du familier"

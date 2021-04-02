@@ -1047,7 +1047,7 @@ local function Shared(self, unit)
 
 	if C.unitframe.show_boss and unit == "boss" then
 		if not T.classic then
-			self.AlternativePower = CreateFrame("StatusBar", nil, self.Health, not T.classic and "BackdropTemplate" or nil)
+			self.AlternativePower = CreateFrame("StatusBar", nil, self.Health, (not T.classic or T.BCC) and "BackdropTemplate" or nil)
 			self.AlternativePower:SetFrameLevel(self.Health:GetFrameLevel() + 1)
 			self.AlternativePower:SetHeight(5)
 			self.AlternativePower:SetStatusBarTexture(C.media.texture)
@@ -1211,7 +1211,7 @@ if C.unitframe.show_pet == true then
 	pet:SetSize(pet_width, 16 + (C.unitframe.extra_health_height / 2))
 end
 
-if not T.classic and C.unitframe.show_focus == true then
+if (not T.classic or T.BCC) and C.unitframe.show_focus == true then
 	local focus = oUF:Spawn("focus", "oUF_Focus")
 	focus:SetPoint(unpack(C.position.unitframes.focus))
 	focus:SetSize(pet_width, 16 + (C.unitframe.extra_health_height / 2))
@@ -1362,7 +1362,7 @@ local moving = false
 SlashCmdList.TEST_UF = function()
 	if InCombatLockdown() then print("|cffffff00"..ERR_NOT_IN_COMBAT.."|r") return end
 	if not moving then
-		if not T.classic then
+		if not T.classic or T.BCC then
 			for _, frames in pairs({"oUF_Target", "oUF_TargetTarget", "oUF_Pet", "oUF_Focus", "oUF_FocusTarget"}) do
 				if _G[frames] then
 					_G[frames].oldunit = _G[frames].unit
@@ -1406,7 +1406,7 @@ SlashCmdList.TEST_UF = function()
 		end
 		moving = true
 	else
-		if not T.classic then
+		if not T.classic or T.BCC then
 			for _, frames in pairs({"oUF_Target", "oUF_TargetTarget", "oUF_Pet", "oUF_Focus", "oUF_FocusTarget"}) do
 				if _G[frames] then
 					_G[frames]:SetAttribute("unit", _G[frames].oldunit)
@@ -1490,9 +1490,12 @@ end
 ----------------------------------------------------------------------------------------
 if C.raidframe.auto_position == "DYNAMIC" then
 	local prevNum = 5
-	local function Reposition(self)
+	local function Reposition(self, event)
 		if ShestakUISettings and ShestakUISettings.RaidLayout == "HEAL" and not C.raidframe.raid_groups_vertical and C.raidframe.raid_groups > 5 then
-			if InCombatLockdown() then return end
+			if InCombatLockdown() then
+				self:RegisterEvent("PLAYER_REGEN_ENABLED")
+				return
+			end
 			local maxGroup = 5
 			local num = GetNumGroupMembers()
 			if num > 5 then
@@ -1515,6 +1518,9 @@ if C.raidframe.auto_position == "DYNAMIC" then
 				player:SetPoint(C.position.unitframes.player[1], C.position.unitframes.player[2], C.position.unitframes.player[3], C.position.unitframes.player[4], C.position.unitframes.player[5] + offset)
 				target:SetPoint(C.position.unitframes.target[1], C.position.unitframes.target[2], C.position.unitframes.target[3], C.position.unitframes.target[4], C.position.unitframes.target[5] + offset)
 				prevNum = maxGroup
+			end
+			if event == "PLAYER_REGEN_ENABLED" then
+				self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 			end
 		else
 			self:UnregisterEvent("GROUP_ROSTER_UPDATE")

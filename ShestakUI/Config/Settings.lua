@@ -179,6 +179,8 @@ C["raidframe"] = {
 	-- Main
 	["show_party"] = true,						-- Show party frames
 	["show_raid"] = true,						-- Show raid frames
+	["show_target"] = true,						-- Show target frames
+	["show_pet"] = true,						-- Show pet frames
 	["solo_mode"] = false,						-- Show player frame always
 	["player_in_party"] = true,					-- Show player frame in party
 	["raid_tanks"] = true,						-- Show raid tanks
@@ -398,12 +400,15 @@ C["nameplate"] = {
 	["totem_icons"] = false,					-- Show icon above enemy totems nameplate
 	["target_glow"] = false,					-- Show glow texture for target
 	["only_name"] = false,						-- Show only name for friendly units
+	["low_health"] = false,						-- Show red border when low health
+	["low_health_value"] = 0.2,					-- Value for low health (between 0.1 and 1)
 	-- Threat
 	["enhance_threat"] = true,					-- Enable threat feature, automatically changes by your role
 	["good_color"] = {0.2, 0.8, 0.2},			-- Good threat color
 	["near_color"] = {1, 1, 0},					-- Near threat color
 	["bad_color"] = {1, 0, 0},					-- Bad threat color
 	["offtank_color"] = {0, 0.5, 1},			-- Offtank threat color
+	["extra_color"] = {1, 0.3, 0},				-- Explosive and Spiteful affix color
 }
 
 if T.classic then
@@ -419,8 +424,9 @@ C["combattext"] = {
 	["enable"] = true,							-- Global enable combat text
 	["blizz_head_numbers"] = false,				-- Use blizzard damage/healing output (above mob/player head)
 	["damage_style"] = true,					-- Change default damage/healing font above mobs/player heads (you need to restart WoW to see changes)
-	["damage"] = true,							-- Show outgoing damage in it's own frame
-	["healing"] = true,							-- Show outgoing healing in it's own frame
+	["damage"] = true,							-- Show outgoing damage
+	["healing"] = true,							-- Show outgoing healing
+	["incoming"] = true,						-- Show incoming damage and healing
 	["show_hots"] = true,						-- Show periodic healing effects in healing frame
 	["show_overhealing"] = true,				-- Show outgoing overhealing
 	["pet_damage"] = true,						-- Show your pet damage

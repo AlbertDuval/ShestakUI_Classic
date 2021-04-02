@@ -1,5 +1,5 @@
 local T, C, L, _ = unpack(select(2, ...))
-if not T.classic or C.raidframe.plugins_aura_watch ~= true then return end
+if not T.classic or T.BCC or C.raidframe.plugins_aura_watch ~= true then return end
 
 ----------------------------------------------------------------------------------------
 --	The best way to add or delete spell is to go at www.wowhead.com, search for a spell.
@@ -35,8 +35,6 @@ T.RaidBuffs = {
 		-- {33206, "LEFT", {0.89, 0.1, 0.1}, true},			-- Pain Suppression
 		{6788, "TOPRIGHT", {1, 0, 0}, true},				-- Weakened Soul
 		{10060, "RIGHT", {0.89, 0.1, 0.1}},					-- Power Infusion
-	},
-	ROGUE = {
 	},
 	SHAMAN = {
 		-- {974, "BOTTOMLEFT", {0.2, 0.7, 0.2}, true},			-- Earth Shield
