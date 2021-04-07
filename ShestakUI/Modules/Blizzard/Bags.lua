@@ -528,7 +528,7 @@ function Stuffing:BagFrameSlotNew(p, slot)
 		ret.slot = slot
 		slot = slot - 4
 		ret.frame = CreateFrame(T.classic and "CheckButton" or "ItemButton", "StuffingBBag"..slot.."Slot", p, "BankItemButtonBagTemplate")
-		if not T.classic then
+		if BackdropTemplateMixin then
 			Mixin(ret.frame, BackdropTemplateMixin)
 		end
 		ret.frame:StripTextures()
@@ -560,7 +560,7 @@ function Stuffing:BagFrameSlotNew(p, slot)
 		end
 	else
 		ret.frame = CreateFrame(T.classic and "CheckButton" or "ItemButton", "StuffingFBag"..slot.."Slot", p, "BagSlotButtonTemplate")
-		if not T.classic then
+		if BackdropTemplateMixin then
 			Mixin(ret.frame, BackdropTemplateMixin)
 		end
 		hooksecurefunc(ret.frame.IconBorder, "SetVertexColor", function(self, r, g, b)
@@ -914,10 +914,10 @@ function Stuffing:CreateBagFrame(w)
 		-- Buy button
 		f.b_purchase = CreateFrame("Button", "StuffingPurchaseButton"..w, f)
 		f.b_purchase:SetSize(80, 20)
-		if not T.classic then
-			f.b_purchase:SetPoint("TOPLEFT", f.b_reagent, "TOPRIGHT", 3, 0)
-		else
+		if T.classic then
 			f.b_purchase:SetPoint("TOPLEFT", 10, -4)
+		else
+			f.b_purchase:SetPoint("TOPLEFT", f.b_reagent, "TOPRIGHT", 3, 0)
 		end
 		f.b_purchase:RegisterForClicks("AnyUp")
 		f.b_purchase:SkinButton()

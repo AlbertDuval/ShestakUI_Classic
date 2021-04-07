@@ -13,7 +13,7 @@ local anchor = CreateFrame("Frame", "PulseCDAnchor", UIParent)
 anchor:SetSize(C.pulsecooldown.size, C.pulsecooldown.size)
 anchor:SetPoint(unpack(C.position.pulse_cooldown))
 
-local frame = CreateFrame("Frame", "PulseCDFrame", anchor, (not T.classic or T.BCC) and "BackdropTemplate" or nil)
+local frame = CreateFrame("Frame", "PulseCDFrame", anchor, BackdropTemplateMixin and "BackdropTemplate" or nil)
 frame:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
 frame:SetBackdrop({
 	bgFile = C.media.blank, edgeFile = C.media.blank, edgeSize = T.noscalemult,
@@ -205,7 +205,7 @@ function frame:COMBAT_LOG_EVENT_UNFILTERED()
 	local _, eventType, _, _, _, sourceFlags, _, _, _, _, _, spellID, spellName = CombatLogGetCurrentEventInfo()
 	if eventType == "SPELL_CAST_SUCCESS" then
 		if (bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PET) == COMBATLOG_OBJECT_TYPE_PET and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE) then
-			if T.classic then
+			if T.classic and not T.BCC then
 				spellID = T.GetSpellID(spellName)
 			end
 			local name = GetSpellInfo(spellID)
