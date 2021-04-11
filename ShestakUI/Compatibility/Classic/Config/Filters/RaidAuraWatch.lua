@@ -84,15 +84,14 @@ T.RaidDebuffs = {
 	-- Magmadar
 	-- Gehennas
 	-- Garr
-	-- Baron
-	-- Geddon
 	-- Shazzrah
-	-- Sulfuron
+	-- Baron Geddon
 	-- Golemagg
+	-- Sulfuron
 	-- Majordomo
 	-- Ragnaros
 
--- Onyxia's Lair
+-- Onyxia's Lair (40)
 	-- Onyxia
 
 -- Blackwing Lair (40)
@@ -139,7 +138,7 @@ T.RaidDebuffs = {
 	-- Ouro
 	-- C'Thun
 
--- Naxxramas
+-- Naxxramas (40)
 	-- Trash
 	-- Anub'Rekhan
 	-- Faerlina
@@ -190,8 +189,7 @@ T.RaidDebuffs = {
 -- PvP
 -----------------------------------------------------------------
 if C.raidframe.plugins_pvp_debuffs == true then
-	T.PvPDebuffs = {
-		--[[
+	local PvPDebuffs = {
 		-- Druid
 		[SpellName(5211)] = 3,		-- Bash
 		[SpellName(16922)] = 3,		-- Celestial Focus
@@ -258,7 +256,6 @@ if C.raidframe.plugins_pvp_debuffs == true then
 		[SpellName(20549)] = 3,		-- War Stomp
 		-- Other
 		[SpellName(5530)] = 3,		-- Mace Specialization
-		--]]
 	}
 
 	for spell, prio in pairs(PvPDebuffs) do
