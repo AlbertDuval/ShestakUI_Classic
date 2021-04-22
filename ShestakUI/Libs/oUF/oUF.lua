@@ -20,7 +20,7 @@ local elements = {}
 local activeElements = {}
 
 local PetBattleFrameHider
-if _G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_CLASSIC then
+if _G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_CLASSIC and _G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
 	PetBattleFrameHider = CreateFrame('Frame', (global or parent) .. '_PetBattleFrameHider', UIParent, 'SecureHandlerStateTemplate')
 	PetBattleFrameHider:SetAllPoints()
 	PetBattleFrameHider:SetFrameStrata('LOW')
@@ -383,7 +383,7 @@ Used to determine if running retail or classic.
 * self - the global oUF object
 --]]
 function oUF:IsClassic()
-	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
+	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC or _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 end
 
 --[[ oUF:IsBCC()
@@ -392,7 +392,7 @@ Used to determine if running Burning Crusade Classic.
 * self - the global oUF object
 --]]
 function oUF:IsBCC()
-	return oUF:IsClassic() and select(4, GetBuildInfo()) > 20500
+	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 end
 
 --[[ oUF:RegisterInitCallback(func)

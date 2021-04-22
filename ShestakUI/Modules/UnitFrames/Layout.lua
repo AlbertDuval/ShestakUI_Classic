@@ -33,7 +33,7 @@ local function Shared(self, unit)
 			or (unit and unit:find("boss%d")) and "boss" or unit
 
 	-- Menu
-	if (not T.classic and (unit == "arena" and C.unitframe.show_arena == true and unit ~= "arenatarget")) or (unit == "boss" and C.unitframe.show_boss == true) then
+	if ((not T.classic or T.BCC) and (unit == "arena" and C.unitframe.show_arena == true and unit ~= "arenatarget")) or (unit == "boss" and C.unitframe.show_boss == true) then
 		self:SetAttribute("type2", "focus")
 		self:SetAttribute("type3", "macro")
 		self:SetAttribute("macrotext3", "/clearfocus")
@@ -473,7 +473,7 @@ local function Shared(self, unit)
 			self.TotemBar:CreateBackdrop("Default")
 			self.TotemBar:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 			self.TotemBar:SetSize(player_width, 7)
-			self.TotemBar.Destroy = not T.classic and true or false
+			self.TotemBar.Destroy = (T.BCC or not T.classic) and true or false
 
 			for i = 1, 4 do
 				self.TotemBar[i] = CreateFrame("StatusBar", self:GetName().."_Totem"..i, self.TotemBar)
@@ -608,7 +608,7 @@ local function Shared(self, unit)
 		end
 
 		-- Absorbs value
-		if C.unitframe.plugins_absorbs == true then
+		if not T.classic and C.unitframe.plugins_absorbs == true then
 			self.Absorbs = T.SetFontString(self.Health, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
 			self.Absorbs:SetPoint("LEFT", self.Health, "LEFT", 4, 0)
 			self:Tag(self.Absorbs, "[Absorbs]")
@@ -1244,7 +1244,7 @@ if C.unitframe.show_boss == true then
 	end
 end
 
-if not T.classic and C.unitframe.show_arena == true then
+if (not T.classic or T.BCC) and C.unitframe.show_arena == true then
 	local arena = {}
 	for i = 1, 5 do
 		arena[i] = oUF:Spawn("arena"..i, "oUF_Arena"..i)
@@ -1508,7 +1508,7 @@ if C.raidframe.auto_position == "DYNAMIC" then
 				maxGroup = C.raidframe.raid_groups
 			end
 			if prevNum ~= maxGroup then
-				local offset = (maxGroup - 5) * 33
+				local offset = (maxGroup - 5) * (C.raidframe.heal_height + 7)
 				if C.unitframe.castbar_icon == true then
 					oUF_Player_Castbar:SetPoint(C.position.unitframes.player_castbar[1], C.position.unitframes.player_castbar[2], C.position.unitframes.player_castbar[3], C.position.unitframes.player_castbar[4] + 11, C.position.unitframes.player_castbar[5] + offset)
 				else
@@ -1534,7 +1534,7 @@ if C.raidframe.auto_position == "DYNAMIC" then
 elseif C.raidframe.auto_position == "STATIC" then
 	local function Reposition()
 		if ShestakUISettings and ShestakUISettings.RaidLayout == "HEAL" and not C.raidframe.raid_groups_vertical and C.raidframe.raid_groups > 5 then
-			local offset = (C.raidframe.raid_groups - 5) * 33
+			local offset = (C.raidframe.raid_groups - 5) * (C.raidframe.heal_height + 7)
 			if C.unitframe.castbar_icon == true then
 				oUF_Player_Castbar:SetPoint(C.position.unitframes.player_castbar[1], C.position.unitframes.player_castbar[2], C.position.unitframes.player_castbar[3], C.position.unitframes.player_castbar[4] + 11, C.position.unitframes.player_castbar[5] + offset)
 			else

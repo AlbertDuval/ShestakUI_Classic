@@ -7,11 +7,11 @@ local L = ns
 ----------------------------------------------------------------------------------------
 -- Temporary Function
 local function IsClassicBuild()
-	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
+	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC or _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 end
 
 local function IsBCCBuild()
-	return IsClassicBuild() and select(4, GetBuildInfo()) > 20500
+	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 end
 
 local function HideOptions(list)
@@ -1326,10 +1326,7 @@ do
 	}
 
 	local bcc = {
-		show_arena,
-		arena_on_right,
 		plugins_enemy_spec,
-		plugins_diminishing,
 		plugins_absorbs
 	}
 
@@ -1427,8 +1424,11 @@ do
 	local player_in_party = ns.CreateCheckBox(parent, "player_in_party", L_GUI_UF_PLAYER_PARTY)
 	player_in_party:SetPoint("LEFT", solo_mode, "RIGHT", 248, 0)
 
+	local raid_pets = ns.CreateCheckBox(parent, "raid_pets", L_GUI_UF_RAID_PETS)
+	raid_pets:SetPoint("TOPLEFT", solo_mode, "BOTTOMLEFT", 0, 0)
+
 	local raid_groups = ns.CreateNumberSlider(parent, "raid_groups", nil, nil, 1, 8, 1, true, L_GUI_UF_RAID_GROUP)
-	raid_groups:SetPoint("TOPLEFT", solo_mode, "BOTTOMLEFT", 0, -20)
+	raid_groups:SetPoint("TOPLEFT", raid_pets, "BOTTOMLEFT", 0, -20)
 
 	local auto_position = ns.CreateDropDown(parent, "auto_position", true, L.raidframe_auto_position, {"DYNAMIC", "STATIC", "NONE"})
 	auto_position:SetPoint("TOPLEFT", raid_groups, "BOTTOMLEFT", -16, -10)
@@ -2475,8 +2475,11 @@ do
 	local toys = ns.CreateCheckBox(parent, "toys", L_GUI_ANNOUNCEMENTS_TOY_TRAIN)
 	toys:SetPoint("TOPLEFT", spells_from_all, "BOTTOMLEFT", -20, 0)
 
+	local says_thanks = ns.CreateCheckBox(parent, "says_thanks", L_GUI_ANNOUNCEMENTS_SAYS_THANKS)
+	says_thanks:SetPoint("TOPLEFT", toys, "BOTTOMLEFT", 0, 0)
+
 	local pull_countdown = ns.CreateCheckBox(parent, "pull_countdown", L_GUI_ANNOUNCEMENTS_PULL_COUNTDOWN)
-	pull_countdown:SetPoint("TOPLEFT", toys, "BOTTOMLEFT", 0, 0)
+	pull_countdown:SetPoint("TOPLEFT", says_thanks, "BOTTOMLEFT", 0, 0)
 
 	local flask_food = ns.CreateCheckBox(parent, "flask_food", L_GUI_ANNOUNCEMENTS_FLASK_FOOD)
 	flask_food:SetPoint("TOPLEFT", pull_countdown, "BOTTOMLEFT", 0, 0)
@@ -2506,8 +2509,14 @@ do
 		safari_hat
 	}
 
-	if IsClassicBuild() then
+	local bcc = {
+		safari_hat
+	}
+
+	if IsClassicBuild() and not IsBCCBuild() then
 		HideOptions(classic)
+	elseif IsBCCBuild() then
+		HideOptions(bcc)
 	end
 end
 
@@ -2581,12 +2590,21 @@ do
 		auto_role
 	}
 
+	local bcc = {
+		dismount_stand,
+		screenshot,
+		solve_artifact,
+		auto_role
+	}
+
 	local retail = {
 		dismount_stand,
 	}
 
-	if IsClassicBuild() then
+	if IsClassicBuild() and not IsBCCBuild() then
 		HideOptions(classic)
+	elseif IsBCCBuild() then
+		HideOptions(bcc)
 	else
 		HideOptions(retail)
 	end
@@ -2685,7 +2703,7 @@ do
 		show_inarena
 	}
 
-	if IsClassicBuild() then
+	if IsClassicBuild() and not IsBCCBuild() then
 		HideOptions(classic)
 	end
 end
@@ -2747,7 +2765,7 @@ do
 		show_inarena
 	}
 
-	if IsClassicBuild() then
+	if IsClassicBuild() and not IsBCCBuild() then
 		HideOptions(classic)
 	end
 end

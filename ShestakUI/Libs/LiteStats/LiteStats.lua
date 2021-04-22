@@ -401,7 +401,7 @@ if clock.enabled then
 		end,
 		OnClick = function(_, b)
 			if T.classic then
-				TimeManager_Toggle()
+				(b == "RightButton" and TimeManager_Toggle or Stopwatch_Toggle)()
 			else
 				(b == "RightButton" and ToggleTimeManager or ToggleCalendar)()
 			end
@@ -1319,7 +1319,7 @@ if experience.enabled then
 				or sub == "curxp" and short(UnitXP(P),tt)
 				or sub == "remainingxp" and short(UnitXPMax(P) - UnitXP(P), tt)
 				or sub == "totalxp" and short(UnitXPMax(P), tt)
-				or sub == "cur%" and floor(UnitXP(P) / UnitXPMax(P) * 100)
+				or sub == "cur%" and (UnitXPMax(P) > 0 and floor(UnitXP(P) / UnitXPMax(P) * 100) or 0)
 				or sub == "remaining%" and 100 - floor(UnitXP(P) / UnitXPMax(P) * 100)
 				or sub == "restxp" and short(GetXPExhaustion() or 0,tt)
 				or sub == "rest%" and min(150, floor((GetXPExhaustion() or 0) / UnitXPMax(P) * 100))
@@ -2042,7 +2042,7 @@ if stats.enabled then
 			string = GetExpertisePercent()
 		elseif sub == "hit" then
 			local hit
-			local melee, ranged, spell = GetHitModifier(), GetCombatRatingBonus(7), GetSpellHitModifier()
+			local melee, ranged, spell = GetCombatRatingBonus(6), GetCombatRatingBonus(7), GetCombatRatingBonus(8)
 			if melee > spell and T.class ~= "HUNTER" then
 				hit = melee
 			elseif T.class == "HUNTER" then

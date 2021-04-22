@@ -108,7 +108,7 @@ if C.nameplate.healer_icon == true then
 			lastCheck = 0
 			healList = {}
 			for i = 1, GetNumBattlefieldScores() do
-				if T.classic then
+				if T.classic and not T.BCC then
 					--[[
 					-- build 30786 changed returns, removing dmg/heals/spec and adding rank
 					local name, _, _, _, _, faction, _, _, _, classToken = GetBattlefieldScore(i)
@@ -119,6 +119,14 @@ if C.nameplate.healer_icon == true then
 						healList[name] = true
 					end
 					--]]
+				elseif T.BCC then
+					local name, _, _, _, _, faction, _, _, _, classToken = GetBattlefieldScore(i)
+
+					-- todo: build CLEU based heal tracking from spellID lookup table
+					if name and healerClassTokens[classToken] and t.factions[UnitFactionGroup("player")] == faction then
+						name = name:match("(.+)%-.+") or name
+						healList[name] = true
+					end
 				else
 					local name, _, _, _, _, faction, _, _, _, _, _, _, _, _, _, talentSpec = GetBattlefieldScore(i)
 
@@ -132,17 +140,19 @@ if C.nameplate.healer_icon == true then
 	end
 
 	local function CheckArenaHealers(_, elapsed)
-		lastCheck = lastCheck + elapsed
-		if lastCheck > 10 then
-			lastCheck = 0
-			healList = {}
-			for i = 1, 5 do
-				local specID = GetArenaOpponentSpec(i)
-				if specID and specID > 0 then
-					local name = UnitName(format("arena%d", i))
-					local _, talentSpec = GetSpecializationInfoByID(specID)
-					if name and healerSpecs[talentSpec] then
-						healList[name] = talentSpec
+		if not T.classic then
+			lastCheck = lastCheck + elapsed
+			if lastCheck > 10 then
+				lastCheck = 0
+				healList = {}
+				for i = 1, 5 do
+					local specID = GetArenaOpponentSpec(i)
+					if specID and specID > 0 then
+						local name = UnitName(format("arena%d", i))
+						local _, talentSpec = GetSpecializationInfoByID(specID)
+						if name and healerSpecs[talentSpec] then
+							healList[name] = talentSpec
+						end
 					end
 				end
 			end
@@ -299,21 +309,23 @@ if T.screenHeight > 1200 then
 	Mult = T.mult
 end
 
+local auraFontHeight = (T.BCC and T.HiDPI) and (C.font.auras_font_size * T.noscalemult * (2/3) / Mult) or (C.font.auras_font_size * T.noscalemult / Mult)
+
 local AurasPostCreateIcon = function(element, button)
 	CreateBorderFrame(button)
 
-	button.remaining = T.SetFontString(button, C.font.auras_font, C.font.auras_font_size * T.noscalemult / Mult, C.font.auras_font_style)
+	button.remaining = T.SetFontString(button, C.font.auras_font, auraFontHeight, C.font.auras_font_style)
 	button.remaining:SetShadowOffset(C.font.auras_font_shadow and 1 or 0, C.font.auras_font_shadow and -1 or 0)
-	button.remaining:SetPoint("CENTER", button, "CENTER", 1, 0)
+	button.remaining:SetPoint("CENTER", button, "CENTER", T.BCC and 0 or 1, 0)
 	button.remaining:SetJustifyH("CENTER")
 
 	button.cd.noCooldownCount = true
 
 	button.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 
-	button.count:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 1, 0)
+	button.count:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", T.classic and 2 or 1, T.classic and -6 or 0)
 	button.count:SetJustifyH("RIGHT")
-	button.count:SetFont(C.font.auras_font, C.font.auras_font_size * T.noscalemult / Mult, C.font.auras_font_style)
+	button.count:SetFont(C.font.auras_font, auraFontHeight, C.font.auras_font_style)
 	button.count:SetShadowOffset(C.font.auras_font_shadow and 1 or 0, C.font.auras_font_shadow and -1 or 0)
 
 	if C.aura.show_spiral == true then
@@ -666,6 +678,10 @@ local function style(self, unit)
 	self.Health.colorReaction = true
 	self.Health.colorHealth = true
 	CreateBorderFrame(self.Health)
+
+	if T.classic then
+		self.Health.frequentUpdates = true
+	end
 
 	self.Health.bg = self.Health:CreateTexture(nil, "BORDER")
 	self.Health.bg:SetAllPoints()

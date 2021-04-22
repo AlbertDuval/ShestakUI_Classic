@@ -164,6 +164,7 @@
 	<Script file="Modules\Announcements\Interrupts.lua"/>
 	<Script file="Modules\Announcements\PullCountdown.lua"/>
 	<Script file="Modules\Announcements\SafariHat.lua"/>
+	<Script file="Modules\Announcements\SayThanks.lua"/>
 	<Script file="Modules\Announcements\Spells.lua"/>
 
 	<Script file="Compatibility\Classic\Modules\Auras\RaidBuffsReminder.lua"/>
@@ -261,6 +262,7 @@
 
 	<Include file="Modules\Skins\Blizzard\LoadFrames.xml"/>
 	<Include file="Compatibility\Classic\Modules\Skins\Blizzard\LoadFrames.xml"/>
+	<Include file="Compatibility\BCC\Modules\Skins\Blizzard\LoadFrames.xml"/>
 	<Script file="Modules\Skins\Ace3.lua"/>
 	<Script file="Modules\Skins\AtlasLoot.lua"/>
 	<Script file="Modules\Skins\Aurora.lua"/>

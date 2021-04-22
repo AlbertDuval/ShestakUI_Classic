@@ -145,7 +145,7 @@ local function Shared(self, unit)
 	end
 
 	-- LFD role icons
-	if C.raidframe.icons_role == true and not (suffix == "target") then
+	if not T.classic and C.raidframe.icons_role == true and not (suffix == "target") then
 		self.GroupRoleIndicator = self.Health:CreateTexture(nil, "OVERLAY")
 		self.GroupRoleIndicator:SetSize(10, 10)
 		self.GroupRoleIndicator:SetPoint("TOP", self.Health, 0, 6)
@@ -307,8 +307,6 @@ end
 ----------------------------------------------------------------------------------------
 --	Default position of ShestakUI unitframes
 ----------------------------------------------------------------------------------------
-if T.BCC and T.wowBuild <= 38225 then return end -- FrameXML\RestrictedExecution.lua:473: Cannot call restricted closure from insecure code
-
 oUF:Factory(function(self)
 	if ShestakUISettings == nil or ShestakUISettings.RaidLayout ~= "HEAL" then return end
 
@@ -327,9 +325,9 @@ oUF:Factory(function(self)
 			"initial-height", T.Scale(unit_height),
 			"showSolo", C.raidframe.solo_mode,
 			"showPlayer", C.raidframe.player_in_party,
-			"groupBy", C.raidframe.by_role and "ASSIGNEDROLE",
-			"groupingOrder", C.raidframe.by_role and "TANK,HEALER,DAMAGER,NONE",
-			"sortMethod", C.raidframe.by_role and "NAME",
+			"groupBy", (not T.classic and C.raidframe.by_role) and "ASSIGNEDROLE",
+			"groupingOrder", (not T.classic and C.raidframe.by_role) and "TANK,HEALER,DAMAGER,NONE",
+			"sortMethod", (not T.classic and C.raidframe.by_role) and "NAME",
 			"showParty", true,
 			"showRaid", true,
 			"yOffset", T.Scale(-7),
@@ -354,9 +352,9 @@ oUF:Factory(function(self)
 				"initial-height", T.Scale(unit_height),
 				"showSolo", C.raidframe.solo_mode,
 				"showPlayer", C.raidframe.player_in_party,
-				"groupBy", C.raidframe.by_role and "ASSIGNEDROLE",
-				"groupingOrder", C.raidframe.by_role and "TANK,HEALER,DAMAGER,NONE",
-				"sortMethod", C.raidframe.by_role and "NAME",
+				"groupBy", (not T.classic and C.raidframe.by_role) and "ASSIGNEDROLE",
+				"groupingOrder", (not T.classic and C.raidframe.by_role) and "TANK,HEALER,DAMAGER,NONE",
+				"sortMethod", (not T.classic and C.raidframe.by_role) and "NAME",
 				"showParty", true,
 				"showRaid", true,
 				"yOffset", T.Scale(-7),
@@ -379,9 +377,9 @@ oUF:Factory(function(self)
 				"initial-height", T.Scale(unit_height),
 				"showSolo", C.raidframe.solo_mode,
 				"showPlayer", C.raidframe.player_in_party,
-				"groupBy", C.raidframe.by_role and "ASSIGNEDROLE",
-				"groupingOrder", C.raidframe.by_role and "TANK,HEALER,DAMAGER,NONE",
-				"sortMethod", C.raidframe.by_role and "NAME",
+				"groupBy", (not T.classic and C.raidframe.by_role) and "ASSIGNEDROLE",
+				"groupingOrder", (not T.classic and C.raidframe.by_role) and "TANK,HEALER,DAMAGER,NONE",
+				"sortMethod", (not T.classic and C.raidframe.by_role) and "NAME",
 				"showParty", true,
 				"showRaid", true,
 				"yOffset", T.Scale(-7),
@@ -401,9 +399,9 @@ oUF:Factory(function(self)
 			"initial-height", T.Scale(unit_height),
 			"showSolo", C.raidframe.solo_mode,
 			"showPlayer", C.raidframe.player_in_party,
-			"groupBy", C.raidframe.by_role and "ASSIGNEDROLE",
-			"groupingOrder", C.raidframe.by_role and "TANK,HEALER,DAMAGER,NONE",
-			"sortMethod", C.raidframe.by_role and "NAME",
+			"groupBy", (not T.classic and C.raidframe.by_role) and "ASSIGNEDROLE",
+			"groupingOrder", (not T.classic and C.raidframe.by_role) and "TANK,HEALER,DAMAGER,NONE",
+			"sortMethod", (not T.classic and C.raidframe.by_role) and "NAME",
 			"showParty", true,
 			"showRaid", true,
 			"xOffset", T.Scale(7),
@@ -428,9 +426,9 @@ oUF:Factory(function(self)
 				"initial-height", T.Scale(unit_height / 2),
 				"showSolo", C.raidframe.solo_mode,
 				"showPlayer", C.raidframe.player_in_party,
-				"groupBy", C.raidframe.by_role and "ASSIGNEDROLE",
-				"groupingOrder", C.raidframe.by_role and "TANK,HEALER,DAMAGER,NONE",
-				"sortMethod", C.raidframe.by_role and "NAME",
+				"groupBy", (not T.classic and C.raidframe.by_role) and "ASSIGNEDROLE",
+				"groupingOrder", (not T.classic and C.raidframe.by_role) and "TANK,HEALER,DAMAGER,NONE",
+				"sortMethod", (not T.classic and C.raidframe.by_role) and "NAME",
 				"showParty", true,
 				"showRaid", true,
 				"xOffset", T.Scale(7),
@@ -453,9 +451,9 @@ oUF:Factory(function(self)
 				"initial-height", T.Scale(unit_height / 2),
 				"showSolo", C.raidframe.solo_mode,
 				"showPlayer", C.raidframe.player_in_party,
-				"groupBy", C.raidframe.by_role and "ASSIGNEDROLE",
-				"groupingOrder", C.raidframe.by_role and "TANK,HEALER,DAMAGER,NONE",
-				"sortMethod", C.raidframe.by_role and "NAME",
+				"groupBy", (not T.classic and C.raidframe.by_role) and "ASSIGNEDROLE",
+				"groupingOrder", (not T.classic and C.raidframe.by_role) and "TANK,HEALER,DAMAGER,NONE",
+				"sortMethod", (not T.classic and C.raidframe.by_role) and "NAME",
 				"showParty", true,
 				"showRaid", true,
 				"xOffset", T.Scale(7),
@@ -483,9 +481,9 @@ oUF:Factory(function(self)
 				"yOffset", T.Scale(-5),
 				"point", "TOPLEFT",
 				"groupFilter", tostring(i),
-				"groupBy", C.raidframe.by_role and "ASSIGNEDROLE",
-				"groupingOrder", C.raidframe.by_role and "TANK,HEALER,DAMAGER,NONE",
-				"sortMethod", C.raidframe.by_role and "NAME",
+				"groupBy", (not T.classic and C.raidframe.by_role) and "ASSIGNEDROLE",
+				"groupingOrder", (not T.classic and C.raidframe.by_role) and "TANK,HEALER,DAMAGER,NONE",
+				"sortMethod", (not T.classic and C.raidframe.by_role) and "NAME",
 				"maxColumns", 5,
 				"unitsPerColumn", 1,
 				"columnSpacing", T.Scale(7),
@@ -497,6 +495,42 @@ oUF:Factory(function(self)
 					raidgroup:SetPoint("TOPLEFT", raid[i-1], "TOPRIGHT", 7, 0)
 				end
 				raid[i] = raidgroup
+			end
+
+			-- Raid pets
+			if C.raidframe.raid_pets == true then
+				local raidpet = {}
+				for i = 1, C.raidframe.raid_groups do
+					local petgroup = self:SpawnHeader("oUF_RaidPet"..i, nil, "custom [@raid6,exists] show;hide",
+					"oUF-initialConfigFunction", [[
+							local header = self:GetParent()
+							self:SetWidth(header:GetAttribute("initial-width"))
+							self:SetHeight(header:GetAttribute("initial-height"))
+							self:SetAttribute("useOwnerUnit", "true")
+							self:SetAttribute("filterOnPet", "true")
+							self:SetAttribute("unitsuffix", "pet")
+						]],
+					"initial-width", unit_width,
+					"initial-height", T.Scale(unit_height / 2),
+					"showRaid", true,
+					"yOffset", T.Scale(-5),
+					"point", "TOPLEFT",
+					"groupFilter", tostring(i),
+					"groupBy", (not T.classic and C.raidframe.by_role) and "ASSIGNEDROLE" or nil,
+					"groupingOrder", (not T.classic and C.raidframe.by_role) and "TANK,HEALER,DAMAGER,NONE" or "1,2,3,4,5,6,7,8",
+					"sortMethod", (not T.classic and C.raidframe.by_role) and "NAME" or "NAME",
+					"maxColumns", 5,
+					"unitsPerColumn", 1,
+					"columnSpacing", T.Scale(7),
+					"columnAnchorPoint", "TOP"
+					)
+					if i == 1 then
+						petgroup:SetPoint(unpack(C.position.unitframes.raid_pets))
+					else
+						petgroup:SetPoint("TOPLEFT", raidpet[i-1], "TOPRIGHT", 7, 0)
+					end
+					raidpet[i] = petgroup
+				end
 			end
 		else
 			-- Raid horizontal
@@ -512,9 +546,9 @@ oUF:Factory(function(self)
 				"initial-height", T.Scale(unit_height),
 				"showRaid", true,
 				"groupFilter", tostring(i),
-				"groupBy", C.raidframe.by_role and "ASSIGNEDROLE",
-				"groupingOrder", C.raidframe.by_role and "TANK,HEALER,DAMAGER,NONE",
-				"sortMethod", C.raidframe.by_role and "NAME",
+				"groupBy", (not T.classic and C.raidframe.by_role) and "ASSIGNEDROLE",
+				"groupingOrder", (not T.classic and C.raidframe.by_role) and "TANK,HEALER,DAMAGER,NONE",
+				"sortMethod", (not T.classic and C.raidframe.by_role) and "NAME",
 				"point", "LEFT",
 				"maxColumns", 5,
 				"unitsPerColumn", 1,
@@ -527,6 +561,41 @@ oUF:Factory(function(self)
 					raidgroup:SetPoint("TOPLEFT", raid[i-1], "BOTTOMLEFT", 0, -7)
 				end
 				raid[i] = raidgroup
+			end
+
+			-- Raid pets
+			if C.raidframe.raid_pets == true then
+				local raidpet = {}
+				for i = 1, C.raidframe.raid_groups do
+					local petgroup = self:SpawnHeader("oUF_RaidPet"..i, nil, "custom [@raid6,exists] show;hide",
+					"oUF-initialConfigFunction", [[
+							local header = self:GetParent()
+							self:SetWidth(header:GetAttribute("initial-width"))
+							self:SetHeight(header:GetAttribute("initial-height"))
+							self:SetAttribute("useOwnerUnit", "true")
+							self:SetAttribute("filterOnPet", "true")
+							self:SetAttribute("unitsuffix", "pet")
+						]],
+					"initial-width", unit_width,
+					"initial-height", T.Scale(unit_height / 2),
+					"showRaid", true,
+					"groupFilter", tostring(i),
+					"groupBy", (not T.classic and C.raidframe.by_role) and "ASSIGNEDROLE" or nil,
+					"groupingOrder", (not T.classic and C.raidframe.by_role) and "TANK,HEALER,DAMAGER,NONE" or "1,2,3,4,5,6,7,8",
+					"sortMethod", (not T.classic and C.raidframe.by_role) and "NAME" or "NAME",
+					"point", "LEFT",
+					"maxColumns", 5,
+					"unitsPerColumn", 1,
+					"columnSpacing", T.Scale(7),
+					"columnAnchorPoint", "LEFT"
+					)
+					if i == 1 then
+						petgroup:SetPoint(unpack(C.position.unitframes.raid_pets))
+					else
+						petgroup:SetPoint("TOPLEFT", raidpet[i-1], "BOTTOMLEFT", 0, -7)
+					end
+					raidpet[i] = petgroup
+				end
 			end
 		end
 

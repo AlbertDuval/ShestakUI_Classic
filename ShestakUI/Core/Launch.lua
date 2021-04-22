@@ -6,7 +6,7 @@ local T, C, L, _ = unpack(select(2, ...))
 local function InstallUI()
 	-- Don't need to set CVar multiple time
 	SetCVar("screenshotQuality", 8)
-	SetCVar("cameraDistanceMaxZoomFactor", 2.6)
+	SetCVar("cameraDistanceMaxZoomFactor", T.classic and 3.4 or 2.6)
 	SetCVar("showTutorials", 0)
 	SetCVar("gameTip", "0")
 	SetCVar("UberTooltips", 1)
@@ -93,7 +93,7 @@ local function InstallUI()
 	ShestakUISettingsPerChar.BottomBars = C.actionbar.bottombars
 
 	if T.classic then
-		if T.level < MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] then
+		if T.level < (T.classic and MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] or GetMaxLevelForPlayerExpansion()) then
 			ShestakUISettings.Experience = true
 		end
 
@@ -278,10 +278,5 @@ OnLogon:SetScript("OnEvent", function(self)
 	if C.general.welcome_message == true then
 		print("|cffffff00"..L_WELCOME_LINE_1..T.version.." "..T.client..", "..T.name..".|r")
 		print("|cffffff00"..L_WELCOME_LINE_2_1.." |cffffff00"..L_WELCOME_LINE_2_2.."|r")
-	end
-
-	-- Temporary message
-	if T.BCC and T.wowBuild <= 38225 then -- FrameXML\RestrictedExecution.lua:473: Cannot call restricted closure from insecure code
-		print("ShestakUI: |cffffff00Please note that action bar paging, party frames, and raid frames are currently disabled in this build due to a Blizzard bug. Using default party & raid frames for now.|r")
 	end
 end)
