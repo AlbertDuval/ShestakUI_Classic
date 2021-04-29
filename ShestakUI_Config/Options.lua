@@ -181,8 +181,13 @@ local ErrorTable = {
 local CollapseTable = {
 	"RAID",
 	"RELOAD",
+	"SCENARIO",
 	"NONE",
 }
+
+if IsClassicBuild() then
+	tremove(CollapseTable, 3)
+end
 
 local TextureTable
 if LSM then
@@ -1138,7 +1143,7 @@ do
 	local uf_color_bg = ns.CreateColourPicker(parent, "uf_color_bg", true)
 	uf_color_bg:SetPoint("LEFT", uf_color, "RIGHT", 248, 0)
 
-	local enemy_health_color = ns.CreateCheckBox(parent, "enemy_health_color", L_GUI_UF_ENEMY_HEALTH_COLOR)
+	local enemy_health_color = ns.CreateCheckBox(parent, "enemy_health_color")
 	enemy_health_color:SetPoint("TOPLEFT", uf_color, "BOTTOMLEFT", -24, -4)
 
 	local show_total_value = ns.CreateCheckBox(parent, "show_total_value", L_GUI_UF_TOTAL_VALUE)
@@ -1247,14 +1252,14 @@ do
 	local plugins_swing = ns.CreateCheckBox(parent, "plugins_swing", L_GUI_UF_PLUGINS_SWING)
 	plugins_swing:SetPoint("TOPLEFT", plugins_power_spark, "BOTTOMLEFT", 0, 0)
 
-	local plugins_reputation_bar = ns.CreateCheckBox(parent, "plugins_reputation_bar")
-	plugins_reputation_bar:SetPoint("TOPLEFT", plugins_swing, "BOTTOMLEFT", 0, 0)
-
 	local plugins_experience_bar = ns.CreateCheckBox(parent, "plugins_experience_bar")
-	plugins_experience_bar:SetPoint("TOPLEFT", plugins_reputation_bar, "BOTTOMLEFT", 0, 0)
+	plugins_experience_bar:SetPoint("TOPLEFT", plugins_swing, "BOTTOMLEFT", 0, 0)
+
+	local plugins_reputation_bar = ns.CreateCheckBox(parent, "plugins_reputation_bar")
+	plugins_reputation_bar:SetPoint("TOPLEFT", plugins_experience_bar, "BOTTOMLEFT", 0, 0)
 
 	local plugins_smooth_bar = ns.CreateCheckBox(parent, "plugins_smooth_bar", L_GUI_UF_PLUGINS_SMOOTH_BAR)
-	plugins_smooth_bar:SetPoint("TOPLEFT", plugins_experience_bar, "BOTTOMLEFT", 0, 0)
+	plugins_smooth_bar:SetPoint("TOPLEFT", plugins_reputation_bar, "BOTTOMLEFT", 0, 0)
 
 	local plugins_enemy_spec = ns.CreateCheckBox(parent, "plugins_enemy_spec", L_GUI_UF_PLUGINS_ENEMY_SPEC)
 	plugins_enemy_spec:SetPoint("TOPLEFT", plugins_smooth_bar, "BOTTOMLEFT", 0, 0)
@@ -2034,7 +2039,7 @@ do
 	local name_abbrev = ns.CreateCheckBox(parent, "name_abbrev", L_GUI_NAMEPLATE_NAME_ABBREV)
 	name_abbrev:SetPoint("TOPLEFT", class_icons, "BOTTOMLEFT", 0, 0)
 
-	local clamp = ns.CreateCheckBox(parent, "clamp", L_GUI_NAMEPLATE_CLAMP)
+	local clamp = ns.CreateCheckBox(parent, "clamp")
 	clamp:SetPoint("TOPLEFT", name_abbrev, "BOTTOMLEFT", 0, 0)
 
 	local track_debuffs = ns.CreateCheckBox(parent, "track_debuffs", L_GUI_NAMEPLATE_SHOW_DEBUFFS)
@@ -2106,17 +2111,26 @@ do
 	local only_name = ns.CreateCheckBox(parent, "only_name")
 	only_name:SetPoint("TOPLEFT", target_glow, "BOTTOMLEFT", 0, 0)
 
-	local low_health_value = ns.CreateNumberSlider(parent, "low_health_value", nil, nil, 0.1, 1, 0.05, true)
-	low_health_value:SetPoint("TOPLEFT", only_name, "BOTTOMLEFT", 0, -20)
-
-	local low_health = ns.CreateCheckBox(parent, "low_health")
-	low_health:SetPoint("LEFT", low_health_value, "RIGHT", 70, 0)
+	local quests = ns.CreateCheckBox(parent, "quests")
+	quests:SetPoint("TOPLEFT", only_name, "BOTTOMLEFT", 0, 0)
 
 	-- Panel 2
 	local parent = ShestakUIOptionsPanel.nameplate2
 
+	local low_health_value = ns.CreateNumberSlider(parent, "low_health_value", nil, nil, 0.1, 1, 0.05, true)
+	low_health_value:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, -20)
+
+	local low_health = ns.CreateCheckBox(parent, "low_health")
+	low_health:SetPoint("LEFT", low_health_value, "RIGHT", 70, 0)
+
+	local cast_color = ns.CreateCheckBox(parent, "cast_color")
+	cast_color:SetPoint("TOPLEFT", low_health_value, "BOTTOMLEFT", 0, -8)
+
+	local kick_color = ns.CreateCheckBox(parent, "kick_color")
+	kick_color:SetPoint("TOPLEFT", cast_color, "BOTTOMLEFT", 0, 0)
+
 	local enhance_threat = ns.CreateCheckBox(parent, "enhance_threat", L_GUI_NAMEPLATE_THREAT)
-	enhance_threat:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, 0)
+	enhance_threat:SetPoint("TOPLEFT", kick_color, "BOTTOMLEFT", 0, 0)
 
 	local good_color = ns.CreateColourPicker(parent, "good_color", true, L_GUI_NAMEPLATE_GOOD_COLOR)
 	good_color:SetPoint("TOPLEFT", enhance_threat, "BOTTOMLEFT", 24, -4)
@@ -2133,9 +2147,18 @@ do
 	local extra_color = ns.CreateColourPicker(parent, "extra_color", true)
 	extra_color:SetPoint("TOPLEFT", offtank_color, "BOTTOMLEFT", 0, -8)
 
+	local mob_color_enable = ns.CreateCheckBox(parent, "mob_color_enable")
+	mob_color_enable:SetPoint("TOPLEFT", extra_color, "BOTTOMLEFT", -24, -8)
+
+	local mob_color = ns.CreateColourPicker(parent, "mob_color", true)
+	mob_color:SetPoint("TOPLEFT", mob_color_enable, "BOTTOMLEFT", 24, -4)
+
 	local classic = {
 		distance, -- broken in Classic
-		healer_icon -- needs fixing since build 30786
+		healer_icon, -- needs fixing since build 30786
+		quests,
+		offtank_color,
+		extra_color,
 	}
 
 	if IsClassicBuild() then
@@ -2328,6 +2351,7 @@ do
 	local faster_loot = ns.CreateCheckBox(parent, "faster_loot")
 	faster_loot:SetPoint("TOPLEFT", width, "BOTTOMLEFT", 0, -10)
 
+	-- NOTE: Group loot is no longer used by Blizzard, but these are still used in Classic
 	local rolllootframe = ns.CreateCheckBox(parent, "rolllootframe", L_GUI_LOOT_ROLL_ENABLE)
 	rolllootframe:SetPoint("TOPLEFT", faster_loot, "BOTTOMLEFT", 0, 0)
 
@@ -2336,6 +2360,16 @@ do
 
 	local auto_confirm_de = ns.CreateCheckBox(parent, "auto_confirm_de", L_GUI_LOOT_AUTODE)
 	auto_confirm_de:SetPoint("TOPLEFT", auto_greed, "BOTTOMLEFT", 0, 0)
+
+	local retail = {
+		rolllootframe,
+		auto_greed,
+		auto_confirm_de,
+	}
+
+	if not IsClassicBuild() then
+		HideOptions(retail)
+	end
 end
 
 -- Filger
@@ -2433,11 +2467,8 @@ end
 do
 	local parent = ShestakUIOptionsPanel.announcements
 
-	local drinking = ns.CreateCheckBox(parent, "drinking", L_GUI_ANNOUNCEMENTS_DRINKING)
-	drinking:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, 0)
-
-	local interrupts = ns.CreateCheckBox(parent, "interrupts", L_GUI_ANNOUNCEMENTS_INTERRUPTS)
-	interrupts:SetPoint("TOPLEFT", drinking, "BOTTOMLEFT", 0, 0)
+	local interrupts = ns.CreateCheckBox(parent, "interrupts")
+	interrupts:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, 0)
 
 	local spells = ns.CreateCheckBox(parent, "spells", L_GUI_ANNOUNCEMENTS_SPELLS)
 	spells:SetPoint("TOPLEFT", interrupts, "BOTTOMLEFT", 0, 0)
@@ -2467,42 +2498,45 @@ do
 	spells:HookScript("OnClick", toggleListButton)
 	ListButton:HookScript("OnShow", toggleListButton)
 
-	local spells_from_all = ns.CreateCheckBox(parent, "spells_from_all", L_GUI_ANNOUNCEMENTS_SPELLS_FROM_ALL)
+	local spells_from_all = ns.CreateCheckBox(parent, "spells_from_all")
 	spells_from_all:SetPoint("TOPLEFT", spells, "BOTTOMLEFT", 20, 0)
 
 	spells.children = {spells_from_all}
 
-	local toys = ns.CreateCheckBox(parent, "toys", L_GUI_ANNOUNCEMENTS_TOY_TRAIN)
-	toys:SetPoint("TOPLEFT", spells_from_all, "BOTTOMLEFT", -20, 0)
+	local feasts = ns.CreateCheckBox(parent, "feasts")
+	feasts:SetPoint("TOPLEFT", spells_from_all, "BOTTOMLEFT", -20, 0)
 
-	local says_thanks = ns.CreateCheckBox(parent, "says_thanks", L_GUI_ANNOUNCEMENTS_SAYS_THANKS)
-	says_thanks:SetPoint("TOPLEFT", toys, "BOTTOMLEFT", 0, 0)
+	local portals = ns.CreateCheckBox(parent, "portals")
+	portals:SetPoint("TOPLEFT", feasts, "BOTTOMLEFT", 0, 0)
 
-	local pull_countdown = ns.CreateCheckBox(parent, "pull_countdown", L_GUI_ANNOUNCEMENTS_PULL_COUNTDOWN)
-	pull_countdown:SetPoint("TOPLEFT", says_thanks, "BOTTOMLEFT", 0, 0)
+	local toys = ns.CreateCheckBox(parent, "toys")
+	toys:SetPoint("TOPLEFT", portals, "BOTTOMLEFT", 0, 0)
 
-	local flask_food = ns.CreateCheckBox(parent, "flask_food", L_GUI_ANNOUNCEMENTS_FLASK_FOOD)
-	flask_food:SetPoint("TOPLEFT", pull_countdown, "BOTTOMLEFT", 0, 0)
+	local flask_food = ns.CreateCheckBox(parent, "flask_food")
+	flask_food:SetPoint("TOPLEFT", toys, "BOTTOMLEFT", 0, 0)
 
-	local flask_food_raid = ns.CreateCheckBox(parent, "flask_food_raid", L_GUI_ANNOUNCEMENTS_FLASK_FOOD_RAID)
+	local flask_food_raid = ns.CreateCheckBox(parent, "flask_food_raid")
 	flask_food_raid:SetPoint("TOPLEFT", flask_food, "BOTTOMLEFT", 20, 0)
 
-	local flask_food_auto = ns.CreateCheckBox(parent, "flask_food_auto", L_GUI_ANNOUNCEMENTS_FLASK_FOOD_AUTO)
+	local flask_food_auto = ns.CreateCheckBox(parent, "flask_food_auto")
 	flask_food_auto:SetPoint("TOPLEFT", flask_food_raid, "BOTTOMLEFT", 0, 0)
 
 	flask_food.children = {flask_food_raid, flask_food_auto}
 
-	local feasts = ns.CreateCheckBox(parent, "feasts", L_GUI_ANNOUNCEMENTS_FEASTS)
-	feasts:SetPoint("TOPLEFT", flask_food_auto, "BOTTOMLEFT", -20, 0)
+	local drinking = ns.CreateCheckBox(parent, "drinking")
+	drinking:SetPoint("TOPLEFT", flask_food_auto, "BOTTOMLEFT", -20, 0)
 
-	local portals = ns.CreateCheckBox(parent, "portals", L_GUI_ANNOUNCEMENTS_PORTALS)
-	portals:SetPoint("TOPLEFT", feasts, "BOTTOMLEFT", 0, 0)
+	local pull_countdown = ns.CreateCheckBox(parent, "pull_countdown")
+	pull_countdown:SetPoint("TOPLEFT", drinking, "BOTTOMLEFT", 0, 0)
 
 	local bad_gear = ns.CreateCheckBox(parent, "bad_gear")
-	bad_gear:SetPoint("TOPLEFT", portals, "BOTTOMLEFT", 0, 0)
+	bad_gear:SetPoint("TOPLEFT", pull_countdown, "BOTTOMLEFT", 0, 0)
 
-	local safari_hat = ns.CreateCheckBox(parent, "safari_hat", L_GUI_ANNOUNCEMENTS_SAFARI_HAT)
+	local safari_hat = ns.CreateCheckBox(parent, "safari_hat")
 	safari_hat:SetPoint("TOPLEFT", bad_gear, "BOTTOMLEFT", 0, 0)
+
+	local says_thanks = ns.CreateCheckBox(parent, "says_thanks")
+	says_thanks:SetPoint("TOPLEFT", safari_hat, "BOTTOMLEFT", 0, 0)
 
 	local classic = {
 		drinking,
@@ -2679,12 +2713,18 @@ do
 	ListButton:SetSize(100, 23)
 	ListButton:SetText(L_GUI_SPELL_LIST)
 	ListButton:SetWidth(ListButton.Text:GetWidth() + 15)
+	ListButton.tooltipText = "|cffFFD100"..L_GUI_RESET_SPELLS_DESC.."|r"
 	ListButton:SetScript("OnClick", function()
 		if not C.options["raidcooldown"] then
 			C.options["raidcooldown"] = {}
 		end
 		if not C.options["raidcooldown"]["spells_list"] then
 			C.options["raidcooldown"]["spells_list"] = T.raid_spells
+		end
+		if IsControlKeyDown() then
+			C.options["raidcooldown"]["spells_list"] = nil
+			ns.setReloadNeeded(true)
+			return
 		end
 		BuildSpellList(C.options["raidcooldown"]["spells_list"], true)
 	end)
@@ -2741,12 +2781,19 @@ do
 	ListButton:SetSize(100, 23)
 	ListButton:SetText(L_GUI_SPELL_LIST)
 	ListButton:SetWidth(ListButton.Text:GetWidth() + 15)
+	ListButton.tooltipText = "|cffFFD100"..L_GUI_RESET_SPELLS_DESC.."|r"
 	ListButton:SetScript("OnClick", function()
 		if not C.options["enemycooldown"] then
 			C.options["enemycooldown"] = {}
 		end
 		if not C.options["enemycooldown"]["spells_list"] then
 			C.options["enemycooldown"]["spells_list"] = T.enemy_spells
+			C.options.enemycooldown.spells_list_ver = 2
+		end
+		if IsControlKeyDown() then
+			C.options["enemycooldown"]["spells_list"] = nil
+			ns.setReloadNeeded(true)
+			return
 		end
 		BuildSpellList(C.options["enemycooldown"]["spells_list"], true)
 	end)

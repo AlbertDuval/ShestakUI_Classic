@@ -19,6 +19,7 @@ L_GUI_SPELL_INPUT = "Spell ID" -- Need review
 L_GUI_TIME_INPUT = "Time" -- Need review
 L_GUI_EXPERT_MODE = "Expert mode" -- Need review
 L_GUI_EXPERT_MODE_DESC = "Custom editing of Lua profile" -- Need review
+L_GUI_RESET_SPELLS_DESC = "CTRL-click to reset list" -- Need review
 
 -- General options
 L_GUI_GENERAL_SUBTEXT = "Ces paramètres controllent les rendus de l'interface utilisateur. Saisir '/uihelp' dans le chat pour plus d'information."
@@ -89,7 +90,7 @@ L_GUI_UF_ENABLE = "Activer les barres d'unité"
 L_GUI_UF_OWN_COLOR = "Mettre la couleur de classe comme couleur pour la barre de vie"
 L_GUI_UF_UF_COLOR = "Couleur de la barre de vie"
 L.unitframe_uf_color_bg = "Color of health background" -- Need review
-L_GUI_UF_ENEMY_HEALTH_COLOR = "Si activée, la couleur des cibles ennemi est rouge"
+L.unitframe_enemy_health_color = "Si activée, la couleur des cibles ennemi est rouge"
 L_GUI_UF_TOTAL_VALUE = "Afficher la vie des joueur/cible avec XXXX/Total"
 L_GUI_UF_COLOR_VALUE = "Valeur de vie/mana colorée"
 L_GUI_UF_BAR_COLOR_VALUE = "Couleur de barre de vie en fonction des points de vie"
@@ -318,7 +319,8 @@ L.nameplate_ad_width_desc = "LArgeur additionnelle pour la barre de Noms de la c
 L_GUI_NAMEPLATE_CASTBAR_NAME = "Afficher le nom du sort"
 L_GUI_NAMEPLATE_CLASS_ICON = "Icône de classe en JcJ"
 L_GUI_NAMEPLATE_NAME_ABBREV = "Afficher les noms abrégés"
-L_GUI_NAMEPLATE_CLAMP = "Afficher les barres en haut de l'écran quand celles-ci sont au delà de la vision"
+L.nameplate_clamp = "Afficher les barres en haut de l'écran quand celles-ci sont au delà de la vision" -- Need review
+L.nameplate_clamp_desc = "Afficher les barres en haut de l'écran quand celles-ci sont au delà de la vision"
 L_GUI_NAMEPLATE_SHOW_DEBUFFS = "Affiche les affaiblissements (Les noms abrégés doivent être désactivés)"
 L_GUI_NAMEPLATE_SHOW_BUFFS = "Show dispellable enemy buffs and buffs from the list" -- Need review
 L_GUI_NAMEPLATE_DEBUFFS_SIZE = "Taille des affaiblissements" -- Need review
@@ -326,6 +328,9 @@ L_GUI_NAMEPLATE_HEALER_ICON = "Affiche une icône de soigneur sur toutes les bar
 L_GUI_NAMEPLATE_TOTEM_ICONS = "Afficher une icone au dessus des barres de vie des totems ennemis"
 L.nameplate_target_glow = "Show glow texture for target" -- Need review
 L.nameplate_only_name = "Show only name for friendly units" -- Need review
+L.nameplate_quests = "Show quest icon" -- Need review
+L.nameplate_cast_color = "Show color border for casting important spells" -- Need review
+L.nameplate_kick_color = "Change cast color if interrupt on cd" -- Need review
 L.nameplate_low_health_value = "Health value" -- Need review
 L.nameplate_low_health = "Low health highlight" -- Need review
 L_GUI_NAMEPLATE_THREAT = "Activer la gestion de la menace, change automatiquement selon votre rôle"
@@ -334,6 +339,8 @@ L_GUI_NAMEPLATE_NEAR_COLOR = "Perte/Gain de couleur de menace"
 L_GUI_NAMEPLATE_BAD_COLOR = "Mauvaise couleur de menace, dépend de si vous êtes un tank ou dps/heal"
 L_GUI_NAMEPLATE_OFFTANK_COLOR = "Coloration de la menace du tank secondaire"
 L.nameplate_extra_color = "Explosive and Spiteful affix color" -- Need review
+L.nameplate_mob_color_enable = "Change color for important mobs in dungeons" -- Need review
+L.nameplate_mob_color = "Color for mobs" -- Need review
 
 -- Combat text options
 L_GUI_COMBATTEXT = "Texte de combat"
@@ -411,7 +418,6 @@ L_GUI_MINIMAP_HIDE_COMBAT = "Cacher la minimap en combat"
 L_GUI_MINIMAP_TOGGLE_MENU = "Montre le menu déroulant"
 L.minimap_bg_map_stylization = "Personnalisation de l'arrière plan de la carte"
 L.minimap_fog_of_war = "Retire le brouillard des zones non explorées sur la carte du monde"
-L.minimap_fog_of_war_desc = "Right click on the close button of World Map to activate the option to hide fog of war" -- Need review
 
 -- Loot options
 L_GUI_LOOT_SUBTEXT = "Settings for loot frame." -- Need review
@@ -455,21 +461,21 @@ L.filger_category_list = "Spell list category" -- Need review
 -- Announcements options
 L_GUI_ANNOUNCEMENTS = "Annonces"
 L_GUI_ANNOUNCEMENTS_SUBTEXT = "Settings that add chat announcements about spells or items." -- Need review
-L_GUI_ANNOUNCEMENTS_DRINKING = "Annonce dans la fenêtre de discussion quand un joueur ennemi est entrain de boire"
-L_GUI_ANNOUNCEMENTS_INTERRUPTS = "Annonce /gr, /raid si vous interrompez un sort"
-L_GUI_ANNOUNCEMENTS_SPELLS = "Annonce dans la fenêtre groupe/raid quand vous lancez certains sorts"
-L_GUI_ANNOUNCEMENTS_SPELLS_FROM_ALL = "Annonce les sorts lancés par tous les membres"
-L_GUI_ANNOUNCEMENTS_TOY_TRAIN = "Annonce le lancement du sort Train électrique ou Télécommande navrebière"
-L_GUI_ANNOUNCEMENTS_SAYS_THANKS = "Dire merci pour certains sorts"
-L_GUI_ANNOUNCEMENTS_PULL_COUNTDOWN = "Annonce le compte à rebours pou Pull '/pc #'"
-L_GUI_ANNOUNCEMENTS_FLASK_FOOD = "Annonce l'usage de flasques et nourriture (/ffcheck)"
-L_GUI_ANNOUNCEMENTS_FLASK_FOOD_RAID = "Announce flasque et nourriture sur le canal raid"
-L_GUI_ANNOUNCEMENTS_FLASK_FOOD_AUTO = "Annonce automatiquement la prise de flasque et nourriture après un appel raid" -- Needs review
-L_GUI_ANNOUNCEMENTS_FEASTS = "Annonce la pose de Festins/Pierre de soins/Robots de réparation"
-L_GUI_ANNOUNCEMENTS_PORTALS = "Annonce le lancement de Portails/Pierre de téléportation"
+L.announcements_drinking = "Annonce dans la fenêtre de discussion quand un joueur ennemi est entrain de boire"
+L.announcements_interrupts = "Annonce /gr, /raid si vous interrompez un sort"
+L.announcements_spells = "Annonce dans la fenêtre groupe/raid quand vous lancez certains sorts"
+L.announcements_spells_from_all = "Annonce les sorts lancés par tous les membres"
+L.announcements_toys = "Annonce le lancement du sort Train électrique ou Télécommande navrebière"
+L.announcements_pull_countdown = "Annonce le compte à rebours pou Pull '/pc #'"
+L.announcements_flask_food = "Annonce l'usage de flasques et nourriture (/ffcheck)"
+L.announcements_flask_food_raid = "Announce flasque et nourriture sur le canal raid"
+L.announcements_flask_food_auto = "Annonce automatiquement la prise de flasque et nourriture après un appel raid" -- Needs review
+L.announcements_feasts = "Annonce la pose de Festins/Pierre de soins/Robots de réparation"
+L.announcements_portals = "Annonce le lancement de Portails/Pierre de téléportation"
 L.announcements_bad_gear = "Check your bad gear" -- Need review
 L.announcements_bad_gear_desc = "Vérifie si un mauvais équipement est porté en instance"
-L_GUI_ANNOUNCEMENTS_SAFARI_HAT = "Vérifie l'équipement du Chapeau de Safari"
+L.announcements_safari_hat = "Vérifie l'équipement du Chapeau de Safari"
+L.announcements_says_thanks = "Dire merci pour certains sorts"
 
 -- Automation options
 L_GUI_AUTOMATION = "Automatisation"
@@ -485,6 +491,7 @@ L.automation_accept_quest = "Accepter les quêtes automatiquement"
 L.automation_auto_collapse = "Auto collapse Objective Tracker" -- Need review
 L.automation_auto_collapse_raid = "In Instance" -- Need review
 L.automation_auto_collapse_reload = "After reload" -- Need review
+L.automation_auto_collapse_scenario = "Partially" -- Need review
 L.automation_skip_cinematic = "Désactive automatiquement les cinématiques/film (inactif si la touche Ctrl est appuyée)"
 L.automation_auto_role = "Active automatiquement l'affichage de votre rôle"
 L.automation_cancel_bad_buffs = "Annule automatiquement certains buffs"

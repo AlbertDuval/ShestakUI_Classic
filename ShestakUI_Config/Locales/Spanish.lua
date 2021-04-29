@@ -19,6 +19,7 @@ L_GUI_SPELL_INPUT = "Spell ID" -- Need review
 L_GUI_TIME_INPUT = "Time" -- Need review
 L_GUI_EXPERT_MODE = "Expert mode" -- Need review
 L_GUI_EXPERT_MODE_DESC = "Custom editing of Lua profile" -- Need review
+L_GUI_RESET_SPELLS_DESC = "CTRL-click to reset list" -- Need review
 
 -- General options
 L_GUI_GENERAL_SUBTEXT = "These settings control the general user interface settings. Type in chat '/uihelp' for help." -- Need review
@@ -89,7 +90,7 @@ L_GUI_UF_ENABLE = "Activar marcos de unidades"
 L_GUI_UF_OWN_COLOR = "Color para las barras de vida"
 L_GUI_UF_UF_COLOR = "Color de las Barras de vida (si color para las barras de vida está activo)"
 L.unitframe_uf_color_bg = "Color of health background" -- Need review
-L_GUI_UF_ENEMY_HEALTH_COLOR = "Barra de vida del enemigo objetivo en rojo"
+L.unitframe_enemy_health_color = "Barra de vida del enemigo objetivo en rojo"
 L_GUI_UF_TOTAL_VALUE = "Mostrar vida restante en jugador y objetivo con XXXX/Total"
 L_GUI_UF_COLOR_VALUE = "Colorear valor de Vida/Maná"
 L_GUI_UF_BAR_COLOR_VALUE = "Color de la barra de vida dependiendo de la vida restante"
@@ -318,7 +319,8 @@ L.nameplate_ad_width_desc = "Additional width for selected nameplate" -- Needs r
 L_GUI_NAMEPLATE_CASTBAR_NAME = "Mostrar nombre del hechizo en la barra de lanzamiento"
 L_GUI_NAMEPLATE_CLASS_ICON = "Iconos de clase en JcJ"
 L_GUI_NAMEPLATE_NAME_ABBREV = "Mostrar los nombres abreviados"
-L_GUI_NAMEPLATE_CLAMP = "Clamp nameplates to the top of the screen when outside of view" -- Need review
+L.nameplate_clamp = "Clamp nameplates to the top of the screen when outside of view" -- Need review
+L.nameplate_clamp_desc = "Clamp nameplates to the top of the screen when outside of view" -- Need review
 L_GUI_NAMEPLATE_SHOW_DEBUFFS = "Mostrar perjuicios (Nombres abreviados debe ser desactivado)"
 L_GUI_NAMEPLATE_SHOW_BUFFS = "Show dispellable enemy buffs and buffs from the list" -- Need review
 L_GUI_NAMEPLATE_DEBUFFS_SIZE = "Tamaño de los perjuicios" -- Need review
@@ -326,6 +328,9 @@ L_GUI_NAMEPLATE_HEALER_ICON = "Show icon above enemy healers nameplate in battle
 L_GUI_NAMEPLATE_TOTEM_ICONS = "Show icon above enemy totems nameplate" -- Need review
 L.nameplate_target_glow = "Show glow texture for target" -- Need review
 L.nameplate_only_name = "Show only name for friendly units" -- Need review
+L.nameplate_quests = "Show quest icon" -- Need review
+L.nameplate_cast_color = "Show color border for casting important spells" -- Need review
+L.nameplate_kick_color = "Change cast color if interrupt on cd" -- Need review
 L.nameplate_low_health_value = "Health value" -- Need review
 L.nameplate_low_health = "Low health highlight" -- Need review
 L_GUI_NAMEPLATE_THREAT = "Activar visor de amenaza, cambia automáticamente según tu rol"
@@ -334,6 +339,8 @@ L_GUI_NAMEPLATE_NEAR_COLOR = "Color de perdiendo/ganando amenaza"
 L_GUI_NAMEPLATE_BAD_COLOR = "Color de baja amenaza, varía dependiendo si eres tanque o dps/sanador"
 L_GUI_NAMEPLATE_OFFTANK_COLOR = "Offtank threat color" -- Need review
 L.nameplate_extra_color = "Explosive and Spiteful affix color" -- Need review
+L.nameplate_mob_color_enable = "Change color for important mobs in dungeons" -- Need review
+L.nameplate_mob_color = "Color for mobs" -- Need review
 
 -- Combat text options
 L_GUI_COMBATTEXT = "Texto de Combate"
@@ -411,7 +418,6 @@ L_GUI_MINIMAP_HIDE_COMBAT = "Ocultar minimapa en combate"
 L_GUI_MINIMAP_TOGGLE_MENU = "Show toggle menu" -- Needs review
 L.minimap_bg_map_stylization = "Estilizado del mapa de CB"
 L.minimap_fog_of_war = "Remove fog of war on World Map" -- Needs review
-L.minimap_fog_of_war_desc = "Right click on the close button of World Map to activate the option to hide fog of war" -- Need review
 
 -- Loot options
 L_GUI_LOOT_SUBTEXT = "Settings for loot frame." -- Need review
@@ -455,21 +461,21 @@ L.filger_category_list = "Spell list category" -- Need review
 -- Announcements options
 L_GUI_ANNOUNCEMENTS = "Anuncios"
 L_GUI_ANNOUNCEMENTS_SUBTEXT = "Settings that add chat announcements about spells or items." -- Need review
-L_GUI_ANNOUNCEMENTS_DRINKING = "Anunciar en el chat cuando un enemigo en la arena beba"
-L_GUI_ANNOUNCEMENTS_INTERRUPTS = "Anunciar en el grupo/banda cuando interrumpes"
-L_GUI_ANNOUNCEMENTS_SPELLS = "Anunciar en grupo/banda cuando lanzas el mismo hechizo que otro"
-L_GUI_ANNOUNCEMENTS_SPELLS_FROM_ALL = "Comprueba los lanzamientos de hechizo de todos los miembros"
-L_GUI_ANNOUNCEMENTS_TOY_TRAIN = "Announce Toy Train or Direbrew's Remote cast" -- Needs review
-L_GUI_ANNOUNCEMENTS_SAYS_THANKS = "Says thanks for some spells (resurrection, from the list)" -- Needs review
-L_GUI_ANNOUNCEMENTS_PULL_COUNTDOWN = "Pull countdown announce (/pc #)" -- Needs review
-L_GUI_ANNOUNCEMENTS_FLASK_FOOD = "Announce the usage of flasks and food (/ffcheck)" -- Needs review
-L_GUI_ANNOUNCEMENTS_FLASK_FOOD_RAID = "Announce to raid channel" -- Needs review
-L_GUI_ANNOUNCEMENTS_FLASK_FOOD_AUTO = "Auto check when ReadyCheck" -- Needs review
-L_GUI_ANNOUNCEMENTS_FEASTS = "Announce Feasts/Souls/Repair Bots cast" -- Needs review
-L_GUI_ANNOUNCEMENTS_PORTALS = "Announce Portals/Ritual of Summoning cast" -- Needs review
+L.announcements_drinking = "Anunciar en el chat cuando un enemigo en la arena beba"
+L.announcements_interrupts = "Anunciar en el grupo/banda cuando interrumpes"
+L.announcements_spells = "Anunciar en grupo/banda cuando lanzas el mismo hechizo que otro"
+L.announcements_spells_from_all = "Comprueba los lanzamientos de hechizo de todos los miembros"
+L.announcements_toys = "Announce Toy Train or Direbrew's Remote cast" -- Needs review
+L.announcements_pull_countdown = "Pull countdown announce (/pc #)" -- Needs review
+L.announcements_flask_food = "Announce the usage of flasks and food (/ffcheck)" -- Needs review
+L.announcements_flask_food_raid = "Announce to raid channel" -- Needs review
+L.announcements_flask_food_auto = "Auto check when ReadyCheck" -- Needs review
+L.announcements_feasts = "Announce Feasts/Souls/Repair Bots cast" -- Needs review
+L.announcements_portals = "Announce Portals/Ritual of Summoning cast" -- Needs review
 L.announcements_bad_gear = "Check your bad gear" -- Need review
 L.announcements_bad_gear_desc = "Check your bad gear in instance (fishing pole, from the list)" -- Needs review
-L_GUI_ANNOUNCEMENTS_SAFARI_HAT = "Check Safari Hat when starting Pet Battle" -- Needs review
+L.announcements_safari_hat = "Check Safari Hat when starting Pet Battle" -- Needs review
+L.announcements_says_thanks = "Says thanks for some spells (resurrection, from the list)" -- Needs review
 
 -- Automation options
 L_GUI_AUTOMATION = "Automation" -- Needs review
@@ -485,6 +491,7 @@ L.automation_accept_quest = "Auto aceptar misiones"
 L.automation_auto_collapse = "Auto collapse Objective Tracker" -- Need review
 L.automation_auto_collapse_raid = "In Instance" -- Need review
 L.automation_auto_collapse_reload = "After reload" -- Need review
+L.automation_auto_collapse_scenario = "Partially" -- Need review
 L.automation_skip_cinematic = "Auto skip cinematics/movies (disabled if hold Ctrl)" -- Needs review
 L.automation_auto_role = "Auto set your role" -- Needs review
 L.automation_cancel_bad_buffs = "Auto cancel annoying holiday buffs (from the list)" -- Needs review
