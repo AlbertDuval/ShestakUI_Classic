@@ -31,7 +31,7 @@ for i = 1, 12 do
 				NumPerRows = NumPerRows + C.actionbar.bar1_row
 				NextRowButtonAnchor = _G["ActionButton"..i]
 			else
-				b:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", C.actionbar.button_space, 0)
+				b:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", T.Scale(C.actionbar.button_space), 0)
 			end
 		else
 			b:SetPoint("TOP", UIParent, "TOP", 0, 200)
@@ -41,15 +41,24 @@ for i = 1, 12 do
 			b:SetPoint("BOTTOMLEFT", Bar1Holder, 0, 0)
 		else
 			local previous = _G["ActionButton"..i-1]
-			b:SetPoint("LEFT", previous, "RIGHT", C.actionbar.button_space, 0)
+			b:SetPoint("LEFT", previous, "RIGHT", T.Scale(C.actionbar.button_space), 0)
 		end
 	end
 end
 
 local Page = {}
-if T.classic then
+if T.classic and not T.BCC then
 	Page = {
 		["DRUID"] = "[bonusbar:1,nostealth] 7; [bonusbar:1,stealth] 8; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
+		["WARRIOR"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9;",
+		["PRIEST"] = "[bonusbar:1] 7;",
+		["ROGUE"] = "[bonusbar:1] 7; [form:3] 7;",
+		["WARLOCK"] = "[form:2] 10;",
+		["DEFAULT"] = "[bonusbar:5] 11; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6;",
+	}
+elseif T.BCC then
+	Page = {
+		["DRUID"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
 		["WARRIOR"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9;",
 		["PRIEST"] = "[bonusbar:1] 7;",
 		["ROGUE"] = "[bonusbar:1] 7; [form:3] 7;",

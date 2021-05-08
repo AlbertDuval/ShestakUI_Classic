@@ -12,7 +12,7 @@ PvPMessage:SetScript("OnEvent", function()
 	for i = 1, MAX_BATTLEFIELD_QUEUES do
 		local status = GetBattlefieldStatus(i)
 		if status == "confirm" then
-			if not hasShown and StaticPopup_Visible("CONFIRM_BATTLEFIELD_ENTRY") then
+			if not hasShown and (StaticPopup_Visible("CONFIRM_BATTLEFIELD_ENTRY") or StaticPopup_Visible("CONFIRM_WARGAME_ENTRY")) then
 				hasShown = true
 				print("|cffffff00".."There is an issue with entering BGs from the StaticPopupDialog in WoW Classic. Please enter by right clicking the minimap icon.".."|r")
 			else
@@ -110,11 +110,11 @@ GetAverageItemLevel = _G.GetAverageItemLevel or function()
 		"Trinket0Slot", "Trinket1Slot", "MainHandSlot", "SecondaryHandSlot", "RangedSlot", "AmmoSlot"
 	}
 
-	local total, slot, itn, level = 0, 0, nil, 0
+	local total, slot, itn, level = 0, 0, 0, 0
 
 	for i in pairs(slotName) do
 		slot = GetInventoryItemLink("player", GetInventorySlotInfo(slotName[i]))
-		if slot ~= nil then
+		if slot then
 			itn = itn + 1
 			level = select(4, GetItemInfo(slot))
 			total = total + level

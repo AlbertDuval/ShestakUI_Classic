@@ -24,6 +24,12 @@ if C.reminder.raid_buffs_enable == true or C.announcements.flask_food == true th
 			SpellName(17629),	-- Flask of Chromatic Resistance (+25 Magic Resistance)
 			SpellName(17626),	-- Flask of the Titans (+400 Health)
 		},
+		BattleElixir = {
+			-- SpellName(spellID),	-- Spell name
+		},
+		GuardianElixir = {
+			-- SpellName(spellID),	-- Spell name
+		},
 		Other = {
 			Agility = {
 				SpellName(11334),	-- Elixir of Greater Agility (+25 Agility)
@@ -120,7 +126,6 @@ if C.reminder.raid_buffs_enable == true or C.announcements.flask_food == true th
 				SpellName(8072),	-- Stoneskin
 				SpellName(8836),	-- Grace of Air
 			},
-			
 			Threat = {
 				SpellName(25909)	-- Tranquil Air
 			},
@@ -212,30 +217,6 @@ end
 ]]--------------------------------------------------------------------------------------
 if C.reminder.solo_buffs_enable == true then
 	T.ReminderSelfBuffs = {
-		--[[
-		ROGUE = {
-			[1] = {	-- Lethal Poisons group
-				["spells"] = {
-					SpellName(2823),	-- Deadly Poison
-					SpellName(8679),	-- Wound Poison
-				},
-				["spec"] = 1,		-- Only Assassination have poisen now
-				["combat"] = true,
-				["instance"] = true,
-				["pvp"] = true,
-			},
-			[2] = {	-- Non-Lethal Poisons group
-				["spells"] = {
-					SpellName(3408),	-- Crippling Poison
-					SpellName(108211),	-- Leeching Poison
-				},
-				["spec"] = 1,		-- Only Assassination have poisen now
-				["combat"] = true,
-				["instance"] = true,
-				["pvp"] = true,
-			},
-		},
-		--]]
 		DRUID = {
 			[1] = {	-- Mark of the Wild group
 				["spells"] = {
@@ -354,6 +335,10 @@ if C.reminder.solo_buffs_enable == true then
 					SpellName(20165),		-- Seal of Light
 					SpellName(20166),		-- Seal of Wisdom
 					SpellName(21082),		-- Seal of the Crusader
+					SpellName(31801),		-- Seal of Vengeance
+					SpellName(31892),		-- Seal of Blood
+					SpellName(348700),		-- Seal of the Martyr
+					SpellName(348704),		-- Seal of Corruption
 				},
 				["combat"] = true,
 				["instance"] = true,
@@ -409,22 +394,47 @@ if C.reminder.solo_buffs_enable == true then
 			--]]
 		},
 		ROGUE = {
-			[1] = {	-- Weapon enchants group
-				["weapon"] = true,
+			[1] = {	-- Main Hand Weapon Enchant group
+				["spells"] = {
+					SpellName(8679),	-- Instant Poison
+					SpellName(2823),	-- Deadly Poison
+					SpellName(3408),	-- Crippling Poison
+					SpellName(5761),	-- Mind-numbing Poison
+					SpellName(13219),	-- Wound Poison
+				},
+				["mainhand"] = true,
 				["combat"] = true,
 				["instance"] = true,
 				["pvp"] = true,
-				-- ["level"] = 20,
+				["level"] = 20,
+			},
+			[2] = {	-- Off-Hand Weapon Enchant group
+				["spells"] = {
+					SpellName(8679),	-- Instant Poison
+					SpellName(2823),	-- Deadly Poison
+					SpellName(3408),	-- Crippling Poison
+					SpellName(5761),	-- Mind-numbing Poison
+					SpellName(13219),	-- Wound Poison
+				},
+				["offhand"] = true,
+				["combat"] = true,
+				["instance"] = true,
+				["pvp"] = true,
+				["level"] = 20,
 			},
 		},
 		SHAMAN = {
 			[1] = {	-- Main Hand Weapon Enchant group
 				["spells"] = {
+					SpellName(8232),	-- Windfury Weapon
 					SpellName(8017),	-- Rockbiter Weapon
 					SpellName(8024),	-- Flametongue Weapon
 					SpellName(8033),	-- Frostbrand Weapon
 					SpellName(8024),	-- Flametongue Weapon
-					SpellName(8232),	-- Windfury Weapon
+					SpellName(25123),	-- Brilliant Mana Oil
+					SpellName(25122),	-- Brilliant Wizard Oil
+					SpellName(28898),	-- Blessed Wizard Oil
+					SpellName(25121),	-- Wizard Oil
 				},
 				["mainhand"] = true,
 				["combat"] = true,
@@ -433,11 +443,11 @@ if C.reminder.solo_buffs_enable == true then
 			},
 			[2] = {	-- Off-Hand Weapon Enchant group
 				["spells"] = {
+					SpellName(8232),	-- Windfury Weapon
 					SpellName(8017),	-- Rockbiter Weapon
 					SpellName(8024),	-- Flametongue Weapon
 					SpellName(8033),	-- Frostbrand Weapon
 					SpellName(8024),	-- Flametongue Weapon
-					SpellName(8232),	-- Windfury Weapon
 				},
 				["offhand"] = true,
 				["combat"] = true,
