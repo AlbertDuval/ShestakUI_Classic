@@ -91,7 +91,7 @@ C["unitframe"] = {
 	["uf_color"] = {0.4, 0.4, 0.4},				-- Color for health bars if ["own_color"] = true
 	["uf_color_bg"] = {0.1, 0.1, 0.1},			-- Color for background
 	["enemy_health_color"] = true,				-- If enable, enemy target color is red
-	["show_total_value"] = false,				-- Display of info text on player and target with XXXX/Total
+	["show_total_value"] = true,				-- Display of info text on player and target with XXXX/Total
 	["color_value"] = false,					-- Health/mana value is colored
 	["bar_color_value"] = false,				-- Health bar color by current health remaining
 	["lines"] = true,							-- Show Player and Target lines
@@ -99,9 +99,9 @@ C["unitframe"] = {
 	["bar_color_happiness"] = true,				-- Pet health bar color by happiness
 	-- Cast bars
 	["unit_castbar"] = true,					-- Show castbars
-	["castbar_icon"] = false,					-- Show castbar icons
+	["castbar_icon"] = true,					-- Show castbar icons
 	["castbar_latency"] = true,					-- Castbar latency
-	["castbar_ticks"] = false,					-- Castbar ticks
+	["castbar_ticks"] = true,					-- Castbar ticks
 	-- Frames
 	["show_pet"] = true,						-- Show pet frame
 	["show_focus"] = true,						-- Show focus frame
@@ -126,14 +126,14 @@ C["unitframe"] = {
 	["plugins_power_spark"] = true,				-- Power spark for energy/mana on player frame
 	["plugins_swing"] = false,					-- Swing bar
 	["plugins_reputation_bar"] = false,			-- Reputation bar (left from player frame by mouseover, Middle-Click to lock visibility)
-	["plugins_experience_bar"] = false,			-- Experience bar (left from player frame by mouseover, Middle-Click to lock visibility)
-	["plugins_smooth_bar"] = false,				-- Smooth bar
+	["plugins_experience_bar"] = true,			-- Experience bar (left from player frame by mouseover, Middle-Click to lock visibility)
+	["plugins_smooth_bar"] = true,				-- Smooth bar
 	["plugins_enemy_spec"] = false,				-- Enemy specialization in BG and Arena
 	["plugins_combat_feedback"] = false,		-- Combat text on player/target frame
-	["plugins_fader"] = false,					-- Fade unit frames
+	["plugins_fader"] = true,					-- Fade unit frames
 	["plugins_diminishing"] = false,			-- Diminishing Returns icons on arena frames
-	["plugins_power_prediction"] = false,		-- Power cost prediction bar on player frame
-	["plugins_absorbs"] = false,				-- Absorbs value on player frame
+	["plugins_power_prediction"] = true,		-- Power cost prediction bar on player frame
+	["plugins_absorbs"] = true,				-- Absorbs value on player frame
 	-- Size
 	["player_width"] = 217,						-- Player and Target width
 	["boss_width"] = 150,						-- Boss and Arena width
@@ -206,6 +206,7 @@ C["raidframe"] = {
 	["icons_sumon"] = true,						-- Sumon icons on frames
 	["icons_phase"] = true,						-- Phase icons on frames
 	-- Plugins
+	["plugins_debuffhighlight_icon"] = true,	-- Debuff highlight texture + icon
 	["plugins_aura_watch"] = true,				-- Raid debuff icons (from the list)
 	["plugins_aura_watch_timer"] = false,		-- Timer on raid debuff icons
 	["plugins_debuffhighlight_icon"] = false,	-- Show dispellable debuff icon (texture will be shown anyway)
@@ -214,7 +215,7 @@ C["raidframe"] = {
 	["plugins_auto_resurrection"] = false,		-- Auto cast resurrection on middle-click (doesn't work with Clique)
 	-- Heal layout size
 	["heal_width"] = 60.2,						-- Unit width
-	["heal_height"] = 26,						-- Unit height
+	["heal_height"] = 34,						-- Unit height
 	["heal_power_height"] = 2,					-- Raid power height
 	-- DPS layout size
 	["dps_raid_width"] = 104,					-- Raid width
@@ -233,8 +234,8 @@ end
 --	Auras/Buffs/Debuffs options
 ----------------------------------------------------------------------------------------
 C["aura"] = {
-	["player_buff_size"] = 25,					-- Player buffs size
-	["player_debuff_size"] = 25,				-- Debuffs size
+	["player_buff_size"] = 35,					-- Player buffs size
+	["player_debuff_size"] = 35,				-- Debuffs size
 	["show_spiral"] = false,					-- Spiral on aura icons
 	["show_timer"] = true,						-- Show cooldown timer on aura icons
 	["player_auras"] = true,					-- Auras on player frame
@@ -246,8 +247,8 @@ C["aura"] = {
 	["boss_buffs"] = true,						-- Buffs on boss frame
 	["player_aura_only"] = false,				-- Only your debuff on target frame
 	["debuff_color_type"] = true,				-- Color debuff by type
-	["cast_by"] = false,						-- Show who cast a buff/debuff in its tooltip
-	["classcolor_border"] = false,				-- Enable classcolor border for player buffs
+	["cast_by"] = true,						-- Show who cast a buff/debuff in its tooltip
+	["classcolor_border"] = true,				-- Enable classcolor border for player buffs
 }
 
 ----------------------------------------------------------------------------------------
@@ -384,9 +385,9 @@ C["nameplate"] = {
 	["enable"] = true, 							-- Enable nameplate
 	["width"] = 120,							-- Nameplate width
 	["height"] = 9,								-- Nameplate height
-	["ad_width"] = 0,							-- Additional width for selected nameplate
-	["ad_height"] = 0,							-- Additional height for selected nameplate
-	["alpha"] = 0.5,							-- Non-target nameplate alpha
+	["ad_width"] = 16,							-- Additional width for selected nameplate
+	["ad_height"] = 2,							-- Additional height for selected nameplate
+	["alpha"] = 0.67,							-- Non-target nameplate alpha
 	["distance"] = 40,							-- Show nameplates for units within this range
 	["combat"] = false,							-- Automatically show nameplate in combat
 	["health_value"] = false,					-- Numeral health value
@@ -562,7 +563,7 @@ C["announcements"] = {
 C["automation"] = {
 	["dismount_stand"] = true,					-- Auto dismount/stand
 	["release"] = true,							-- Auto release the spirit in battlegrounds
-	["screenshot"] = false,						-- Take screenshot when player get achievement
+	["screenshot"] = true,						-- Take screenshot when player get achievement
 	["solve_artifact"] = true,					-- Auto popup for solve artifact
 	["accept_invite"] = false,					-- Auto accept invite
 	["decline_duel"] = true,					-- Auto decline duel (/disduel to temporarily disable)
