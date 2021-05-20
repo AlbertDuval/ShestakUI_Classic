@@ -31,6 +31,11 @@ local AddUnit = function(unit)
 	if threatval and threatval < 0 then
 		threatval = threatval + 410065408
 	end
+
+	if T.classic then
+		threatval = threatval and math.floor(threatval / 100)
+	end
+
 	local guid = UnitGUID(unit)
 	if not tList[guid] then
 		tinsert(barList, guid)

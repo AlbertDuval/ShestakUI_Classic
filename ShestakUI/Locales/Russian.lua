@@ -47,6 +47,7 @@ L_MISC_UNDRESS = "Раздеть"
 L_MISC_DRINKING = " пьёт."
 L_MISC_BUY_STACK = "Зажмите Alt и щелкните мышью, чтобы купить связку"
 L_MISC_UI_OUTDATED = "Ваша версия ShestakUI устарела. Вы можете скачать последнюю версию с www.shestak.org"
+L_MISC_UI_OUTDATED_CLASSIC = "Ваша версия ShestakUI устарела. Вы можете скачать последнюю версию с https://github.com/EsreverWoW/ShestakUI_Classic"
 L_MISC_HEADER_MARK = "Метки по наведению курсора"
 L_MISC_BINDER_OPEN = "Назначения мыши"
 L_MISC_SCROLL = "Свиток"
@@ -114,7 +115,6 @@ L_ERRORFRAME_L = "Щелкните, чтобы посмотреть ошибки
 
 -- Bags
 L_BAG_SHOW_BAGS = "Показать сумки"
-L_BAG_SHOW_KEYRING = "Toggle Keyring" -- Needs review
 L_BAG_RIGHT_CLICK_SEARCH = "ПКМ для поиска"
 L_BAG_STACK_MENU = "Сложить"
 L_BAG_RIGHT_CLICK_CLOSE = "ПКМ, чтобы открыть меню"
@@ -187,6 +187,9 @@ L_POPUP_ARMORY = "Оружейная"
 L_WELCOME_LINE_1 = "Добро пожаловать в ShestakUI "
 L_WELCOME_LINE_2_1 = "Введите /cfg для входа в настройки интерфейса, или посетите страницу http://shestak.org"
 L_WELCOME_LINE_2_2 = "для получения дополнительной информации."
+L_WELCOME_LINE_1_CLASSIC = "Добро пожаловать в ShestakUI (Classic) "
+L_WELCOME_LINE_2_1_CLASSIC = "Введите /cfg для входа в настройки интерфейса, или посетите страницу https://github.com/EsreverWoW/ShestakUI_Classic"
+L_WELCOME_LINE_2_2_CLASSIC = "для получения дополнительной информации."
 
 -- Combat text
 L_COMBATTEXT_KILLING_BLOW = "Смерт. Удар"
