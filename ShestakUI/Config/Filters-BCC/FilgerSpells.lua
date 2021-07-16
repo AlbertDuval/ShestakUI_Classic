@@ -1163,9 +1163,9 @@ C["filger_spells"] = {
 			-- Blood Fury (Physical)
 			{spellID = 20572, filter = "CD", absID = true},
 			-- Blood Fury (Both)
-			-- {spellID = 33697, filter = "CD", absID = true},
+			{spellID = 33697, filter = "CD", absID = true},
 			-- Blood Fury (Spell)
-			-- {spellID = 33702, filter = "CD", absID = true},
+			{spellID = 33702, filter = "CD", absID = true},
 			-- Gift of the Naaru (Draenei)
 			{spellID = 28880, filter = "CD"},
 			-- Shadowmeld (Night Elf)
@@ -1736,6 +1736,8 @@ C["filger_spells"] = {
 			{spellID = 31892, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Seal of Command
 			{spellID = 27170, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Seal of Corruption
+			{spellID = 348704, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Seal of Justice
 			{spellID = 20164, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Seal of Light
@@ -1748,6 +1750,8 @@ C["filger_spells"] = {
 			{spellID = 20166, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Seal of the Crusader
 			{spellID = 21082, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Seal of the Martyr
+			{spellID = 348700, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Shadow Resistance Aura
 			-- {spellID = 19876, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Vengeance r1
@@ -3159,7 +3163,7 @@ C["filger_spells"] = {
 			-- Blood Fury (Physical)
 			{spellID = 20572, filter = "CD", absID = true},
 			-- Blood Fury (Both)
-			-- {spellID = 33697, filter = "CD", absID = true},
+			{spellID = 33697, filter = "CD", absID = true},
 			-- Cannibalize (Forsaken)
 			{spellID = 20577, filter = "CD"},
 			-- Escape Artist (Gnome)
@@ -3288,8 +3292,10 @@ C["filger_spells"] = {
 			-- {spellID = 8076, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Totem of Wrath
 			-- {spellID = 30708, unitID = "player", caster = "player", filter = "BUFF"},
-			-- Water Shield
+			-- Water Shield r1
 			{spellID = 24398, unitID = "player", caster = "player", filter = "BUFF", absID = true},
+			-- Water Shield r2
+			{spellID = 33736, unitID = "player", caster = "player", filter = "BUFF", absID = true},
 			-- Windwall Totem
 			-- {spellID = 15108, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Wrath of Air Totem
@@ -3767,9 +3773,9 @@ C["filger_spells"] = {
 			-- Blood Fury (Physical)
 			{spellID = 20572, filter = "CD", absID = true},
 			-- Blood Fury (Both)
-			-- {spellID = 33697, filter = "CD", absID = true},
+			{spellID = 33697, filter = "CD", absID = true},
 			-- Blood Fury (Spell)
-			-- {spellID = 33702, filter = "CD", absID = true},
+			{spellID = 33702, filter = "CD", absID = true},
 			-- Gift of the Naaru (Draenei)
 			{spellID = 28880, filter = "CD"},
 			-- War Stomp (Tauren)
@@ -4130,8 +4136,12 @@ C["filger_spells"] = {
 			{spellID = 21949, unitID = "target", caster = "all", filter = "DEBUFF", absID = true},
 			-- Tainted Blood Effect (Felhunter)
 			{spellID = 19479, unitID = "target", caster = "all", filter = "DEBUFF"},
-			-- Unstable Affliction
+			-- Unstable Affliction r1
 			{spellID = 30108, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
+			-- Unstable Affliction r2
+			{spellID = 30404, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
+			-- Unstable Affliction r3
+			{spellID = 30405, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
 			-- Unstable Affliction (Silence)
 			{spellID = 31117, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
 
@@ -4223,7 +4233,7 @@ C["filger_spells"] = {
 			-- Blood Fury (Both)
 			{spellID = 33697, filter = "CD", absID = true},
 			-- Blood Fury (Spell)
-			-- {spellID = 33702, filter = "CD", absID = true},
+			{spellID = 33702, filter = "CD", absID = true},
 			-- Cannibalize (Forsaken)
 			{spellID = 20577, filter = "CD"},
 			-- Escape Artist (Gnome)
@@ -4728,7 +4738,7 @@ C["filger_spells"] = {
 			-- Blood Fury (Physical)
 			{spellID = 20572, filter = "CD", absID = true},
 			-- Blood Fury (Both)
-			-- {spellID = 33697, filter = "CD", absID = true},
+			{spellID = 33697, filter = "CD", absID = true},
 			-- Cannibalize (Forsaken)
 			{spellID = 20577, filter = "CD"},
 			-- Escape Artist (Gnome)
@@ -4895,9 +4905,9 @@ C["filger_spells"] = {
 			-- Blood Fury (Physical)
 			{spellID = 20572, unitID = "player", caster = "player", filter = "BUFF", absID = true},
 			-- Blood Fury (Both)
-			-- {spellID = 33697, unitID = "player", caster = "player", filter = "BUFF", absID = true},
+			{spellID = 33697, unitID = "player", caster = "player", filter = "BUFF", absID = true},
 			-- Blood Fury (Spell)
-			-- {spellID = 33702, unitID = "player", caster = "player", filter = "BUFF", absID = true},
+			{spellID = 33702, unitID = "player", caster = "player", filter = "BUFF", absID = true},
 			-- Gift of the Naaru (Draenei)
 			{spellID = 28880, unitID = "player", caster = "all", filter = "BUFF"},-- Perception (Human)
 			{spellID = 20600, unitID = "player", caster = "player", filter = "BUFF"},

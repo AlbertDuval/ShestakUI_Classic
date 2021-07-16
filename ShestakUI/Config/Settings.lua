@@ -584,7 +584,7 @@ C["automation"] = {
 	["invite_keyword"] = "inv +",				-- List of keyword (separated by space)
 }
 
-if not T.classic or T.BCC then
+if not T.classic then
 	C["automation"]["dismount_stand"] = false
 end
 
