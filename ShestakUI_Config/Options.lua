@@ -197,6 +197,13 @@ if IsClassicBuild() then
 	tremove(RaidTable, 3)
 end
 
+local PortraitTable = {
+	"3D",
+	"2D",
+	"ICONS",
+	"OVERLAY"
+}
+
 local TextureTable
 if LSM then
 	TextureTable = LSM:HashTable("statusbar")
@@ -609,6 +616,9 @@ do
 	local hide_talking_head = ns.CreateCheckBox(parent, "hide_talking_head")
 	hide_talking_head:SetPoint("TOPLEFT", hide_banner, "BOTTOMLEFT", 0, 0)
 
+	local hide_maw_buffs = ns.CreateCheckBox(parent, "hide_maw_buffs")
+	hide_maw_buffs:SetPoint("TOPLEFT", hide_talking_head, "BOTTOMLEFT", 0, 0)
+
 	-- Panel 2
 	local parent = ShestakUIOptionsPanel.general2
 
@@ -692,7 +702,8 @@ do
 	local classic = {
 		vehicle_mouseover,
 		hide_banner,
-		hide_talking_head
+		hide_talking_head,
+		hide_maw_buffs
 	}
 
 	if IsClassicBuild() then
@@ -954,7 +965,79 @@ end
 
 -- Skins
 do
-	if not IsClassicBuild() then
+	if IsClassicBuild() then
+		local parent = ShestakUIOptionsPanel.skins
+
+		local blizzard_frames = ns.CreateCheckBox(parent, "blizzard_frames", L_GUI_SKINS_BLIZZARD)
+		blizzard_frames:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, 0)
+
+		local bubbles = ns.CreateCheckBox(parent, "bubbles", L_GUI_CHAT_SKIN_BUBBLE)
+		bubbles:SetPoint("TOPLEFT", blizzard_frames, "BOTTOMLEFT", 0, 0)
+
+		local minimap_buttons = ns.CreateCheckBox(parent, "minimap_buttons", L_GUI_SKINS_MINIMAP_BUTTONS)
+		minimap_buttons:SetPoint("TOPLEFT", bubbles, "BOTTOMLEFT", 0, 0)
+
+		local minimap_buttons_mouseover = ns.CreateCheckBox(parent, "minimap_buttons_mouseover")
+		minimap_buttons_mouseover:SetPoint("TOPLEFT", minimap_buttons, "BOTTOMLEFT", 20, 0)
+
+		-- Addons
+		local subheader = ns.addSubCategory(parent, L_GUI_SKINS_SUBHEADER)
+		subheader:SetPoint("TOPLEFT", minimap_buttons_mouseover, "BOTTOMLEFT", -20, -16)
+
+		local ace3 = ns.CreateCheckBox(parent, "ace3", L_GUI_SKINS_ACE3)
+		ace3:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -8)
+
+		local atlasloot = ns.CreateCheckBox(parent, "atlasloot", L_GUI_SKINS_ATLASLOOT)
+		atlasloot:SetPoint("LEFT", ace3, "RIGHT", 320, 0)
+
+		local bigwigs = ns.CreateCheckBox(parent, "bigwigs", L_GUI_SKINS_BW)
+		bigwigs:SetPoint("TOPLEFT", ace3, "BOTTOMLEFT", 0, 0)
+
+		local capping = ns.CreateCheckBox(parent, "capping", L_GUI_SKINS_CAPPING)
+		capping:SetPoint("LEFT", bigwigs, "RIGHT", 320, 0)
+
+		local clique = ns.CreateCheckBox(parent, "clique", L_GUI_SKINS_CLIQUE)
+		clique:SetPoint("TOPLEFT", bigwigs, "BOTTOMLEFT", 0, 0)
+
+		local cool_line = ns.CreateCheckBox(parent, "cool_line", L_GUI_SKINS_COOL_LINE)
+		cool_line:SetPoint("LEFT", clique, "RIGHT", 320, 0)
+
+		local dbm = ns.CreateCheckBox(parent, "dbm", L_GUI_SKINS_DBM)
+		dbm:SetPoint("TOPLEFT", clique, "BOTTOMLEFT", 0, 0)
+
+		local details = ns.CreateCheckBox(parent, "details", L_GUI_SKINS_DETAILS)
+		details:SetPoint("LEFT", dbm, "RIGHT", 320, 0)
+
+		local dominos = ns.CreateCheckBox(parent, "dominos", L_GUI_SKINS_DOMINOS)
+		dominos:SetPoint("TOPLEFT", dbm, "BOTTOMLEFT", 0, 0)
+
+		local ls_toasts = ns.CreateCheckBox(parent, "ls_toasts", L_GUI_SKINS_LS_TOASTS)
+		ls_toasts:SetPoint("LEFT", dominos, "RIGHT", 320, 0)
+
+		local omen = ns.CreateCheckBox(parent, "omen", L_GUI_SKINS_OMEN)
+		omen:SetPoint("TOPLEFT", dominos, "BOTTOMLEFT", 0, 0)
+
+		local opie = ns.CreateCheckBox(parent, "opie", L_GUI_SKINS_OPIE)
+		opie:SetPoint("LEFT", omen, "RIGHT", 320, 0)
+
+		local postal = ns.CreateCheckBox(parent, "postal", L_GUI_SKINS_POSTAL)
+		postal:SetPoint("TOPLEFT", omen, "BOTTOMLEFT", 0, 0)
+
+		local recount = ns.CreateCheckBox(parent, "recount", L_GUI_SKINS_RECOUNT)
+		recount:SetPoint("LEFT", postal, "RIGHT", 320, 0)
+
+		local skada = ns.CreateCheckBox(parent, "skada", L_GUI_SKINS_SKADA)
+		skada:SetPoint("TOPLEFT", postal, "BOTTOMLEFT", 0, 0)
+
+		local vanaskos = ns.CreateCheckBox(parent, "vanaskos", L_GUI_SKINS_VANASKOS)
+		vanaskos:SetPoint("LEFT", skada, "RIGHT", 320, 0)
+
+		local weak_auras = ns.CreateCheckBox(parent, "weak_auras", L_GUI_SKINS_WEAK_AURAS)
+		weak_auras:SetPoint("TOPLEFT", skada, "BOTTOMLEFT", 0, 0)
+
+		-- Versions of MyRolePlay and NugRunning exist for Classic, but the skins
+		-- presently need some work before being reintroduced.
+	else
 		local parent = ShestakUIOptionsPanel.skins
 
 		local blizzard_frames = ns.CreateCheckBox(parent, "blizzard_frames", L_GUI_SKINS_BLIZZARD)
@@ -997,13 +1080,8 @@ do
 		local dbm = ns.CreateCheckBox(parent, "dbm", L_GUI_SKINS_DBM)
 		dbm:SetPoint("TOPLEFT", clique, "BOTTOMLEFT", 0, 0)
 
-		local dbm_movable = ns.CreateCheckBox(parent, "dbm_movable", L_GUI_SKINS_DBM_MOVABLE)
-		dbm_movable:SetPoint("TOPLEFT", dbm, "BOTTOMLEFT", 20, 0)
-
-		dbm.children = {dbm_movable}
-
 		local details = ns.CreateCheckBox(parent, "details", L_GUI_SKINS_DETAILS)
-		details:SetPoint("TOPLEFT", dbm_movable, "BOTTOMLEFT", -20, 0)
+		details:SetPoint("TOPLEFT", dbm, "BOTTOMLEFT", -20, 0)
 
 		local dominos = ns.CreateCheckBox(parent, "dominos", L_GUI_SKINS_DOMINOS)
 		dominos:SetPoint("LEFT", details, "RIGHT", 320, 0)
@@ -1055,83 +1133,6 @@ do
 
 		local weak_auras = ns.CreateCheckBox(parent, "weak_auras", L_GUI_SKINS_WEAK_AURAS)
 		weak_auras:SetPoint("LEFT", vanaskos, "RIGHT", 320, 0)
-	else
-		local parent = ShestakUIOptionsPanel.skins
-
-		local blizzard_frames = ns.CreateCheckBox(parent, "blizzard_frames", L_GUI_SKINS_BLIZZARD)
-		blizzard_frames:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, 0)
-
-		local bubbles = ns.CreateCheckBox(parent, "bubbles", L_GUI_CHAT_SKIN_BUBBLE)
-		bubbles:SetPoint("TOPLEFT", blizzard_frames, "BOTTOMLEFT", 0, 0)
-
-		local minimap_buttons = ns.CreateCheckBox(parent, "minimap_buttons", L_GUI_SKINS_MINIMAP_BUTTONS)
-		minimap_buttons:SetPoint("TOPLEFT", bubbles, "BOTTOMLEFT", 0, 0)
-
-		local minimap_buttons_mouseover = ns.CreateCheckBox(parent, "minimap_buttons_mouseover")
-		minimap_buttons_mouseover:SetPoint("TOPLEFT", minimap_buttons, "BOTTOMLEFT", 20, 0)
-
-		-- Addons
-		local subheader = ns.addSubCategory(parent, L_GUI_SKINS_SUBHEADER)
-		subheader:SetPoint("TOPLEFT", minimap_buttons_mouseover, "BOTTOMLEFT", -20, -16)
-
-		local ace3 = ns.CreateCheckBox(parent, "ace3", L_GUI_SKINS_ACE3)
-		ace3:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -8)
-
-		local atlasloot = ns.CreateCheckBox(parent, "atlasloot", L_GUI_SKINS_ATLASLOOT)
-		atlasloot:SetPoint("LEFT", ace3, "RIGHT", 320, 0)
-
-		local bigwigs = ns.CreateCheckBox(parent, "bigwigs", L_GUI_SKINS_BW)
-		bigwigs:SetPoint("TOPLEFT", ace3, "BOTTOMLEFT", 0, 0)
-
-		local capping = ns.CreateCheckBox(parent, "capping", L_GUI_SKINS_CAPPING)
-		capping:SetPoint("LEFT", bigwigs, "RIGHT", 320, 0)
-
-		local clique = ns.CreateCheckBox(parent, "clique", L_GUI_SKINS_CLIQUE)
-		clique:SetPoint("TOPLEFT", bigwigs, "BOTTOMLEFT", 0, 0)
-
-		local cool_line = ns.CreateCheckBox(parent, "cool_line", L_GUI_SKINS_COOL_LINE)
-		cool_line:SetPoint("LEFT", clique, "RIGHT", 320, 0)
-
-		local dbm = ns.CreateCheckBox(parent, "dbm", L_GUI_SKINS_DBM)
-		dbm:SetPoint("TOPLEFT", clique, "BOTTOMLEFT", 0, 0)
-
-		local dbm_movable = ns.CreateCheckBox(parent, "dbm_movable", L_GUI_SKINS_DBM_MOVABLE)
-		dbm_movable:SetPoint("TOPLEFT", dbm, "BOTTOMLEFT", 20, 0)
-
-		dbm.children = {dbm_movable}
-
-		local details = ns.CreateCheckBox(parent, "details", L_GUI_SKINS_DETAILS)
-		details:SetPoint("TOPLEFT", dbm_movable, "BOTTOMLEFT", -20, 0)
-
-		local dominos = ns.CreateCheckBox(parent, "dominos", L_GUI_SKINS_DOMINOS)
-		dominos:SetPoint("LEFT", details, "RIGHT", 320, 0)
-
-		local ls_toasts = ns.CreateCheckBox(parent, "ls_toasts", L_GUI_SKINS_LS_TOASTS)
-		ls_toasts:SetPoint("TOPLEFT", details, "BOTTOMLEFT", 0, 0)
-
-		local omen = ns.CreateCheckBox(parent, "omen", L_GUI_SKINS_OMEN)
-		omen:SetPoint("LEFT", ls_toasts, "RIGHT", 320, 0)
-
-		local opie = ns.CreateCheckBox(parent, "opie", L_GUI_SKINS_OPIE)
-		opie:SetPoint("TOPLEFT", ls_toasts, "BOTTOMLEFT", 0, 0)
-
-		local postal = ns.CreateCheckBox(parent, "postal", L_GUI_SKINS_POSTAL)
-		postal:SetPoint("LEFT", opie, "RIGHT", 320, 0)
-
-		local recount = ns.CreateCheckBox(parent, "recount", L_GUI_SKINS_RECOUNT)
-		recount:SetPoint("TOPLEFT", opie, "BOTTOMLEFT", 0, 0)
-
-		local skada = ns.CreateCheckBox(parent, "skada", L_GUI_SKINS_SKADA)
-		skada:SetPoint("LEFT", recount, "RIGHT", 320, 0)
-
-		local vanaskos = ns.CreateCheckBox(parent, "vanaskos", L_GUI_SKINS_VANASKOS)
-		vanaskos:SetPoint("TOPLEFT", recount, "BOTTOMLEFT", 0, 0)
-
-		local weak_auras = ns.CreateCheckBox(parent, "weak_auras", L_GUI_SKINS_WEAK_AURAS)
-		weak_auras:SetPoint("LEFT", vanaskos, "RIGHT", 320, 0)
-
-		-- Versions of MyRolePlay and NugRunning exist for Classic, but the skins
-		-- presently need some work before being reintroduced.
 	end
 end
 
@@ -1241,8 +1242,11 @@ do
 	local portrait_classcolor_border = ns.CreateCheckBox(parent, "portrait_classcolor_border", L_GUI_UF_PORTRAIT_CLASSCOLOR_BORDER)
 	portrait_classcolor_border:SetPoint("TOPLEFT", portrait_enable, "BOTTOMLEFT", 0, 0)
 
+	local portrait_type = ns.CreateDropDown(parent, "portrait_type", true, nil, PortraitTable)
+	portrait_type:SetPoint("TOPLEFT", portrait_classcolor_border, "BOTTOMLEFT", -16, -10)
+
 	local portrait_height = ns.CreateNumberSlider(parent, "portrait_height", nil, nil, 0, 190, 1, true, L_GUI_UF_PORTRAIT_HEIGHT)
-	portrait_height:SetPoint("TOPLEFT", portrait_classcolor_border, "BOTTOMLEFT", 0, -20)
+	portrait_height:SetPoint("TOPLEFT", portrait_type, "BOTTOMLEFT", 16, -16)
 
 	local portrait_width = ns.CreateNumberSlider(parent, "portrait_width", nil, nil, 0, 130, 1, true, L_GUI_UF_PORTRAIT_WIDTH)
 	portrait_width:SetPoint("LEFT", portrait_height, "RIGHT", 120, 0)
@@ -1558,10 +1562,10 @@ do
 	local subheader = ns.addSubCategory(parent, L.raidframe_subheader_heal_size)
 	subheader:SetPoint("TOPLEFT", plugins_auto_resurrection, "BOTTOMLEFT", 0, -10)
 
-	local heal_width = ns.CreateNumberSlider(parent, "heal_width", nil, nil, 50, 120, 1, true)
+	local heal_width = ns.CreateNumberSlider(parent, "heal_width", nil, nil, 50, 200, 1, true)
 	heal_width:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -30)
 
-	local heal_height = ns.CreateNumberSlider(parent, "heal_height", nil, nil, 20, 60, 1, true)
+	local heal_height = ns.CreateNumberSlider(parent, "heal_height", nil, nil, 20, 200, 1, true)
 	heal_height:SetPoint("LEFT", heal_width, "RIGHT", 120, 0)
 
 	local heal_power_height = ns.CreateNumberSlider(parent, "heal_power_height", nil, nil, 0, 10, 1, true)
@@ -2551,8 +2555,12 @@ do
 	local pull_countdown = ns.CreateCheckBox(parent, "pull_countdown")
 	pull_countdown:SetPoint("TOPLEFT", drinking, "BOTTOMLEFT", 0, 0)
 
+	-- Self announce
+	local subheader = ns.addSubCategory(parent, L.announcements_subheader_self)
+	subheader:SetPoint("TOPLEFT", pull_countdown, "BOTTOMLEFT", 0, -10)
+
 	local bad_gear = ns.CreateCheckBox(parent, "bad_gear")
-	bad_gear:SetPoint("TOPLEFT", pull_countdown, "BOTTOMLEFT", 0, 0)
+	bad_gear:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -10)
 
 	local safari_hat = ns.CreateCheckBox(parent, "safari_hat")
 	safari_hat:SetPoint("TOPLEFT", bad_gear, "BOTTOMLEFT", 0, 0)

@@ -1294,8 +1294,6 @@ C["filger_spells"] = {
 			{spellID = 115750, filter = "CD"},
 			-- Holy Avenger
 			{spellID = 105809, filter = "CD"},
-			-- Holy Wrath
-			{spellID = 210220, filter = "CD"},
 			-- Aura Mastery
 			{spellID = 31821, filter = "CD"},
 			-- Blessing of Sacrifice
@@ -2750,8 +2748,6 @@ C["filger_spells"] = {
 			{spellID = 108978, unitID = "target", caster = "all", filter = "BUFF"},
 			-- Temporal Shield
 			{spellID = 198111, unitID = "target", caster = "all", filter = "BUFF"},
-			-- Evanesce
-			{spellID = 157913, unitID = "target", caster = "all", filter = "BUFF"},
 			-- Evocation
 			{spellID = 12051, unitID = "target", caster = "all", filter = "BUFF"},
 			-- Debuffs
@@ -2881,8 +2877,6 @@ C["filger_spells"] = {
 			{spellID = 114052, unitID = "target", caster = "all", filter = "BUFF"},
 			-- Ethereal Form
 			{spellID = 210918, unitID = "target", caster = "all", filter = "BUFF"},
-			-- Spirit Link
-			{spellID = 204293, unitID = "target", caster = "all", filter = "BUFF"},
 			-- Debuffs
 			-- Hex
 			{spellID = 51514, unitID = "target", caster = "all", filter = "DEBUFF"},
@@ -3075,4 +3069,10 @@ do
 	-- Trinkets
 	tinsert(T.CustomFilgerSpell, {"COOLDOWN", {slotID = 13, filter = "CD"}})
 	tinsert(T.CustomFilgerSpell, {"COOLDOWN", {slotID = 14, filter = "CD"}})
+
+	-- Shard of Domination [9.1]
+	-- Soul Fragment
+	tinsert(T.CustomFilgerSpell, {"P_PROC_ICON", {spellID = 356042, unitID = "player", caster = "all", filter = "BUFF", absID = true}})
+	-- Chaos Bane
+	tinsert(T.CustomFilgerSpell, {"P_PROC_ICON", {spellID = 356043, unitID = "player", caster = "all", filter = "BUFF", absID = true}})
 end

@@ -41,6 +41,7 @@ C["general"] = {
 	["minimize_mouseover"] = false,				-- Mouseover for quest minimize button
 	["hide_banner"] = false,					-- Hide Boss Banner Loot Frame
 	["hide_talking_head"] = false,				-- Hide Talking Head Frame
+	["hide_maw_buffs"] = false,					-- Hide Maw Buffs frame in instances
 }
 
 ----------------------------------------------------------------------------------------
@@ -60,7 +61,6 @@ C["skins"] = {
 	["clique"] = false,							-- Clique skin
 	["cool_line"] = false,						-- CoolLine skin
 	["dbm"] = true,							-- DBM skin
-	["dbm_movable"] = false,					-- Allow to move DBM bars
 	["details"] = false,						-- Details skin
 	["dominos"] = false,						-- Dominos skin
 	["flyout_button"] = false,					-- FlyoutButtonCustom skin
@@ -119,6 +119,7 @@ C["unitframe"] = {
 	-- Portraits
 	["portrait_enable"] = false,				-- Enable player/target portraits
 	["portrait_classcolor_border"] = true,		-- Enable classcolor border
+	["portrait_type"] = "3D",					-- Type of portraits (3D, 2D, ICONS, OVERLAY)
 	["portrait_height"] = 92,					-- Portrait height
 	["portrait_width"] = 67,					-- Portrait width
 	-- Plugins
