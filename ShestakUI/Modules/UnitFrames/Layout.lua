@@ -76,11 +76,19 @@ local function Shared(self, unit)
 		self.Health.colorClass = true
 		self.Health.colorReaction = true
 	end
+
+	if unit == "pet" and C.unitframe.bar_color_happiness == true then
+		self.Health.colorHappiness = true
+	else
+		self.Health.colorHappiness = false
+	end
+
 	if C.unitframe.plugins_smooth_bar == true then
 		self.Health.Smooth = true
 	end
 
 	self.Health.PostUpdate = T.PostUpdateHealth
+	self.Health.PostUpdateColor = T.PostUpdateHealthColor
 
 	-- Health bar background
 	self.Health.bg = self.Health:CreateTexture(nil, "BORDER")
@@ -146,6 +154,7 @@ local function Shared(self, unit)
 
 	self.Power.PreUpdate = T.PreUpdatePower
 	self.Power.PostUpdate = T.PostUpdatePower
+	self.Power.PostUpdateColor = T.PostUpdatePowerColor
 
 	self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
 	self.Power.bg:SetAllPoints()

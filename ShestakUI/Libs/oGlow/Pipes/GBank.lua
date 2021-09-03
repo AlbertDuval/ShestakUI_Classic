@@ -1,25 +1,43 @@
-if oGlow:IsClassic() then return end
+if oGlow:IsClassic() and not oGlow:IsBCC() then return end
 
 local _E
 
 local update = function(self)
 	if not IsAddOnLoaded("Blizzard_GuildBankUI") then return end
 
-	hooksecurefunc("GuildBankFrame_Update", function()
-		local tab = GetCurrentGuildBankTab()
-		for i = 1, MAX_GUILDBANK_SLOTS_PER_TAB or 98 do
-			local index = math.fmod(i, 14)
-			if index == 0 then
-				index = 14
+	if oGlow:IsBCC() then
+		hooksecurefunc(GuildBankFrame, "Update", function()
+			local tab = GetCurrentGuildBankTab()
+			for i = 1, MAX_GUILDBANK_SLOTS_PER_TAB or 98 do
+				local index = math.fmod(i, 14)
+				if index == 0 then
+					index = 14
+				end
+				local column = math.ceil((i - 0.5) / 14)
+
+				local slotLink = GetGuildBankItemLink(tab, i)
+				local slotFrame = _G["GuildBankFrame"]["Column"..column]["Button"..index]
+
+				self:CallFilters("gbank", slotFrame, _E and slotLink)
 			end
-			local column = math.ceil((i - 0.5) / 14)
+		end)
+	else
+		hooksecurefunc("GuildBankFrame_Update", function()
+			local tab = GetCurrentGuildBankTab()
+			for i = 1, MAX_GUILDBANK_SLOTS_PER_TAB or 98 do
+				local index = math.fmod(i, 14)
+				if index == 0 then
+					index = 14
+				end
+				local column = math.ceil((i - 0.5) / 14)
 
-			local slotLink = GetGuildBankItemLink(tab, i)
-			local slotFrame = _G["GuildBankColumn"..column.."Button"..index]
+				local slotLink = GetGuildBankItemLink(tab, i)
+				local slotFrame = _G["GuildBankColumn"..column.."Button"..index]
 
-			self:CallFilters("gbank", slotFrame, _E and slotLink)
-		end
-	end)
+				self:CallFilters("gbank", slotFrame, _E and slotLink)
+			end
+		end)
+	end
 end
 
 local enable = function(self)

@@ -1,10 +1,12 @@
-## Interface: 90005
+## Interface: 11307
+## Interface-Classic: 11307
+## Interface-BCC: 20502
 ## Title: ShestakUI (Classic)
 ## Notes: A total UI overhaul for World of Warcraft
 ## Author: Shestak
-## X-Curse-Project-ID:
-## X-WoWI-ID: 25916
-## Version: 1.22
+## X-Curse-Project-ID: 468754
+## X-WoWI-ID: 25934
+## Version: 1.26
 ## SavedVariables: ShestakUISettings, ShestakUIStats, ShestakUIBindings, ShestakUICurrency, ShestakUIPositions
 ## SavedVariablesPerCharacter: ShestakUISettingsPerChar, ShestakUIChatHistory
 
