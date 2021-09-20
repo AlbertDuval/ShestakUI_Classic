@@ -136,6 +136,8 @@ local function Shared(self, unit)
 			self.Power.colorPower = true
 		end
 
+		self.Power.PostUpdateColor = T.PostUpdatePowerColor
+
 		-- Power bar background
 		self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
 		self.Power.bg:SetAllPoints(self.Power)
@@ -247,6 +249,10 @@ local function Shared(self, unit)
 				absorbBar = ahpb,
 				healAbsorbBar = hab
 			}
+
+			if T.classic then
+				self.HealthPrediction.frequentUpdates = true
+			end
 		end
 	end
 

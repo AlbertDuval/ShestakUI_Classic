@@ -1188,6 +1188,10 @@ local function Shared(self, unit)
 				absorbBar = ahpb,
 				healAbsorbBar = hab
 			}
+
+			if T.classic then
+				self.HealthPrediction.frequentUpdates = true
+			end
 		end
 	end
 
