@@ -86,6 +86,9 @@ end
 
 -- Hide world map button
 MiniMapWorldMapButton:Hide()
+if T.classic and not T.BCC then
+	MiniMapWorldMapButton.Show = T.dummy
+end
 
 -- Garrison icon
 if not T.classic then
@@ -381,7 +384,9 @@ if C.minimap.hide_combat == true then
 		if event == "PLAYER_REGEN_ENABLED" then
 			self:Show()
 		elseif event == "PLAYER_REGEN_DISABLED" then
-			self:Hide()
+			if not T.FarmMode then
+				self:Hide()
+			end
 		end
 	end)
 end
