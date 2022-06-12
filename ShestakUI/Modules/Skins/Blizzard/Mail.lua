@@ -44,7 +44,7 @@ local function LoadSkin()
 	T.SkinTab(MailFrameTab1)
 	T.SkinTab(MailFrameTab2)
 
-	if T.classic then
+	if T.Classic then
 		InboxPrevPageButton:ClearAllPoints()
 		InboxPrevPageButton:SetPoint("CENTER", InboxFrame, "BOTTOMLEFT", 28, 114)
 		InboxNextPageButton:ClearAllPoints()
@@ -57,12 +57,14 @@ local function LoadSkin()
 	-- Send mail
 	SendMailFrame:StripTextures()
 
-	SendMailScrollFrame:StripTextures(true)
-	SendMailScrollFrame:CreateBackdrop("Overlay")
-	SendMailScrollFrame.backdrop:SetPoint("TOPLEFT", 12, 0)
-	SendMailScrollFrame.backdrop:SetPoint("BOTTOMRIGHT", 2, 0)
+	if T.Mainline then
+		SendMailScrollFrame:StripTextures(true)
+		SendMailScrollFrame:CreateBackdrop("Overlay")
+		SendMailScrollFrame.backdrop:SetPoint("TOPLEFT", 12, 0)
+		SendMailScrollFrame.backdrop:SetPoint("BOTTOMRIGHT", 2, 0)
 
-	T.SkinScrollBar(SendMailScrollFrameScrollBar)
+		T.SkinScrollBar(SendMailScrollFrameScrollBar)
+	end
 
 	select(3, SendMailNameEditBox:GetRegions()):SetDrawLayer("OVERLAY")
 	select(3, SendMailSubjectEditBox:GetRegions()):SetDrawLayer("OVERLAY")
@@ -73,7 +75,7 @@ local function LoadSkin()
 	T.SkinEditBox(SendMailMoneySilver)
 	T.SkinEditBox(SendMailMoneyCopper)
 
-	if T.classic then
+	if T.Classic then
 		SendMailMoneyGold.texture:SetDrawLayer("ARTWORK")
 	end
 
@@ -138,7 +140,9 @@ local function LoadSkin()
 
 	T.SkinScrollBar(OpenMailScrollFrameScrollBar)
 
-	SendMailBodyEditBox:SetTextColor(1, 1, 1)
+	if T.Mainline then
+		SendMailBodyEditBox:SetTextColor(1, 1, 1)
+	end
 	OpenMailBodyText:SetTextColor(1, 1, 1)
 	InvoiceTextFontNormal:SetTextColor(1, 1, 1)
 	OpenMailArithmeticLine:Kill()

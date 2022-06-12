@@ -169,7 +169,7 @@ local tagStrings = {
 	end]],
 
 	['level'] = [[function(u)
-		local l = UnitLevel(u)
+		local l = _G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_MAINLINE and UnitLevel(u) or UnitEffectiveLevel(u)
 		if((_G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_CLASSIC and _G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC) and (UnitIsWildBattlePet(u) or UnitIsBattlePetCompanion(u))) then
 			l = UnitBattlePetLevel(u)
 		end
@@ -490,6 +490,7 @@ local tagEvents = {
 
 local unitlessEvents = {
 	ARENA_PREP_OPPONENT_SPECIALIZATIONS = true,
+	CHARACTER_POINTS_CHANGED = true,
 	GROUP_ROSTER_UPDATE = true,
 	NEUTRAL_FACTION_SELECT_RESULT = true,
 	PARTY_LEADER_CHANGED = true,
@@ -557,10 +558,9 @@ local tagPool = {}
 local funcPool = {}
 local tmp = {}
 
+-- full tag syntax: '[prefix$>tag-name<$suffix(a,r,g,s)]'
+-- for a small test case see https://github.com/oUF-wow/oUF/pull/602
 local function getBracketData(tag)
-	-- full tag syntax: '[prefix$>tag-name<$suffix(a,r,g,s)]'
-	local suffixEnd = (tag:match('()%(') or -1) - 1
-
 	local prefixEnd, prefixOffset = tag:match('()$>'), 1
 	if(not prefixEnd) then
 		prefixEnd = 1
@@ -569,6 +569,7 @@ local function getBracketData(tag)
 		prefixOffset = 3
 	end
 
+	local suffixEnd = (tag:match('()%(', prefixOffset + 1) or -1) - 1
 	local suffixStart, suffixOffset = tag:match('<$()', prefixEnd), 1
 	if(not suffixStart) then
 		suffixStart = suffixEnd + 1
@@ -576,7 +577,11 @@ local function getBracketData(tag)
 		suffixOffset = 3
 	end
 
-	return tag:sub(prefixEnd + prefixOffset, suffixStart - suffixOffset), prefixEnd, suffixStart, suffixEnd, tag:match('%((.-)%)')
+	return tag:sub(prefixEnd + prefixOffset, suffixStart - suffixOffset),
+		prefixEnd,
+		suffixStart,
+		suffixEnd,
+		tag:match('%((.-)%)', suffixOffset + 1)
 end
 
 local function getTagFunc(tagstr)
@@ -604,7 +609,7 @@ local function getTagFunc(tagstr)
 						tagFunc = function(unit, realUnit)
 							local str
 							if(customArgs) then
-								str = tag(unit, realUnit, strsplit(',', customArgs))
+								str = tag(unit, realUnit, string.split(',', customArgs))
 							else
 								str = tag(unit, realUnit)
 							end
@@ -617,7 +622,7 @@ local function getTagFunc(tagstr)
 						tagFunc = function(unit, realUnit)
 							local str
 							if(customArgs) then
-								str = tag(unit, realUnit, strsplit(',', customArgs))
+								str = tag(unit, realUnit, string.split(',', customArgs))
 							else
 								str = tag(unit, realUnit)
 							end
@@ -640,7 +645,7 @@ local function getTagFunc(tagstr)
 				nierror(string.format('Attempted to use invalid tag %s.', bracket))
 
 				format_[idx] = bracket
-				format = string.format(format, unpack(format_, 1, numTags))
+				format = format:format(unpack(format_, 1, numTags))
 				format_[idx] = '%s'
 
 				numTags = numTags - 1
