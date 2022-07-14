@@ -31,7 +31,6 @@ T.ArenaControl = {
 	-- Hunter
 	[SpellName(60210)] = 5,		-- Freezing Arrow Effect
 	[SpellName(3355)] = 5,		-- Freezing Trap
-	[SpellName(19410)] = 5,		-- Improved Concussive Shot
 	[SpellName(24394)] = 5,		-- Intimidation
 	[SpellName(1513)] = 5,		-- Scare Beast
 	[SpellName(19503)] = 5,		-- Scatter Shot
@@ -52,9 +51,7 @@ T.ArenaControl = {
 	[SpellName(20066)] = 5,		-- Repentance
 	[SpellName(20170)] = 5,		-- Stun (Seal of Justice Proc)
 	[SpellName(10326)] = 5,		-- Turn Evil
-	[SpellName(2878)] = 5,		-- Turn Undead
 	-- Priest
-	[SpellName(15269)] = 5,		-- Blackout
 	[SpellName(605)] = 5,		-- Mind Control
 	[SpellName(64044)] = 5,		-- Psychic Horror
 	[SpellName(8122)] = 5,		-- Psychic Scream
@@ -172,7 +169,7 @@ T.ArenaControl = {
 	[SpellName(45182)] = 1,		-- Cheating Death
 	[SpellName(51690)] = 1,		-- Killing Spree
 	[SpellName(51713)] = 1,		-- Shadow Dance
-	[SpellName(57933] = 1,		-- Tricks of the Trade
+	[SpellName(57933)] = 1,		-- Tricks of the Trade
 	-- Shaman
 	[SpellName(8178)] = 1,		-- Grounding Totem
 	[SpellName(16190)] = 1,		-- Mana Tide Totem
