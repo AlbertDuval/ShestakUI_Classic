@@ -5,7 +5,7 @@ local oUF = ns.oUF
 
 if(oUF:IsClassic() and not oUF:IsWrath()) then return end
 
-local runemap = {1, 2, 3, 4, 5, 6}
+local runemap = oUF:IsWrath() and {1, 2, 5, 6, 3, 4} or {1, 2, 3, 4, 5, 6}
 local hasSortOrder = false
 
 local function onUpdate(self, elapsed)
