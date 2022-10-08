@@ -48,8 +48,8 @@ if not lib then
     return
 end
 
-local IsClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) or (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) -- TODO: Add WotLK: Classic when there is a project ID
-local IsWrath = select(4, GetBuildInfo()) >= 30400 and select(4, GetBuildInfo()) < 40000 -- TODO: Change when there is a project ID
+local IsClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) or (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) or (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+local IsWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
 
 -- << STATIC CONFIG
 
@@ -1180,7 +1180,7 @@ function lib:activate()
         local _, playerClass = UnitClass("player")
         if playerClass == "MAGE" or playerClass == "SHAMAN" then
             -- Mage and Shaman gladiator gloves modify spell ranges
-            frame:RegisterUnitEvent("UNIT_INVENTORY_CHANGED", "player")
+            frame:RegisterUnitEvent("UNIT_INVENTORY_CHANGED", "player", "")
         end
     end
     initItemRequests()

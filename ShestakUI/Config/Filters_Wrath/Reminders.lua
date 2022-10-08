@@ -195,13 +195,6 @@ if C.reminder.solo_buffs_enable == true then
 				["combat"] = true,
 				["instance"] = true,
 			},
-			[2] = {	-- Omen of Clarity group
-				["spells"] = {
-					SpellName(16864),	-- Omen of Clarity
-				},
-				["combat"] = true,
-				["instance"] = true,
-			},
 		},
 		HUNTER = {
 			[1] = {	-- Aspects group
@@ -275,7 +268,6 @@ if C.reminder.solo_buffs_enable == true then
 				},
 				["combat"] = true,
 				["instance"] = true,
-				["pvp"] = true,
 			},
 			[3] = {	-- Blessings group
 				["spells"] = {

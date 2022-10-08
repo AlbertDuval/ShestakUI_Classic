@@ -19,16 +19,26 @@ local function LoadSkin()
 
 	if T.Wrath then
 		_G["PlayerTalentFrameSpentPointsText"]:ClearAllPoints()
-		_G["PlayerTalentFrameSpentPointsText"]:SetPoint("TOP", _G["PlayerTalentFrame"].backdrop, "TOP", 0, -30)
+		_G["PlayerTalentFrameSpentPointsText"]:SetPoint("LEFT", _G["PlayerTalentFramePointsBar"], "LEFT", 8, -2)
+
+		_G["PlayerTalentFrameTalentPointsText"]:ClearAllPoints()
+		_G["PlayerTalentFrameTalentPointsText"]:SetPoint("RIGHT", _G["PlayerTalentFramePointsBar"], "RIGHT", 0, 0)
+
+		_G["PlayerTalentFrameRoleButton"]:ClearAllPoints()
+		_G["PlayerTalentFrameRoleButton"]:SetPoint("TOPRIGHT", _G["PlayerTalentFrameScrollFrame"], "TOPRIGHT", 0, -6)
 	else
 		_G["PlayerTalentFrameSpentPoints"]:ClearAllPoints()
 		_G["PlayerTalentFrameSpentPoints"]:SetPoint("TOP", _G["PlayerTalentFrame"].backdrop, "TOP", 0, -30)
+
+		_G["PlayerTalentFrameTalentPointsText"]:ClearAllPoints()
+		_G["PlayerTalentFrameTalentPointsText"]:SetPoint("BOTTOMRIGHT", _G["PlayerTalentFrame"], "BOTTOMLEFT", 220, 84)
 
 		_G["PlayerTalentFrameCancelButton"]:Kill()
 	end
 
 	_G["PlayerTalentFrameTab1"]:ClearAllPoints()
 	_G["PlayerTalentFrameTab1"]:SetPoint("TOPLEFT", _G["PlayerTalentFrame"].backdrop, "BOTTOMLEFT", 2, -2)
+
 	for i = 1, 5 do
 		T.SkinTab(_G["PlayerTalentFrameTab"..i])
 	end
@@ -40,8 +50,6 @@ local function LoadSkin()
 
 	T.SkinScrollBar(_G["PlayerTalentFrameScrollFrameScrollBar"])
 	_G["PlayerTalentFrameScrollFrameScrollBar"]:SetPoint("TOPLEFT", _G["PlayerTalentFrameScrollFrame"], "TOPRIGHT", 10, -16)
-
-	_G["PlayerTalentFrameTalentPointsText"]:SetPoint("BOTTOMRIGHT", PlayerTalentFrame, "BOTTOMLEFT", 220, 84)
 
 	for i = 1, MAX_NUM_TALENTS do
 		local talent = _G["PlayerTalentFrameTalent"..i]
@@ -73,19 +81,26 @@ local function LoadSkin()
 			tab:GetNormalTexture():SetTexCoord(0.1, 0.9, 0.1, 0.9)
 		end
 
-		PlayerTalentFrameStatusFrame:SetPoint("TOPLEFT", 57, -40)
-		PlayerTalentFrameActivateButton:SetPoint("TOP", 0, -40)
+		_G["PlayerTalentFrameStatusFrame"]:SetPoint("TOP", 8, -30)
+		_G["PlayerTalentFrameStatusFrame"]:StripTextures()
 
-		PlayerTalentFrameResetButton:SetPoint("RIGHT", -4, 1)
-		PlayerTalentFrameLearnButton:SetPoint("RIGHT", PlayerTalentFrameResetButton, "LEFT", -3, 0)
+		_G["PlayerTalentFrameActivateButton"]:SetPoint("TOP", -10, -40)
+		_G["PlayerTalentFrameActivateButton"]:SkinButton()
 
-		PlayerSpecTab1:SetPoint("TOPLEFT", PlayerTalentFrame, "TOPRIGHT", -33, -65)
-		PlayerSpecTab1.ClearAllPoints = T.dummy
-		PlayerSpecTab1.SetPoint = T.dummy
+		_G["PlayerTalentFrameResetButton"]:SetPoint("RIGHT", -2, -1)
+		_G["PlayerTalentFrameResetButton"]:SkinButton()
 
-		PlayerTalentFrameTab1:SetPoint("BOTTOMLEFT", 11, 46)
+		_G["PlayerTalentFrameLearnButton"]:SetPoint("RIGHT", _G["PlayerTalentFrameResetButton"], "LEFT", -3, 0)
+		_G["PlayerTalentFrameLearnButton"]:SkinButton()
 
-		PlayerTalentFramePointsBar:StripTextures()
+		_G["PlayerSpecTab1"]:SetPoint("TOPLEFT", _G["PlayerTalentFrame"], "TOPRIGHT", -33, -65)
+		_G["PlayerSpecTab1"].ClearAllPoints = T.dummy
+		_G["PlayerSpecTab1"].SetPoint = T.dummy
+
+		_G["PlayerTalentFramePreviewBar"]:StripTextures()
+		_G["PlayerTalentFramePreviewBarFiller"]:StripTextures()
+
+		_G["PlayerTalentFramePointsBar"]:StripTextures()
 	end
 
 	local f = CreateFrame("Frame")
