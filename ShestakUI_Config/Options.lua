@@ -5,7 +5,6 @@ local L = ns
 ----------------------------------------------------------------------------------------
 --	GUI for ShestakUI(by Haleth, Solor)
 ----------------------------------------------------------------------------------------
--- Temporary Function
 local function IsClassicBuild()
 	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC or _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC or _G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC
 end
@@ -245,7 +244,7 @@ SpellList:SetPoint("TOPLEFT", ShestakUIOptionsPanel, "TOPRIGHT", 22, 0)
 SpellList:SetSize(290, 420)
 SpellList:Hide()
 
-_G["SpellListPortrait"]:SetTexture("Interface\\Spellbook\\Spellbook-Icon")
+SpellListPortrait:SetAlpha(0)
 
 SpellList.title = _G["SpellListTitle"] or SpellList:CreateFontString("SpellListTitle", "OVERLAY", "GameFontNormal")
 SpellList.title:SetPoint("TOP", _G["SpellList"], "TOP", 0, -5)
@@ -268,7 +267,7 @@ SpellList.makeSpellsList = function(_, db, double)
 	while _G["SpellList"..i.."_cbs"] do
 		_G["SpellList"..i.."_fs"]:SetText("")
 		_G["SpellList"..i.."_fs2"]:SetText("")
-		_G["SpellList"..i.."_texture"]:SetTexture(nil)
+		_G["SpellList"..i.."_texture"]:SetTexture(0)
 		_G["SpellList"..i.."_cbs"]:ClearAllPoints()
 		_G["SpellList"..i.."_cbs"]:Hide()
 		i = i + 1
@@ -489,6 +488,123 @@ end)
 AddSpellButton:Disable()
 tinsert(ns.buttons, AddSpellButton)
 
+-- Info frame
+do
+	local frame = CreateFrame("Frame", "ShestakUIInfoFrame", UIParent)
+	frame:SetWidth(800)
+	frame:SetHeight(770)
+	frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+	frame:SetFrameStrata("DIALOG")
+	tinsert(UISpecialFrames, "ShestakUIInfoFrame")
+	frame:Hide()
+	frame:EnableMouse(true)
+
+	local title = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	title:SetPoint("TOPLEFT", 26, -26)
+	title:SetText("Links:")
+
+	local HelpButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+	HelpButton:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -20)
+	HelpButton:SetSize(100, 23)
+	HelpButton:SetText("Wiki page")
+	HelpButton:SetWidth(HelpButton.Text:GetWidth() + 15)
+	local url = L_GUI_WIKI_URL
+	HelpButton:SetScript("OnClick", function()
+		StaticPopup_Show("LINK_URL", _, _, url)
+	end)
+
+	local DiscordButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+	DiscordButton:SetPoint("LEFT", HelpButton, "RIGHT", 10, 0)
+	DiscordButton:SetSize(100, 23)
+	DiscordButton:SetText("Discord")
+	DiscordButton:SetWidth(DiscordButton.Text:GetWidth() + 15)
+	local url = IsClassicBuild() and "https://discord.gg/mWGp4ac" or "https://discord.gg/vwHwnTt"
+	DiscordButton:SetScript("OnClick", function()
+		StaticPopup_Show("LINK_URL", _, _, url)
+	end)
+
+	local GithubButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+	GithubButton:SetPoint("LEFT", DiscordButton, "RIGHT", 10, 0)
+	GithubButton:SetSize(100, 23)
+	GithubButton:SetText("Github")
+	GithubButton:SetWidth(GithubButton.Text:GetWidth() + 15)
+	local url = IsClassicBuild() and "https://github.com/EsreverWoW/ShestakUI_Classic" or "https://github.com/Shestak/ShestakUI"
+	GithubButton:SetScript("OnClick", function()
+		StaticPopup_Show("LINK_URL", _, _, url)
+	end)
+
+	tinsert(ns.buttons, DiscordButton)
+	tinsert(ns.buttons, HelpButton)
+	tinsert(ns.buttons, GithubButton)
+
+	local title2 = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	title2:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -66)
+	title2:SetText("Credits:")
+
+	local subtitle2 = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+	subtitle2:SetWidth(750)
+	subtitle2:SetPoint("TOPLEFT", title2, "BOTTOMLEFT", 0, -8)
+	subtitle2:SetJustifyH("LEFT")
+	subtitle2:SetText(GetAddOnMetadata("ShestakUI", "X-Credits"))
+
+	local title3 = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	title3:SetPoint("TOPLEFT", subtitle2, "BOTTOMLEFT", 0, -16)
+	title3:SetText("Translation:")
+
+	local subtitle3 = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+	subtitle3:SetWidth(750)
+	subtitle3:SetPoint("TOPLEFT", title3, "BOTTOMLEFT", 0, -8)
+	subtitle3:SetJustifyH("LEFT")
+	subtitle3:SetText(GetAddOnMetadata("ShestakUI", "X-Translation"))
+
+	local title4 = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	title4:SetPoint("TOPLEFT", subtitle3, "BOTTOMLEFT", 0, -16)
+	title4:SetText("Thanks:")
+
+	local subtitle4 = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+	subtitle4:SetWidth(750)
+	subtitle4:SetPoint("TOPLEFT", title4, "BOTTOMLEFT", 0, -8)
+	subtitle4:SetJustifyH("LEFT")
+	subtitle4:SetText(GetAddOnMetadata("ShestakUI", "X-Thanks"))
+
+	local CancelButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+	CancelButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10)
+	CancelButton:SetSize(100, 23)
+	CancelButton:SetText(CLOSE)
+	CancelButton:SetWidth(CancelButton.Text:GetWidth() + 15)
+	CancelButton:SetScript("OnClick", function()
+		frame:Hide()
+	end)
+
+	tinsert(ns.buttons, CancelButton)
+
+	StaticPopupDialogs.LINK_URL = {
+		text = "Help",
+		button1 = OKAY,
+		timeout = 0,
+		whileDead = true,
+		hasEditBox = true,
+		editBoxWidth = 350,
+		OnShow = function(self, text)
+			self.editBox:SetMaxLetters(0)
+			self.editBox:SetText(text)
+			self.editBox:HighlightText()
+			selfText = text
+		end,
+		EditBoxOnEnterPressed = function(self) self:GetParent():Hide() end,
+		EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
+		EditBoxOnTextChanged = function(self)
+			if self:GetText():len() < 1 then
+				self:GetParent():Hide()
+			else
+				self:SetText(selfText)
+				self:HighlightText()
+			end
+		end,
+		preferredIndex = 5,
+	}
+end
+
 -- Expert mode
 do
 	local frame = CreateFrame("Frame", "ShestakUIProfileFrame", UIParent)
@@ -555,7 +671,7 @@ ns.addCategory("unitframe", UNITFRAME_LABEL, L_GUI_UF_SUBTEXT, 3)
 ns.addCategory("unitframe_class_bar", L_GUI_UF_PLUGINS_CLASS_BAR, L_GUI_UF_PLUGINS_CLASS_BAR_SUBTEXT)
 ns.addCategory("raidframe", RAID_FRAMES_LABEL, L_GUI_UF_RAIDFRAMES_SUBTEXT, 2)
 ns.addCategory("aura", BUFFOPTIONS_LABEL, BUFFOPTIONS_SUBTEXT)
-ns.addCategory("actionbar", L_GUI_ACTIONBAR, ACTIONBARS_SUBTEXT, 2)
+ns.addCategory("actionbar", L_GUI_ACTIONBAR, ACTIONBARS_SUBTEXT, IsClassicBuild() and 2 or 3)
 ns.addCategory("tooltip", L.tooltip, L.tooltip_subtext)
 ns.addCategory("chat", SOCIALS, L_GUI_CHAT_SUBTEXT)
 ns.addCategory("nameplate", UNIT_NAMEPLATES, L_GUI_NAMEPLATE_SUBTEXT, 2)
@@ -624,6 +740,17 @@ do
 
 	local hide_maw_buffs = ns.CreateCheckBox(parent, "hide_maw_buffs")
 	hide_maw_buffs:SetPoint("TOPLEFT", hide_talking_head, "BOTTOMLEFT", 0, 0)
+
+	local InfoButton = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+	InfoButton:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -20, 5)
+	InfoButton:SetSize(100, 23)
+	InfoButton:SetText(L_GUI_INFO)
+	InfoButton:SetWidth(InfoButton.Text:GetWidth() + 15)
+	InfoButton:SetScript("OnClick", function()
+		ShestakUIInfoFrame:Show()
+	end)
+
+	tinsert(ns.buttons, InfoButton)
 
 	-- Panel 2
 	local parent = ShestakUIOptionsPanel.general2
@@ -1313,8 +1440,11 @@ do
 	local chi = ns.CreateCheckBox(parent, "chi", L_GUI_UF_PLUGINS_CHI_BAR)
 	chi:SetPoint("TOPLEFT", arcane, "BOTTOMLEFT", 0, 0)
 
+	local essence = ns.CreateCheckBox(parent, "essence")
+	essence:SetPoint("TOPLEFT", chi, "BOTTOMLEFT", 0, 0)
+
 	local stagger = ns.CreateCheckBox(parent, "stagger", L_GUI_UF_PLUGINS_STAGGER_BAR)
-	stagger:SetPoint("TOPLEFT", chi, "BOTTOMLEFT", 0, 0)
+	stagger:SetPoint("TOPLEFT", essence, "BOTTOMLEFT", 0, 0)
 
 	local holy = ns.CreateCheckBox(parent, "holy", L_GUI_UF_PLUGINS_HOLY_BAR)
 	holy:SetPoint("TOPLEFT", stagger, "BOTTOMLEFT", 0, 0)
@@ -1336,6 +1466,7 @@ do
 	local classic = {
 		arcane,
 		chi,
+		essence,
 		stagger,
 		holy,
 		shard,
@@ -1459,7 +1590,7 @@ do
 	plugins_aura_watch:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, 0)
 
 	local ListButton = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
-	ListButton:SetPoint("LEFT", plugins_aura_watch.Text, "RIGHT", 20, 0)
+	ListButton:SetPoint("LEFT", plugins_aura_watch, "RIGHT", 400, 0)
 	ListButton:SetSize(100, 23)
 	ListButton:SetText(ADD)
 	ListButton:SetWidth(ListButton.Text:GetWidth() + 15)
@@ -1496,8 +1627,14 @@ do
 	local plugins_healcomm = ns.CreateCheckBox(parent, "plugins_healcomm", L_GUI_UF_PLUGINS_HEALCOMM)
 	plugins_healcomm:SetPoint("TOPLEFT", plugins_pvp_debuffs, "BOTTOMLEFT", -20, 0)
 
+	local plugins_over_absorb = ns.CreateCheckBox(parent, "plugins_over_absorb")
+	plugins_over_absorb:SetPoint("TOPLEFT", plugins_healcomm, "BOTTOMLEFT", 20, 0)
+
+	local plugins_over_heal_absorb = ns.CreateCheckBox(parent, "plugins_over_heal_absorb")
+	plugins_over_heal_absorb:SetPoint("TOPLEFT", plugins_over_absorb, "BOTTOMLEFT", 0, 0)
+
 	local plugins_auto_resurrection = ns.CreateCheckBox(parent, "plugins_auto_resurrection")
-	plugins_auto_resurrection:SetPoint("TOPLEFT", plugins_healcomm, "BOTTOMLEFT", 0, 0)
+	plugins_auto_resurrection:SetPoint("TOPLEFT", plugins_over_heal_absorb, "BOTTOMLEFT", -20, 0)
 
 	-- Heal layout size
 	local subheader = ns.addSubCategory(parent, L.raidframe_subheader_heal_size)
@@ -1546,7 +1683,9 @@ do
 	local classic = {
 		by_role,
 		icons_role,
-		icons_phase
+		icons_phase,
+		plugins_over_absorb,
+		plugins_over_heal_absorb,
 	}
 
 	if IsClassicBuild() then
@@ -1558,6 +1697,7 @@ do
 		icons_sumon:ClearAllPoints()
 		icons_sumon:SetPoint("LEFT", icons_leader, "RIGHT", 248, 0)
 		icons_phase:SetPoint("TOPLEFT", icons_leader, "BOTTOMLEFT", 0, 0)
+		plugins_auto_resurrection:SetPoint("TOPLEFT", plugins_over_heal_absorb, "BOTTOMLEFT", 0, 0)
 	end
 end
 
@@ -1800,6 +1940,30 @@ do
 	local bar5_mouseover = ns.CreateCheckBox(parent, "bar5_mouseover", L.actionbar_bar1_mouseover)
 	bar5_mouseover:SetPoint("LEFT", bar5_size, "RIGHT", 130, 0)
 
+	if not IsClassicBuild() then
+		-- Panel 2
+		local parent = ShestakUIOptionsPanel.actionbar3
+
+		-- Bar 6
+		local subheader = ns.addSubCategory(parent, BINDING_HEADER_ACTIONBAR.." 6")
+		subheader:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, -10)
+
+		local custom_bar_enable = ns.CreateCheckBox(parent, "custom_bar_enable", ENABLE)
+		custom_bar_enable:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -10)
+
+		local custom_bar_num = ns.CreateNumberSlider(parent, "custom_bar_num", nil, nil, 0, 12, 1, true, L.actionbar_bar1_num)
+		custom_bar_num:SetPoint("TOPLEFT", custom_bar_enable, "BOTTOMLEFT", 0, -20)
+
+		local custom_bar_row = ns.CreateNumberSlider(parent, "custom_bar_row", nil, nil, 1, 12, 1, true, L.actionbar_bar1_row)
+		custom_bar_row:SetPoint("LEFT", custom_bar_num, "RIGHT", 120, 0)
+
+		local custom_bar_size = ns.CreateNumberSlider(parent, "custom_bar_size", nil, nil, 0, 50, 1, true, L_GUI_ACTIONBAR_BUTTON_SIZE)
+		custom_bar_size:SetPoint("TOPLEFT", custom_bar_num, "BOTTOMLEFT", 0, -20)
+
+		local custom_bar_mouseover = ns.CreateCheckBox(parent, "custom_bar_mouseover", L.actionbar_bar1_mouseover)
+		custom_bar_mouseover:SetPoint("LEFT", custom_bar_size, "RIGHT", 130, 0)
+	end
+
 	local classic = {
 		hide_highlight
 	}
@@ -2040,8 +2204,11 @@ do
 	local name_abbrev = ns.CreateCheckBox(parent, "name_abbrev", L_GUI_NAMEPLATE_NAME_ABBREV)
 	name_abbrev:SetPoint("TOPLEFT", class_icons, "BOTTOMLEFT", 0, 0)
 
+	local short_name = ns.CreateCheckBox(parent, "short_name")
+	short_name:SetPoint("TOPLEFT", name_abbrev, "BOTTOMLEFT", 0, 0)
+
 	local clamp = ns.CreateCheckBox(parent, "clamp")
-	clamp:SetPoint("TOPLEFT", name_abbrev, "BOTTOMLEFT", 0, 0)
+	clamp:SetPoint("TOPLEFT", short_name, "BOTTOMLEFT", 0, 0)
 
 	local track_debuffs = ns.CreateCheckBox(parent, "track_debuffs", L_GUI_NAMEPLATE_SHOW_DEBUFFS)
 	track_debuffs:SetPoint("TOPLEFT", clamp, "BOTTOMLEFT", 0, 0)
@@ -2234,8 +2401,33 @@ do
 	local short_numbers = ns.CreateCheckBox(parent, "short_numbers", L_GUI_COMBATTEXT_SHORT_NUMBERS)
 	short_numbers:SetPoint("TOPLEFT", max_lines, "BOTTOMLEFT", 0, -8)
 
-	local merge_aoe_spam = ns.CreateCheckBox(parent, "merge_aoe_spam", L_GUI_COMBATTEXT_MERGE_AOE_SPAM)
+	local merge_aoe_spam = ns.CreateCheckBox(parent, "merge_aoe_spam")
 	merge_aoe_spam:SetPoint("TOPLEFT", short_numbers, "BOTTOMLEFT", 0, 0)
+
+	local ListButton = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+	ListButton:SetPoint("LEFT", merge_aoe_spam, "RIGHT", 400, 0)
+	ListButton:SetSize(100, 23)
+	ListButton:SetText(ADD)
+	ListButton:SetWidth(ListButton.Text:GetWidth() + 15)
+	ListButton.tooltipText = "|cffFFD100"..L_GUI_RESET_SPELLS_DESC.."|r"
+	ListButton:SetScript("OnClick", function()
+		if not C.options["combattext"] then
+			C.options["combattext"] = {}
+		end
+		if not C.options["combattext"]["spells_list"] then
+			C.options["combattext"]["spells_list"] = {}
+		end
+		BuildSpellList(C.options["combattext"]["spells_list"], true)
+	end)
+	tinsert(ns.buttons, ListButton)
+
+	local function toggleListButton()
+		local shown = merge_aoe_spam:GetChecked()
+		ListButton:SetEnabled(shown)
+	end
+
+	merge_aoe_spam:HookScript("OnClick", toggleListButton)
+	ListButton:HookScript("OnShow", toggleListButton)
 
 	local merge_melee = ns.CreateCheckBox(parent, "merge_melee", L_GUI_COMBATTEXT_MERGE_MELEE)
 	merge_melee:SetPoint("TOPLEFT", merge_aoe_spam, "BOTTOMLEFT", 20, 0)
@@ -2309,8 +2501,11 @@ do
 	local enable = ns.CreateCheckBox(parent, "enable", L_GUI_MINIMAP_ENABLE)
 	enable:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, 0)
 
+	local on_top = ns.CreateCheckBox(parent, "on_top")
+	on_top:SetPoint("TOPLEFT", enable, "BOTTOMLEFT", 0, 0)
+
 	local tracking_icon = ns.CreateCheckBox(parent, "tracking_icon", L_GUI_MINIMAP_ICON)
-	tracking_icon:SetPoint("TOPLEFT", enable, "BOTTOMLEFT", 0, 0)
+	tracking_icon:SetPoint("TOPLEFT", on_top, "BOTTOMLEFT", 0, 0)
 
 	local garrison_icon = ns.CreateCheckBox(parent, "garrison_icon", L_GUI_GARRISON_ICON)
 	garrison_icon:SetPoint("TOPLEFT", tracking_icon, "BOTTOMLEFT", 0, 0)
@@ -2482,7 +2677,7 @@ do
 	spells:SetPoint("TOPLEFT", interrupts, "BOTTOMLEFT", 0, 0)
 
 	local ListButton = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
-	ListButton:SetPoint("LEFT", spells.Text, "RIGHT", 20, 0)
+	ListButton:SetPoint("LEFT", spells, "RIGHT", 400, 0)
 	ListButton:SetSize(100, 23)
 	ListButton:SetText(">>")
 	ListButton:SetWidth(ListButton.Text:GetWidth() + 15)
@@ -2926,8 +3121,11 @@ do
 	local battleground = ns.CreateCheckBox(parent, "battleground", L_GUI_STATS_BG)
 	battleground:SetPoint("TOPLEFT", coords, "BOTTOMLEFT", 0, 0)
 
+	local damage = ns.CreateCheckBox(parent, "damage", DAMAGE)
+	damage:SetPoint("TOPLEFT", battleground, "BOTTOMLEFT", 0, 0)
+
 	local bottom_line = ns.CreateCheckBox(parent, "bottom_line")
-	bottom_line:SetPoint("TOPLEFT", battleground, "BOTTOMLEFT", 0, 0)
+	bottom_line:SetPoint("TOPLEFT", damage, "BOTTOMLEFT", 0, 0)
 
 	-- Currency
 	local currency
@@ -3086,77 +3284,14 @@ f:SetScript("OnEvent", function()
 	T.SkinEditBox(SpellListTextInput)
 	T.SkinEditBox(SpellListTextInput2)
 
+	ShestakUIInfoFrame:SetTemplate("Overlay")
+
 	ShestakUIProfileFrame:SetTemplate("Transparent")
 	T.SkinScrollBar(ShestakUIProfileFrameScrollScrollBar)
 	ShestakUIProfileFrameScroll:CreateBackdrop("Overlay")
 	ShestakUIProfileFrameScroll.backdrop:SetPoint("TOPLEFT", -4, 4)
 	ShestakUIProfileFrameScroll.backdrop:SetPoint("BOTTOMRIGHT", 4, -4)
 end)
-
-----------------------------------------------------------------------------------------
---	Information
-----------------------------------------------------------------------------------------
-do
-	local frame = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
-	frame:Hide()
-
-	frame.name = not IsClassicBuild() and "ShestakUI" or "ShestakUI (Classic)"
-	frame:SetScript("OnShow", function(self)
-		if self.show then return end
-		local T = unpack(ShestakUI)
-		local title = self:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-		title:SetPoint("TOPLEFT", 16, -16)
-		title:SetText("Info:")
-
-		local subtitle = self:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-		subtitle:SetWidth(580)
-		subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
-		subtitle:SetJustifyH("LEFT")
-		if not IsClassicBuild() then
-			subtitle:SetText("UI Site: |cff298F00https://web.archive.org/web/20211224222431/http://shestak.org/|r\nGitHub: |cff298F00https://github.com/Shestak/ShestakUI|r\nCurse: |cff298F00https://www.curseforge.com/wow/addons/shestakui/|r\nWoWInterface: |cff298F00https://www.wowinterface.com/downloads/info19033-ShestakUI.html|r\nChange Log: |cff298F00https://github.com/Shestak/ShestakUI/commits/master/|r")
-		else
-			subtitle:SetText("UI Site: |cff298F00https://web.archive.org/web/20211224222431/http://shestak.org/|r\nGitHub: |cff298F00https://github.com/EsreverWoW/ShestakUI_Classic|r\nChange Log: |cff298F00https://github.com/EsreverWoW/ShestakUI_Classic/commits|r")
-		end
-
-		local title2 = self:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-		title2:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -16)
-		title2:SetText("Credits:")
-
-		local subtitle2 = self:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-		subtitle2:SetWidth(580)
-		subtitle2:SetPoint("TOPLEFT", title2, "BOTTOMLEFT", 0, -8)
-		subtitle2:SetJustifyH("LEFT")
-		subtitle2:SetText(GetAddOnMetadata("ShestakUI", "X-Credits"))
-
-		local title3 = self:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-		title3:SetPoint("TOPLEFT", subtitle2, "BOTTOMLEFT", 0, -16)
-		title3:SetText("Translation:")
-
-		local subtitle3 = self:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-		subtitle3:SetWidth(580)
-		subtitle3:SetPoint("TOPLEFT", title3, "BOTTOMLEFT", 0, -8)
-		subtitle3:SetJustifyH("LEFT")
-		subtitle3:SetText(GetAddOnMetadata("ShestakUI", "X-Translation"))
-
-		local title4 = self:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-		title4:SetPoint("TOPLEFT", subtitle3, "BOTTOMLEFT", 0, -16)
-		title4:SetText("Thanks:")
-
-		local subtitle4 = self:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-		subtitle4:SetWidth(580)
-		subtitle4:SetPoint("TOPLEFT", title4, "BOTTOMLEFT", 0, -8)
-		subtitle4:SetJustifyH("LEFT")
-		subtitle4:SetText(GetAddOnMetadata("ShestakUI", "X-Thanks"))
-
-		local version = self:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-		version:SetPoint("BOTTOMRIGHT", -16, 16)
-		version:SetText("Version: "..T.version)
-
-		self.show = true
-	end)
-
-	InterfaceOptions_AddCategory(frame)
-end
 
 ----------------------------------------------------------------------------------------
 --	Slash commands

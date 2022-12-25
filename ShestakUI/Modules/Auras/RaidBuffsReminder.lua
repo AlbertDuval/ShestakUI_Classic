@@ -9,9 +9,12 @@ local battleelixirbuffs = T.ReminderBuffs["BattleElixir"]
 local guardianelixirbuffs = T.ReminderBuffs["GuardianElixir"]
 local foodbuffs = T.ReminderBuffs["Food"]
 local staminabuffs = T.ReminderBuffs["Stamina"]
+local versbuffs = T.ReminderBuffs["Vers"]
 local custombuffs = T.ReminderBuffs["Custom"]
-local visible, flask, battleelixir, guardianelixir, food, stamina, spell4, custom, weapon, armor
+local visible, flask, battleelixir, guardianelixir, food, stamina, vers, spell4, custom, weapon, armor
 local playerBuff = {}
+local icons = {}
+local UpdatePositions
 
 local function CheckElixir()
 	if #battleelixirbuffs > 0 then
@@ -79,11 +82,11 @@ scanner:SetOwner(UIParent, "ANCHOR_NONE")
 
 local KitPattern = "(.+) %(%d+ .+%)$"
 if T.client == "zhTW" then
-    KitPattern = "%(%+%d+.+"
+	KitPattern = "%(%+%d+.+"
 elseif T.client == "zhCN" then
-    KitPattern = "%（%+%d+ .+"
+	KitPattern = "%（%+%d+ .+"
 elseif T.client == "koKR" then
-    KitPattern = "%(.+ %+%d+%)"
+	KitPattern = "%(.+ %+%d+%)"
 end
 
 local function CheckArmorBuff()
@@ -184,6 +187,21 @@ local function OnAuraChange()
 		end
 	end
 
+	for i = 1, #versbuffs do
+		local name, icon = unpack(versbuffs[i])
+		if i == 1 then
+			VersFrame.t:SetTexture(icon)
+		end
+		if playerBuff[name] then
+			VersFrame:SetAlpha(C.reminder.raid_buffs_alpha)
+			vers = true
+			break
+		else
+			VersFrame:SetAlpha(1)
+			vers = false
+		end
+	end
+
 	for i = 1, #Spell4Buff do
 		local name, icon = unpack(Spell4Buff[i])
 		if i == 1 then
@@ -219,11 +237,12 @@ local function OnAuraChange()
 		custom = true
 	end
 
+	UpdatePositions()
 	local _, instanceType = IsInInstance()
 	if (not IsInGroup() or instanceType ~= "raid") and C.reminder.raid_buffs_always == false then
 		RaidBuffReminder:SetAlpha(0)
 		visible = false
-	elseif flask == true and food == true and stamina == true and spell4 == true and custom == true and weapon == true and armor == true then
+	elseif flask == true and food == true and stamina == true and spell4 == true and custom == true and weapon == true and armor == true and vers == true then
 		if not visible then
 			RaidBuffReminder:SetAlpha(0)
 			visible = false
@@ -256,17 +275,18 @@ raidbuff_reminder:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 raidbuff_reminder:RegisterUnitEvent("UNIT_INVENTORY_CHANGED", "player", "")
 raidbuff_reminder:SetScript("OnEvent", OnAuraChange)
 
-local line = math.ceil(C.minimap.size / (C.reminder.raid_buffs_size + 2))
-
 local buffButtons = {
 	"FlaskFrame",
 	"FoodFrame",
 	"WeaponFrame",
 	"ArmorFrame",
 	"StaminaFrame",
+	"VersFrame",
 	"Spell4Frame",
 	"CustomFrame",
 }
+
+local line = math.ceil(C.minimap.size / (C.reminder.raid_buffs_size + 2))
 
 for i = 1, #buffButtons do
 	local name = buffButtons[i]
@@ -282,4 +302,30 @@ for i = 1, #buffButtons do
 
 	button.t = button:CreateTexture(name..".t", "OVERLAY")
 	button.t:CropIcon()
+	tinsert(icons, button)
+end
+
+function UpdatePositions()
+	local first, previousBuff
+	for i = 1, #icons do
+		local buff = icons[i]
+		buff:ClearAllPoints()
+		if buff:GetAlpha() == C.reminder.raid_buffs_alpha then
+			-- buff:SetPoint("TOP", UIParent, "TOP", 0, 900)
+			line = line + 1
+		else
+			if not first then
+				buff:SetPoint("BOTTOMLEFT", RaidBuffReminder, "BOTTOMLEFT", 0, 0)
+				first = true
+			else
+				buff:SetPoint("LEFT", previousBuff, "RIGHT", 3, 0)
+			end
+			previousBuff = buff
+			if i >= line then
+				buff:SetAlpha(0)
+			else
+				buff:SetAlpha(1)
+			end
+		end
+	end
 end

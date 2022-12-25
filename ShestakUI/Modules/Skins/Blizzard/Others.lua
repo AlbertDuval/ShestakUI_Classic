@@ -44,11 +44,20 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 		}
 
 		GameMenuFrame:StripTextures()
+		OpacityFrame:StripTextures()
+
+		if T.Classic then
+			AutoCompleteBox:StripTextures()
+			TicketStatusFrameButton:StripTextures()
+		end
+
+		if T.Wrath then
+			RolePollPopup:StripTextures()
+		end
+
 		if T.Mainline then
 			QueueStatusFrame:StripTextures()
 			LFDRoleCheckPopup:StripTextures()
-			RolePollPopup:StripTextures()
-			OpacityFrame:StripTextures()
 			ColorPickerFrame.Border:Hide()
 		end
 
@@ -98,9 +107,9 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 			_G["StaticPopup"..i.."ItemFrameIconTexture"]:ClearAllPoints()
 			_G["StaticPopup"..i.."ItemFrameIconTexture"]:SetPoint("TOPLEFT", 2, -2)
 			_G["StaticPopup"..i.."ItemFrameIconTexture"]:SetPoint("BOTTOMRIGHT", -2, 2)
-			_G["StaticPopup"..i.."CloseButton"]:SetNormalTexture("")
+			_G["StaticPopup"..i.."CloseButton"]:SetNormalTexture(0)
 			_G["StaticPopup"..i.."CloseButton"].SetNormalTexture = T.dummy
-			_G["StaticPopup"..i.."CloseButton"]:SetPushedTexture("")
+			_G["StaticPopup"..i.."CloseButton"]:SetPushedTexture(0)
 			_G["StaticPopup"..i.."CloseButton"].SetPushedTexture = T.dummy
 			T.SkinCloseButton(_G["StaticPopup"..i.."CloseButton"])
 
@@ -151,6 +160,48 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 			end
 		end)
 
+		hooksecurefunc("ToggleDropDownMenu", function(level)
+			if not level then
+				level = 1
+			end
+
+			for i = 1, _G.UIDROPDOWNMENU_MAXBUTTONS do
+				local button = _G["DropDownList"..level.."Button"..i]
+				local check = _G["DropDownList"..level.."Button"..i.."Check"]
+				local uncheck = _G["DropDownList"..level.."Button"..i.."UnCheck"]
+
+				if not button.backdrop then
+					button:CreateBackdrop("Transparent")
+					button.backdrop:SetBackdropColor(C.media.backdrop_color[1], C.media.backdrop_color[2], C.media.backdrop_color[3], 0.3)
+				end
+
+				button.backdrop:Hide()
+
+				if not button.notCheckable then
+					uncheck:SetTexture()
+					local _, co = check:GetTexCoord()
+					if co == 0 then
+						check:SetTexture([[Interface\Buttons\UI-CheckBox-Check]])
+						check:SetVertexColor(1, 0.9, 0, 1)
+						check:SetSize(18, 18)
+						check:SetDesaturated(true)
+						button.backdrop:SetInside(check, 4, 4)
+					else
+						check:SetTexture(C.media.blank)
+						check:SetVertexColor(1, 0.82, 0, 0.8)
+						check:SetSize(5, 5)
+						check:SetDesaturated(false)
+						button.backdrop:SetOutside(check)
+					end
+
+					button.backdrop:Show()
+					check:SetTexCoord(0, 1, 0, 1)
+				else
+					check:SetSize(16, 16)
+				end
+			end
+		end)
+
 		if RaiderIO_CustomDropDownListMenuBackdrop then
 			RaiderIO_CustomDropDownListMenuBackdrop:StripTextures()
 		end
@@ -198,17 +249,19 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 			"GameMenuButtonHelp",
 			"GameMenuButtonStore",
 			"GameMenuButtonUIOptions",
+			"GameMenuButtonSettings",
+			"GameMenuButtonEditMode",
 			"GameMenuButtonKeybindings",
 			"GameMenuButtonMacros",
 			"GameMenuButtonRatings",
 			"GameMenuButtonAddOns",
+			"GameMenuButtonAddons",
 			"GameMenuButtonLogout",
 			"GameMenuButtonQuit",
 			"GameMenuButtonContinue",
 			"GameMenuButtonMacOptions",
 			"GameMenuButtonOptionHouse",
 			"GameMenuButtonSettingsUI",
-			"GameMenuButtonAddons",
 			"GameMenuButtonWhatsNew",
 			"ReadyCheckFrameYesButton",
 			"ReadyCheckFrameNoButton",
@@ -330,9 +383,9 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 				if navButton and not navButton.isSkinned then
 					navButton:SkinButton(true)
 					if navButton.MenuArrowButton then
-						navButton.MenuArrowButton:SetNormalTexture(nil)
-						navButton.MenuArrowButton:SetPushedTexture(nil)
-						navButton.MenuArrowButton:SetHighlightTexture(nil)
+						navButton.MenuArrowButton:SetNormalTexture(0)
+						navButton.MenuArrowButton:SetPushedTexture(0)
+						navButton.MenuArrowButton:SetHighlightTexture(0)
 					end
 					navButton.xoffset = 1
 					navButton.isSkinned = true

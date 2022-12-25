@@ -95,6 +95,7 @@ local herbs = {
 	[169701] = true,	-- Deathblossom
 	[170554] = true,	-- Vigil's Torch
 	[171315] = true,	-- Nightshade
+	[187699] = true,	-- First Flower
 }
 
 local ores = {
@@ -130,6 +131,7 @@ local ores = {
 	[171831] = true,	-- Phaedrum
 	[171832] = true,	-- Sinvyr
 	[171833] = true,	-- Elethium
+	[187700] = true,	-- Progenium Ore
 }
 
 function button:PLAYER_LOGIN()
@@ -155,16 +157,11 @@ function button:PLAYER_LOGIN()
 		end
 	end
 
-	GameTooltip:HookScript("OnTooltipSetItem", function(self)
-		local _, link = self:GetItem()
+	local function OnTooltipSetUnit(self)
+		if self ~= GameTooltip or self:IsForbidden() then return end
+		local _, link = T.Classic and self:GetItem() or TooltipUtil.GetDisplayedItem(self)
 
-		local auctionFrame
-
-		if T.Classic then
-			auctionFrame = AuctionFrame
-		else
-			auctionFrame = AuctionHouseFrame
-		end
+		local auctionFrame = T.Classic and AuctionFrame or AuctionHouseFrame
 
 		if link and not InCombatLockdown() and IsAltKeyDown() and not (auctionFrame and auctionFrame:IsShown()) then
 			local itemID = GetItemInfoFromHyperlink(link)
@@ -176,7 +173,11 @@ function button:PLAYER_LOGIN()
 				spell, r, g, b = GetSpellInfo(31252), 1, 0.33, 0.33
 			elseif disenchanter then
 				local _, _, itemRarity, _, _, _, _, _, _, _, _, class, subClass = GetItemInfo(link)
-				if not (class == Enum.ItemClass.Weapon or class == Enum.ItemClass.Armor or (class == 3 and subClass == 11)) or not (itemRarity and (itemRarity > 1 and (itemRarity < 5 or itemRarity == 6))) then return end
+				if T.Classic then
+					if not (class == Enum.ItemClass.Weapon or class == Enum.ItemClass.Armor or (class == 3 and subClass == 11)) or not (itemRarity and (itemRarity > 1 and (itemRarity < 5 or itemRarity == 6))) then return end
+				else
+					if not (itemRarity and (itemRarity > 1 and (itemRarity < 5 or itemRarity == 6))) then return end
+				end
 				spell, r, g, b = GetSpellInfo(13262), 0.5, 0.5, 1
 			elseif rogue then
 				for index = 1, self:NumLines() do
@@ -194,7 +195,13 @@ function button:PLAYER_LOGIN()
 				AutoCastShine_AutoCastStart(button, r, g, b)
 			end
 		end
-	end)
+	end
+
+	if T.Classic then
+		GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetUnit)
+	else
+		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetUnit)
+	end
 
 	self:SetFrameStrata("TOOLTIP")
 	self:SetAttribute("*type1", "macro")

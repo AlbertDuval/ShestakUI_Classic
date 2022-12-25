@@ -11,38 +11,79 @@ local function setTooltipIcon(self, icon)
 	end
 end
 
-local function newTooltipHooker(method, func)
-	return function(tooltip)
-		local modified = false
+local whiteTooltip = {
+	[GameTooltip] = true,
+	[ItemRefTooltip] = true,
+	[ItemRefShoppingTooltip1] = true,
+	[ItemRefShoppingTooltip2] = true,
+	[ShoppingTooltip1] = true,
+	[ShoppingTooltip2] = true,
+}
 
-		tooltip:HookScript("OnTooltipCleared", function()
-			modified = false
-		end)
+if T.Classic then
+	local function newTooltipHooker(method, func)
+		return function(tooltip)
+			local modified = false
 
-		tooltip:HookScript(method, function(self, ...)
-			if not modified then
-				modified = true
-				func(self, ...)
+			tooltip:HookScript("OnTooltipCleared", function()
+				modified = false
+			end)
+
+			tooltip:HookScript(method, function(self, ...)
+				if not modified then
+					modified = true
+					func(self, ...)
+				end
+			end)
+		end
+	end
+
+	local hookItem = newTooltipHooker("OnTooltipSetItem", function(self)
+		local _, link = self:GetItem()
+		if link then
+			setTooltipIcon(self, GetItemIcon(link))
+		end
+	end)
+
+	local hookSpell = newTooltipHooker("OnTooltipSetSpell", function(self)
+		local _, id = self:GetSpell()
+		if id then
+			setTooltipIcon(self, select(3, GetSpellInfo(id)))
+		end
+	end)
+
+	for tooltip in pairs(whiteTooltip) do
+		hookItem(tooltip)
+		hookSpell(tooltip)
+	end
+else
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self, data)
+		if whiteTooltip[self] and not self:IsForbidden() then
+			if data and data.id then
+				setTooltipIcon(self, GetItemIcon(data.id))
 			end
-		end)
-	end
-end
+		end
+	end)
 
-local hookItem = newTooltipHooker("OnTooltipSetItem", function(self)
-	local _, link = self:GetItem()
-	if link then
-		setTooltipIcon(self, GetItemIcon(link))
-	end
-end)
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(self, data)
+		if whiteTooltip[self] and not self:IsForbidden() then
+			if data and data.id then
+				setTooltipIcon(self, select(3, GetSpellInfo(data.id)))
+			end
+		end
+	end)
 
-local hookSpell = newTooltipHooker("OnTooltipSetSpell", function(self)
-	local _, id = self:GetSpell()
-	if id then
-		setTooltipIcon(self, select(3, GetSpellInfo(id)))
-	end
-end)
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Macro, function(self, data)
+		if whiteTooltip[self] and not self:IsForbidden() then
+			local lineData = data.lines and data.lines[1]
+			local tooltipType = lineData and lineData.tooltipType
+			if not tooltipType then return end
 
-for _, tooltip in pairs{GameTooltip, ItemRefTooltip, ItemRefShoppingTooltip1, ItemRefShoppingTooltip2, ShoppingTooltip1, ShoppingTooltip2} do
-	hookItem(tooltip)
-	hookSpell(tooltip)
+			if tooltipType == 0 then -- item
+				setTooltipIcon(self, GetItemIcon(lineData.tooltipID))
+			elseif tooltipType == 1 then -- spell
+				setTooltipIcon(self, select(3, GetSpellInfo(lineData.tooltipID)))
+			end
+		end
+	end)
 end

@@ -14,6 +14,7 @@ local function LoadSkin()
 	MailFrameInset:StripTextures()
 	SendMailMoneyInset:StripTextures()
 	SendMailMoneyBg:StripTextures()
+	MailFramePortrait:SetAlpha(0)
 
 	for i = 1, INBOXITEMS_TO_DISPLAY do
 		local bg = _G["MailItem"..i]
@@ -145,7 +146,7 @@ local function LoadSkin()
 	if T.Mainline then
 		SendMailBodyEditBox:SetTextColor(1, 1, 1)
 	end
-	OpenMailBodyText:SetTextColor(1, 1, 1)
+	MailTextFontNormal:SetTextColor(1, 1, 1)
 	InvoiceTextFontNormal:SetTextColor(1, 1, 1)
 	OpenMailArithmeticLine:Kill()
 

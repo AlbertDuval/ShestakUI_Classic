@@ -165,6 +165,7 @@ L_GUI_UF_PLUGINS_SHARD_BAR = "Activier la barre de Fragment d'âme"
 L_GUI_UF_PLUGINS_RUNE_BAR = "Activer la barre de Rune"
 L_GUI_UF_PLUGINS_TOTEM_BAR = "Activer la barre totem pour Shaman"
 L.unitframe_class_bar_totem_other = "Activer la barre totem pour les autres classes"
+L.unitframe_class_bar_essence = "Enable Essence bar for Evoker" -- Need review
 
 -- Raid Frames options
 L_GUI_UF_RAIDFRAMES_SUBTEXT = "Personnalisez l’apparence des cadres de raid."
@@ -207,6 +208,8 @@ L.raidframe_plugins_aura_watch = "Icônes d'affaiblissement de raid (de la liste
 L.raidframe_plugins_aura_watch_timer = "Durée sur les icônes d'affaiblissement du raid"
 L.raidframe_plugins_pvp_debuffs = "Afficher les icônes d'affaiblissement JcJ (de la liste)"
 L_GUI_UF_PLUGINS_HEALCOMM = "Afficher l'estimation des soins entrant sur le cadre"
+L.raidframe_plugins_over_absorb = "Montrer la barre d'absorption sur le cadre"
+L.raidframe_plugins_over_heal_absorb = "Montrer l'excédent de soin absorber sur le cadre"
 L.raidframe_plugins_auto_resurrection = "Incantation automatique de résurrection"
 L.raidframe_plugins_auto_resurrection_desc = "Lance résurrection avec le clic du milieu de la souris (ne fonctionne pas avec l'addon Clique activé)"
 L.raidframe_hide_health_value = "Masquer la valeur de santé du raid"
@@ -329,6 +332,7 @@ L.nameplate_ad_width_desc = "LArgeur additionnelle pour la barre de Noms de la c
 L_GUI_NAMEPLATE_CASTBAR_NAME = "Afficher le nom du sort"
 L_GUI_NAMEPLATE_CLASS_ICON = "Icône de classe en JcJ"
 L_GUI_NAMEPLATE_NAME_ABBREV = "Afficher les noms abrégés"
+L.nameplate_short_name = "Remplacer les noms par des noms courts"
 L.nameplate_clamp = "Afficher les barres en haut de l'écran quand celles-ci sont hors champs"
 L.nameplate_clamp_desc = "Afficher les barres en haut de l'écran quand celles-ci sont hors champs"
 L_GUI_NAMEPLATE_SHOW_DEBUFFS = "Afficher vos debuffs (de la liste)"
@@ -382,7 +386,8 @@ L_GUI_COMBATTEXT_TIME_VISIBLE = "Temps"
 L_GUI_COMBATTEXT_TIME_VISIBLE_DESC = "Temps en seconde durant lequel un message est affiché"
 L_GUI_COMBATTEXT_DK_RUNES = "Afficher le rechargement des runes du chevalier de la mort"
 L_GUI_COMBATTEXT_KILLINGBLOW = "Afficher les coups fatals"
-L_GUI_COMBATTEXT_MERGE_AOE_SPAM = "Rassembler tous les dégâts d'un aoe en un seul message"
+L.combattext_merge_aoe_spam = "Merges spell spam into single message" -- Needs review
+L.combattext_merge_aoe_spam_desc = "Rassembler tous les dégâts d'un aoe en un seul message"
 L_GUI_COMBATTEXT_MERGE_MELEE = "Rassemble les dégâts multiples en auto attaque"
 L_GUI_COMBATTEXT_DISPEL = "Affiche les sorts que vous avez dissipé"
 L_GUI_COMBATTEXT_INTERRUPT = "Affiche les sorts que vous avez interrompu"
@@ -406,8 +411,8 @@ L_GUI_AURA_PLAYER_AURA_ONLY = "Afficher seulement ses propres debuffs sur la cib
 L_GUI_AURA_DEBUFF_COLOR_TYPE = "Couleur de debuff par type"
 L_GUI_AURA_CAST_BY = "Montrer qui a lancé un buff/debuff dans son tooltip"
 L_GUI_AURA_CLASSCOLOR_BORDER = "Activer la couleur de votre classe pour la bordure de vos buffs"
-L.aura_subheader_buffs = "Player buffs" -- Need review
-L.aura_subheader_debuffs = "Debuffs" -- Need review
+L.aura_subheader_buffs = "Les buffs des joueurs"
+L.aura_subheader_debuffs = "Les Débuffs des joueurs"
 
 -- Bag options
 L_GUI_BAGS = "Sacs"
@@ -423,6 +428,7 @@ L_GUI_BAGS_BAG = "Nombre de colonne pour les sacs"
 -- Minimap options
 L_GUI_MINIMAP_SUBTEXT = "Paramètres de la minimap"
 L_GUI_MINIMAP_ENABLE = "Activer minimap"
+L.minimap_on_top = "Move minimap on top right corner" -- Need review
 L_GUI_MINIMAP_ICON = "Icone de pistage"
 L_GUI_GARRISON_ICON = "Icône de Covenant"
 L_GUI_MINIMAP_SIZE = "Taille de la minicarte"

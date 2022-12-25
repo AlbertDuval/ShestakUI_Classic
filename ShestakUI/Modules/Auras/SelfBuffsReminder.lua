@@ -23,7 +23,7 @@ local function OnEvent(self, event)
 			self.icon:SetTexture(icon)
 			break
 		else
-			self.icon:SetTexture(nil)
+			self.icon:SetTexture(0)
 		end
 	end
 
@@ -79,7 +79,7 @@ local function OnEvent(self, event)
 	-- Check event to play sound
 	if (event == "ZONE_CHANGED_NEW_AREA" or event == "PLAYER_REGEN_DISABLED") and C.reminder.solo_buffs_sound == true then canplaysound = true end
 
-	if ((group.combat and UnitAffectingCombat("player")) or (group.instance and difficultyID ~= 0) or (group.pvp and (instanceType == "arena" or instanceType == "pvp"))) and
+	if ((group.combat and UnitAffectingCombat("player")) or (group.instance and difficultyID ~= 0 and (T.Mainline and not C_Garrison.IsOnGarrisonMap())) or (group.pvp and (instanceType == "arena" or instanceType == "pvp"))) and
 	specpass == true and rolepass == true and not UnitInVehicle("player") then
 		if group.mainhand then
 			local hasMainHandEnchant = GetWeaponEnchantInfo()
@@ -136,9 +136,7 @@ for i = 1, #tab do
 	frame.id = i
 
 	frame.icon = frame:CreateTexture(nil, "OVERLAY")
-	frame.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-	frame.icon:SetPoint("TOPLEFT", frame, "TOPLEFT", 2, -2)
-	frame.icon:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -2, 2)
+	frame.icon:CropIcon()
 	frame.icon:SetSize(C.reminder.solo_buffs_size, C.reminder.solo_buffs_size)
 
 	frame:Hide()

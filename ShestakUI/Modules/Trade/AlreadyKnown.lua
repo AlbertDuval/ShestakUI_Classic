@@ -56,6 +56,7 @@ local function IsKnown(itemLink)
 	local _, _, _, _, _, _, _, _, _, _, _, class, subClass = GetItemInfo(itemID)
 	if not (knowables[class] or knowables[subClass]) then return end
 
+	if T.newPatch then return end -- BETA
 	tooltip:ClearLines()
 	tooltip:SetHyperlink(itemLink)
 	if not Scan(2, tooltip:NumLines()) then return end
@@ -97,7 +98,9 @@ local function LootFrame_UpdateButton(index)
 		end
 	end
 end
-hooksecurefunc("LootFrame_UpdateButton", LootFrame_UpdateButton)
+if T.Classic then
+	hooksecurefunc("LootFrame_UpdateButton", LootFrame_UpdateButton)
+end
 
 -- Merchant frame
 local function MerchantFrame_UpdateMerchantInfo()
@@ -253,15 +256,48 @@ if IsAddOnLoaded("Blizzard_GuildBankUI") then
 end
 
 -- Auction frame
-local function AuctionHouseFrame_RefreshScrollFrame(self)
-	local numResults = self.getNumEntries()
-	local buttons = HybridScrollFrame_GetButtons(self.ScrollFrame)
-	local buttonCount = buttons and #buttons or 0
-	local offset = self:GetScrollOffset()
-	for i = 1, buttonCount do
-		local visible = i + offset <= numResults
-		local button = buttons[i]
-		if visible then
+local AuctionHouseFrame_RefreshScrollFrame
+if T.Classic then
+	AuctionHouseFrame_RefreshScrollFrame = function(self)
+		local numResults = self.getNumEntries()
+		local buttons = HybridScrollFrame_GetButtons(self.ScrollFrame)
+		local buttonCount = buttons and #buttons or 0
+		local offset = self:GetScrollOffset()
+		for i = 1, buttonCount do
+			local visible = i + offset <= numResults
+			local button = buttons[i]
+			if visible then
+				if button.rowData.itemKey.itemID then
+					local itemLink
+					if button.rowData.itemKey.itemID == 82800 then -- BattlePet
+						itemLink = format("|Hbattlepet:%d::::::|h[Dummy]|h", button.rowData.itemKey.battlePetSpeciesID)
+					else -- Normal item
+						itemLink = format("item:%d:", button.rowData.itemKey.itemID)
+					end
+
+					if itemLink and IsKnown(itemLink) then
+						-- Highlight
+						button.SelectedHighlight:Show()
+						button.SelectedHighlight:SetVertexColor(color.r, color.g, color.b)
+						button.SelectedHighlight:SetAlpha(.2)
+						-- Icon
+						button.cells[2].Icon:SetVertexColor(color.r, color.g, color.b)
+						button.cells[2].IconBorder:SetVertexColor(color.r, color.g, color.b)
+					else
+						-- Highlight
+						button.SelectedHighlight:SetVertexColor(1, 1, 1)
+						-- Icon
+						button.cells[2].Icon:SetVertexColor(1, 1, 1)
+						button.cells[2].IconBorder:SetVertexColor(1, 1, 1)
+					end
+				end
+			end
+		end
+	end
+else
+	AuctionHouseFrame_RefreshScrollFrame = function(self)
+		-- Derived from https://www.townlong-yak.com/framexml/10.0.0/Blizzard_AuctionHouseUI/Blizzard_AuctionHouseItemList.lua#322
+		self.ScrollBox:ForEachFrame(function(button)
 			if button.rowData.itemKey.itemID then
 				local itemLink
 				if button.rowData.itemKey.itemID == 82800 then -- BattlePet
@@ -269,7 +305,6 @@ local function AuctionHouseFrame_RefreshScrollFrame(self)
 				else -- Normal item
 					itemLink = format("item:%d:", button.rowData.itemKey.itemID)
 				end
-
 				if itemLink and IsKnown(itemLink) then
 					-- Highlight
 					button.SelectedHighlight:Show()
@@ -286,7 +321,7 @@ local function AuctionHouseFrame_RefreshScrollFrame(self)
 					button.cells[2].IconBorder:SetVertexColor(1, 1, 1)
 				end
 			end
-		end
+		end)
 	end
 end
 
@@ -369,22 +404,10 @@ local function BlackMarketFrame_UpdateHotItem(self)
 	end
 end
 
-local function BlackMarketScrollFrame_Update()
-	local numItems = C_BlackMarket.GetNumItems()
-	local offset = HybridScrollFrame_GetOffset(BlackMarketScrollFrame)
-	local buttons = BlackMarketScrollFrame.buttons
-
-	for i = 1, #buttons do
-		local index = offset + i
-		if type(numItems) == "number" and index <= numItems then
-			local texture = buttons[i].Item.IconTexture
-			if texture and texture:IsShown() then
-				local name, _, _, _, usable, _, _, _, _, _, _, _, _, _, link = C_BlackMarket.GetItemInfoByIndex(index)
-				if name and usable and IsKnown(link) then
-					texture:SetVertexColor(color.r, color.g, color.b)
-				end
-			end
-		end
+local function BlackMarketScrollFrame_Update(self, elementData)
+	local name, _, _, _, usable, _, _, _, _, _, _, _, _, _, link = C_BlackMarket.GetItemInfoByIndex(elementData.index)
+	if name and usable and IsKnown(link) then
+		self.Item.IconTexture:SetVertexColor(color.r, color.g, color.b)
 	end
 end
 
@@ -392,8 +415,7 @@ local isBlizzard_BlackMarketUILoaded
 if IsAddOnLoaded("Blizzard_BlackMarketUI") then
 	isBlizzard_BlackMarketUILoaded = true
 	hooksecurefunc("BlackMarketFrame_UpdateHotItem", BlackMarketFrame_UpdateHotItem)
-	hooksecurefunc("BlackMarketScrollFrame_Update", BlackMarketScrollFrame_Update)
-	hooksecurefunc(BlackMarketScrollFrame, "update", BlackMarketScrollFrame_Update)
+	hooksecurefunc(BlackMarketItemMixin, "Init", BlackMarketScrollFrame_Update)
 end
 
 -- LoD addons
@@ -417,8 +439,7 @@ if not (isBlizzard_GuildUILoaded and isBlizzard_GuildBankUILoaded and isBlizzard
 		elseif addon == "Blizzard_BlackMarketUI" then
 			isBlizzard_BlackMarketUILoaded = true
 			hooksecurefunc("BlackMarketFrame_UpdateHotItem", BlackMarketFrame_UpdateHotItem)
-			hooksecurefunc("BlackMarketScrollFrame_Update", BlackMarketScrollFrame_Update)
-			hooksecurefunc(BlackMarketScrollFrame, "update", BlackMarketScrollFrame_Update)
+			hooksecurefunc(BlackMarketItemMixin, "Init", BlackMarketScrollFrame_Update)
 		end
 
 		if isBlizzard_GuildUILoaded and isBlizzard_GuildBankUILoaded and isBlizzard_AuctionHouseUILoaded and isBlizzard_AuctionUILoaded and isBlizzard_BlackMarketUILoaded then

@@ -117,7 +117,8 @@ local function LoadSkin()
 
 			if quality then
 				if frame then
-					frame:SetBackdropBorderColor(GetItemQualityColor(quality))
+					local R, G, B = GetItemQualityColor(quality)
+					frame:SetBackdropBorderColor(R, G, B)
 				end
 				text:SetTextColor(GetItemQualityColor(quality))
 			else
@@ -129,7 +130,7 @@ local function LoadSkin()
 		end
 
 		hooksecurefunc("QuestRewardItem_OnClick", function()
-			QuestRewardItemHighlight:ClearAllPoints();
+			QuestRewardItemHighlight:ClearAllPoints()
 			QuestRewardItemHighlight:SetOutside(this:GetName().."IconTexture")
 			_G[this:GetName().."Name"]:SetTextColor(1, 1, 0)
 
@@ -297,7 +298,7 @@ local function LoadSkin()
                         questLogTitle:SetPoint("CENTER")
                         questLogTitle:SetHitRectInsets(1, 1, 1, 1)
 
-                        highlight:SetTexture("")
+                        highlight:SetTexture(0)
                         highlight.SetTexture = T.dummy
 
                         text:ClearAllPoints()

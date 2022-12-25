@@ -28,6 +28,7 @@ local tooltips = {
 	CampaignTooltip,
 	EmbeddedItemTooltip,
 	QuickKeybindTooltip,
+	SettingsTooltip,
 	-- Addons
 	AtlasLootTooltip,
 	QuestGuru_QuestWatchTooltip,
@@ -56,7 +57,11 @@ for _, tt in pairs(tooltips) do
 		local bg = CreateFrame("Frame", nil, tt)
 		bg:SetPoint("TOPLEFT")
 		bg:SetPoint("BOTTOMRIGHT")
-		bg:SetFrameLevel(tt:GetFrameLevel() - 1)
+		if tt:GetFrameLevel() - 1 >= 0 then
+			bg:SetFrameLevel(tt:GetFrameLevel() - 1)
+		else
+			bg:SetFrameLevel(0)
+		end
 		bg:SetTemplate("Transparent")
 
 		tt.GetBackdrop = function() return backdrop end
@@ -136,7 +141,7 @@ ricon:SetHeight(18)
 ricon:SetWidth(18)
 ricon:SetPoint("BOTTOM", GameTooltip, "TOP", 0, 5)
 
-GameTooltip:HookScript("OnHide", function() ricon:SetTexture(nil) end)
+GameTooltip:HookScript("OnHide", function() ricon:SetTexture(0) end)
 
 -- Add "Targeted By" line
 local targetedList = {}
@@ -261,6 +266,7 @@ if C.tooltip.health_value == true then
 end
 
 local OnTooltipSetUnit = function(self)
+	if self ~= GameTooltip or self:IsForbidden() then return end
 	local lines = self:NumLines()
 	local unit = (select(2, self:GetUnit())) or (GetMouseFocus() and GetMouseFocus().GetAttribute and GetMouseFocus():GetAttribute("unit")) or (UnitExists("mouseover") and "mouseover") or nil
 
@@ -387,7 +393,7 @@ local OnTooltipSetUnit = function(self)
 		if raidIndex then
 			ricon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_"..raidIndex)
 		else
-			ricon:SetTexture(nil)
+			ricon:SetTexture(0)
 		end
 	end
 
@@ -396,7 +402,11 @@ local OnTooltipSetUnit = function(self)
 	end
 end
 
-GameTooltip:HookScript("OnTooltipSetUnit", OnTooltipSetUnit)
+if T.Classic then
+	GameTooltip:HookScript("OnTooltipSetUnit", OnTooltipSetUnit)
+else
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
+end
 
 ----------------------------------------------------------------------------------------
 --	Hide tooltips in combat for action bars, pet bar and stance bar
@@ -416,24 +426,8 @@ end
 ----------------------------------------------------------------------------------------
 --	Fix compare tooltips(by Blizzard)(../FrameXML/GameTooltip.lua)
 ----------------------------------------------------------------------------------------
-if T.Classic then
-	hooksecurefunc("GameTooltip_ShowCompareItem", function(self, anchorFrame)
-		if not self then
-			self = GameTooltip
-		end
-
-		if not anchorFrame then
-			anchorFrame = self.overrideComparisonAnchorFrame or self
-		end
-
-		if self.needsReset then
-			self:ResetSecondaryCompareItem()
-			GameTooltip_AdvanceSecondaryCompareItem(self)
-			self.needsReset = false
-		end
-
-		local shoppingTooltip1, shoppingTooltip2 = unpack(self.shoppingTooltips)
-		local primaryItemShown, secondaryItemShown = shoppingTooltip1:SetCompareItem(shoppingTooltip2, self)
+if T.Classic and not T.Wrath341 then
+	hooksecurefunc("GameTooltip_AnchorComparisonTooltips", function(self, anchorFrame, shoppingTooltip1, shoppingTooltip2, primaryItemShown, secondaryItemShown)
 		local leftPos = anchorFrame:GetLeft()
 		local rightPos = anchorFrame:GetRight()
 
@@ -514,7 +508,8 @@ if T.Classic then
 		shoppingTooltip1:SetCompareItem(shoppingTooltip2, self)
 		shoppingTooltip1:Show()
 	end)
-else
+elseif T.Wrath341 then
+	-- TODO: Revisit this
 	hooksecurefunc("GameTooltip_AnchorComparisonTooltips", function(_, anchorFrame, shoppingTooltip1, shoppingTooltip2, _, secondaryItemShown)
 		local point = shoppingTooltip1:GetPoint(2)
 		if secondaryItemShown then
@@ -536,6 +531,34 @@ else
 			elseif point == "RIGHT" then
 				shoppingTooltip1:ClearAllPoints()
 				shoppingTooltip1:SetPoint("TOPRIGHT", anchorFrame, "TOPLEFT", -3, -10)
+			end
+		end
+	end)
+else
+	hooksecurefunc(TooltipComparisonManager, "AnchorShoppingTooltips", function(self, primaryShown, secondaryItemShown)
+		local tooltip = self.tooltip
+		local shoppingTooltip1 = tooltip.shoppingTooltips[1]
+		local shoppingTooltip2 = tooltip.shoppingTooltips[2]
+		local point = shoppingTooltip1:GetPoint(2)
+		if secondaryItemShown then
+			if point == "TOP" then
+				shoppingTooltip1:ClearAllPoints()
+				shoppingTooltip2:ClearAllPoints()
+				shoppingTooltip1:SetPoint("TOPLEFT", self.anchorFrame, "TOPRIGHT", 3, -10)
+				shoppingTooltip2:SetPoint("TOPLEFT", shoppingTooltip1, "TOPRIGHT", 3, 0)
+			elseif point == "RIGHT" then
+				shoppingTooltip1:ClearAllPoints()
+				shoppingTooltip2:ClearAllPoints()
+				shoppingTooltip1:SetPoint("TOPRIGHT", self.anchorFrame, "TOPLEFT", -3, -10)
+				shoppingTooltip2:SetPoint("TOPRIGHT", shoppingTooltip1, "TOPLEFT", -3, 0)
+			end
+		else
+			if point == "LEFT" then
+				shoppingTooltip1:ClearAllPoints()
+				shoppingTooltip1:SetPoint("TOPLEFT", self.anchorFrame, "TOPRIGHT", 3, -10)
+			elseif point == "RIGHT" then
+				shoppingTooltip1:ClearAllPoints()
+				shoppingTooltip1:SetPoint("TOPRIGHT", self.anchorFrame, "TOPLEFT", -3, -10)
 			end
 		end
 	end)
@@ -580,12 +603,12 @@ else
 			end
 		end
 		for i = 1, 2 do
-			if _G["ItemRefTooltipMoneyFrame"..i] then
-				_G["ItemRefTooltipMoneyFrame"..i.."PrefixText"]:SetFontObject("GameTooltipText")
-				_G["ItemRefTooltipMoneyFrame"..i.."SuffixText"]:SetFontObject("GameTooltipText")
-				_G["ItemRefTooltipMoneyFrame"..i.."GoldButton"]:SetNormalFontObject("GameTooltipText")
-				_G["ItemRefTooltipMoneyFrame"..i.."SilverButton"]:SetNormalFontObject("GameTooltipText")
-				_G["ItemRefTooltipMoneyFrame"..i.."CopperButton"]:SetNormalFontObject("GameTooltipText")
+			if _G["ShoppingTooltip1MoneyFrame"..i] then
+				_G["ShoppingTooltip1MoneyFrame"..i.."PrefixText"]:SetFontObject("GameTooltipText")
+				_G["ShoppingTooltip1MoneyFrame"..i.."SuffixText"]:SetFontObject("GameTooltipText")
+				_G["ShoppingTooltip1MoneyFrame"..i.."GoldButton"]:SetNormalFontObject("GameTooltipText")
+				_G["ShoppingTooltip1MoneyFrame"..i.."SilverButton"]:SetNormalFontObject("GameTooltipText")
+				_G["ShoppingTooltip1MoneyFrame"..i.."CopperButton"]:SetNormalFontObject("GameTooltipText")
 			end
 		end
 	end)
@@ -600,7 +623,7 @@ if T.Mainline then
 		if r ~= 0.65882 and g ~= 0.65882 and b ~= 0.65882 then
 			self:GetParent().backdrop:SetBackdropBorderColor(r, g, b)
 		end
-		self:SetTexture("")
+		self:SetTexture(0)
 	end)
 
 	hooksecurefunc(GameTooltip.ItemTooltip.IconBorder, "Hide", function(self)
@@ -629,7 +652,7 @@ if icon then
 		if r ~= 0.65882 and g ~= 0.65882 and b ~= 0.65882 then
 			self:GetParent().backdrop:SetBackdropBorderColor(r, g, b)
 		end
-		self:SetTexture("")
+		self:SetTexture(0)
 	end)
 
 	hooksecurefunc(reward.IconBorder, "Hide", function(self)

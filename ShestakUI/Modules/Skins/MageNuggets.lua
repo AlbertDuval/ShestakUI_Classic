@@ -1,5 +1,5 @@
 local T, C, L, _ = unpack(select(2, ...))
-if T.Classic or C.skins.mage_nuggets ~= true then return end
+if C.skins.mage_nuggets ~= true then return end
 
 ----------------------------------------------------------------------------------------
 --	MageNuggets skin /run ShowConfigFrames()
@@ -25,7 +25,7 @@ frame:SetScript("OnEvent", function()
 	for i = 1, getn(sparks) do
 		local spark = _G[sparks[i]]
 		if spark then
-			spark:SetTexture(nil)
+			spark:SetTexture(0)
 		end
 	end
 
@@ -673,10 +673,10 @@ frame:SetScript("OnEvent", function()
 	MageNugAlliFrameClose:SkinButton()
 	MageNugAlliFrameShowOptions:SkinButton()
 
-	MageNugAlliFrameText:SetFont(C.media.normal_font, 13)
-	MageNugAlliFrameText2:SetFont(C.media.normal_font, 13)
-	MageNugHordeFrameText:SetFont(C.media.normal_font, 13)
-	MageNugHordeFrameText2:SetFont(C.media.normal_font, 13)
+	MageNugAlliFrameText:SetFont(C.media.normal_font, 13, "")
+	MageNugAlliFrameText2:SetFont(C.media.normal_font, 13, "")
+	MageNugHordeFrameText:SetFont(C.media.normal_font, 13, "")
+	MageNugHordeFrameText2:SetFont(C.media.normal_font, 13, "")
 
 	local portals = {
 		"MageNugAlliFramePortDal",

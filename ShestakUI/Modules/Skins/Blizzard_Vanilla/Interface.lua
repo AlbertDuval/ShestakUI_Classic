@@ -8,7 +8,6 @@ local function LoadSkin()
 	InterfaceOptionsFrame:StripTextures()
 	InterfaceOptionsFrame:SetTemplate("Transparent")
 
-	local InterfaceOptionsFrameHeader = T.Classic and InterfaceOptionsFrameHeader or InterfaceOptionsFrame.Header
 	InterfaceOptionsFrameHeader:StripTextures()
 	InterfaceOptionsFrameHeader:ClearAllPoints()
 	InterfaceOptionsFrameHeader:SetPoint("TOP", InterfaceOptionsFrame, 0, 0)
@@ -66,6 +65,7 @@ local function LoadSkin()
 		"CombatPanelFlashLowHealthWarning",
 		"CombatPanelAutoRange",
 		"CombatPanelEnableFloatingCombatText",
+		"CombatPanelEnableMouseoverCast",
 		"CombatPanelCombatTextLowManaHealth",
 		"CombatPanelCombatTextAuras",
 		"CombatPanelCombatTextAuraFade",
@@ -215,6 +215,7 @@ local function LoadSkin()
 		"CombatPanelCombatTextFloatModeDropDown",
 		"CombatPanelFocusCastKeyDropDown",
 		"CombatPanelSelfCastKeyDropDown",
+		"CombatPanelMouseoverCastKeyDropDown",
 		"ControlsPanelAutoLootKeyDropDown",
 		"DisplayPanelChatBubblesDropDown",
 		"DisplayPanelDisplayDropDown",

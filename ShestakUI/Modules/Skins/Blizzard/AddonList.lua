@@ -24,13 +24,38 @@ local function LoadSkin()
 	AddonListInset:SetTemplate("Overlay")
 	AddonListInset:SetPoint("BOTTOMRIGHT", -6, 29)
 
-	for i = 1, MAX_ADDONS_DISPLAYED do
-		T.SkinCheckBox(_G["AddonListEntry"..i.."Enabled"], nil, T.Classic and true)
-		_G["AddonListEntry"..i.."Load"]:SkinButton()
+	if T.Classic then
+		for i = 1, MAX_ADDONS_DISPLAYED do
+			T.SkinCheckBox(_G["AddonListEntry"..i.."Enabled"], nil, true)
+			_G["AddonListEntry"..i.."Load"]:SkinButton()
+		end
+	else
+		local function forceSaturation(self, _, force)
+			if force then return end
+			self:SetVertexColor(0.6, 0.6, 0.6)
+			self:SetDesaturated(true, true)
+		end
+
+		hooksecurefunc(AddonList.ScrollBox, "Update", function(self)
+			for i = 1, self.ScrollTarget:GetNumChildren() do
+				local child = select(i, self.ScrollTarget:GetChildren())
+				if not child.styled then
+					T.SkinCheckBox(child.Enabled)
+					child.LoadAddonButton:SkinButton()
+					hooksecurefunc(child.Enabled:GetCheckedTexture(), "SetDesaturated", forceSaturation)
+
+					child.styled = true
+				end
+			end
+		end)
 	end
 
-	AddonListScrollFrame:StripTextures()
-	T.SkinScrollBar(AddonListScrollFrameScrollBar)
+	if T.Classic then
+		AddonListScrollFrame:StripTextures()
+		T.SkinScrollBar(AddonListScrollFrameScrollBar)
+	else
+		T.SkinScrollBar(AddonList.ScrollBar)
+	end
 	T.SkinCloseButton(AddonListCloseButton)
 	T.SkinDropDownBox(AddonCharacterDropDown)
 	T.SkinCheckBox(AddonListForceLoad)

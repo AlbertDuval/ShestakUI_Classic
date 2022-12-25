@@ -8,24 +8,54 @@ frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(_, _, addon)
 	if addon == "Blizzard_AchievementUI" then
 		if C.tooltip.enable then
-			hooksecurefunc("AchievementFrameCategories_DisplayButton", function(button) button.showTooltipFunc = nil end)
+			if T.Classic then
+				hooksecurefunc("AchievementFrameCategories_DisplayButton", function(button) button.showTooltipFunc = nil end)
+			end
 		end
 	end
 
+	if ClassPowerBar then
+		ClassPowerBar.OnEvent = T.dummy -- Fix error with druid on logon
+	end
+
 	if C.unitframe.enable and C.raidframe.layout ~= "BLIZZARD" then
-		InterfaceOptionsFrameCategoriesButton10:SetScale(0.00001)
-		InterfaceOptionsFrameCategoriesButton10:SetAlpha(0)
-		if not InCombatLockdown() then
-			if C.raidframe.show_raid or not IsAddOnLoaded("Grid2") then -- may need to add more addons here
-				CompactRaidFrameManager:Kill()
-				CompactRaidFrameContainer:Kill()
+		if T.Classic then
+			InterfaceOptionsFrameCategoriesButton11:SetScale(0.00001)
+			InterfaceOptionsFrameCategoriesButton11:SetAlpha(0)
+
+			if not InCombatLockdown() then
+				if C.raidframe.show_raid or not IsAddOnLoaded("Grid2") then -- may need to add more addons here
+					CompactRaidFrameManager:Kill()
+					CompactRaidFrameContainer:Kill()
+				end
+			end
+
+			ShowPartyFrame = T.dummy
+			HidePartyFrame = T.dummy
+			CompactUnitFrameProfiles_ApplyProfile = T.dummy
+			CompactRaidFrameManager_UpdateShown = T.dummy
+			CompactRaidFrameManager_UpdateOptionsFlowContainer = T.dummy
+		else
+			if CompactRaidFrameManager then
+				local function HideFrames()
+					CompactRaidFrameManager:UnregisterAllEvents()
+					CompactRaidFrameContainer:UnregisterAllEvents()
+					if not InCombatLockdown() then
+						CompactRaidFrameManager:Hide()
+						local shown = CompactRaidFrameManager_GetSetting("IsShown")
+						if shown and shown ~= "0" then
+							CompactRaidFrameManager_SetSetting("IsShown", "0")
+						end
+					end
+				end
+				local hiddenFrame = CreateFrame("Frame")
+				hiddenFrame:Hide()
+				hooksecurefunc("CompactRaidFrameManager_UpdateShown", HideFrames)
+				CompactRaidFrameManager:HookScript("OnShow", HideFrames)
+				CompactRaidFrameContainer:HookScript("OnShow", HideFrames)
+				HideFrames()
 			end
 		end
-		ShowPartyFrame = T.dummy
-		HidePartyFrame = T.dummy
-		CompactUnitFrameProfiles_ApplyProfile = T.dummy
-		CompactRaidFrameManager_UpdateShown = T.dummy
-		CompactRaidFrameManager_UpdateOptionsFlowContainer = T.dummy
 	end
 
 	if T.Classic then
@@ -33,8 +63,8 @@ frame:SetScript("OnEvent", function(_, _, addon)
 		Advanced_UIScaleSlider:Kill()
 		BagHelpBox:Kill()
 	else
-		Display_UseUIScale:Kill()
-		Display_UIScaleSlider:Kill()
+		--BETA Display_UseUIScale:Kill()
+		-- Display_UIScaleSlider:Kill()
 		TutorialFrameAlertButton:Kill()
 	end
 	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WORLD_MAP_FRAME, true)
@@ -44,10 +74,14 @@ frame:SetScript("OnEvent", function(_, _, addon)
 	end
 
 	SetCVar("countdownForCooldowns", 0)
-	InterfaceOptionsActionBarsPanelCountdownCooldowns:Hide()
+	if T.Classic then
+		InterfaceOptionsActionBarsPanelCountdownCooldowns:Hide()
+	end
 
 	if C.chat.enable then
-		InterfaceOptionsSocialPanelChatStyle:Hide()
+		if T.Classic then
+			InterfaceOptionsSocialPanelChatStyle:Hide()
+		end
 		SetCVar("chatStyle", "im")
 	end
 
@@ -55,20 +89,24 @@ frame:SetScript("OnEvent", function(_, _, addon)
 		if T.class == "DEATHKNIGHT" and C.unitframe_class_bar.rune ~= true then
 			RuneFrame:Kill()
 		end
-		InterfaceOptionsDisplayPanelDisplayDropDown:Hide()
-		InterfaceOptionsCombatPanelTargetOfTarget:Hide()
+		if T.Classic then
+			InterfaceOptionsDisplayPanelDisplayDropDown:Hide()
+			InterfaceOptionsCombatPanelTargetOfTarget:Hide()
+		end
 		SetCVar("showPartyBackground", 0)
 	end
 
 	if C.actionbar.enable then
-		InterfaceOptionsActionBarsPanelBottomLeft:Hide()
-		InterfaceOptionsActionBarsPanelBottomRight:Hide()
-		InterfaceOptionsActionBarsPanelRight:Hide()
-		InterfaceOptionsActionBarsPanelRightTwo:Hide()
-		InterfaceOptionsActionBarsPanelAlwaysShowActionBars:Hide()
-		InterfaceOptionsActionBarsPanelStackRightBars:Hide()
-		if not InCombatLockdown() then
-			SetCVar("multiBarRightVerticalLayout", 0)
+		if T.Classic then
+			InterfaceOptionsActionBarsPanelBottomLeft:Hide()
+			InterfaceOptionsActionBarsPanelBottomRight:Hide()
+			InterfaceOptionsActionBarsPanelRight:Hide()
+			InterfaceOptionsActionBarsPanelRightTwo:Hide()
+			InterfaceOptionsActionBarsPanelAlwaysShowActionBars:Hide()
+			InterfaceOptionsActionBarsPanelStackRightBars:Hide()
+			if not InCombatLockdown() then
+				SetCVar("multiBarRightVerticalLayout", 0)
+			end
 		end
 	end
 
@@ -77,23 +115,37 @@ frame:SetScript("OnEvent", function(_, _, addon)
 	end
 
 	if C.minimap.enable then
-		InterfaceOptionsDisplayPanelRotateMinimap:Hide()
+		if T.Classic then
+			InterfaceOptionsDisplayPanelRotateMinimap:Hide()
+		else
+			SetCVar("minimapTrackingShowAll", 1)
+		end
 	end
 
 	if C.bag.enable then
-		if T.Mainline then
-			SetSortBagsRightToLeft(true)
+		if T.Classic and not T.Wrath341 then
+			SetInsertItemsLeftToRight(false)
+		elseif T.Wrath341 then
+			C_Container.SetInsertItemsLeftToRight(false)
+		else
+			C_Container.SetSortBagsRightToLeft(true)
+			C_Container.SetInsertItemsLeftToRight(false)
 		end
-		SetInsertItemsLeftToRight(false)
 	end
 
 	if C.combattext.enable then
-		InterfaceOptionsCombatPanelEnableFloatingCombatText:Hide()
+		if T.Classic then
+			InterfaceOptionsCombatPanelEnableFloatingCombatText:Hide()
+		end
 		if C.combattext.incoming then
 			SetCVar("enableFloatingCombatText", 1)
 		else
 			SetCVar("enableFloatingCombatText", 0)
 		end
+	end
+
+	if T.Mainline then
+		SetCVar("ActionButtonUseKeyDown", 0) -- BETA
 	end
 end)
 

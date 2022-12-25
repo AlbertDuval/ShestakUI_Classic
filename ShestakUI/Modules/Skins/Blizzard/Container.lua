@@ -25,15 +25,40 @@ local function LoadSkin()
 	BagItemAutoSortButton:GetNormalTexture():SetPoint("TOPLEFT", 2, -2)
 	BagItemAutoSortButton:GetNormalTexture():SetPoint("BOTTOMRIGHT", -2, 2)
 
+	if T.Mainline then
+		ContainerFrameCombinedBags:StripTextures(true)
+		ContainerFrameCombinedBags:CreateBackdrop("Transparent")
+		ContainerFrameCombinedBags.Bg:Hide()
+		T.SkinCloseButton(ContainerFrameCombinedBags.CloseButton)
+
+		-- ContainerFrameCombinedBags:ClearAllPoints()
+		-- ContainerFrameCombinedBags:SetPoint(unpack(C.position.bag))
+		-- ContainerFrameCombinedBags.SetPoint = T.dummy
+
+		ContainerFrameCombinedBags.MoneyFrame.Border:Hide()
+
+		ContainerFrameCombinedBagsPortrait:SetAlpha(0)
+		ContainerFrameCombinedBagsPortraitButton.Highlight:SetAlpha(0)
+		ContainerFrameCombinedBagsPortraitButtonTexture = ContainerFrameCombinedBagsPortraitButton:CreateTexture(nil, "OVERLAY")
+		ContainerFrameCombinedBagsPortraitButtonTexture:SetSize(30, 30)
+		ContainerFrameCombinedBagsPortraitButtonTexture:SetPoint("CENTER", 2, 1)
+		ContainerFrameCombinedBagsPortraitButtonTexture:SetTexture("Interface\\Icons\\inv_misc_bag_08")
+		ContainerFrameCombinedBagsPortraitButtonTexture:SkinIcon()
+	end
+
 	for i = 1, NUM_CONTAINER_FRAMES do
 		local frame = _G["ContainerFrame"..i]
-		local close = _G["ContainerFrame"..i.."CloseButton"]
+		local close = _G["ContainerFrame"..i].CloseButton or _G["ContainerFrame"..i.."CloseButton"]
 
 		frame:StripTextures(true)
 		frame:CreateBackdrop("Transparent")
 		frame.backdrop:SetPoint("TOPLEFT", 4, -2)
 		frame.backdrop:SetPoint("BOTTOMRIGHT", 0, 2)
+		if T.Mainline then
+			frame.Bg:Hide()
+		end
 
+		_G["ContainerFrame"..i.."Portrait"]:SetAlpha(0)
 		frame.PortraitButton.Highlight:SetAlpha(0)
 		frame.PortraitButtonTexture = frame.PortraitButton:CreateTexture(nil, "OVERLAY")
 		frame.PortraitButtonTexture:SetSize(30, 30)
@@ -49,9 +74,11 @@ local function LoadSkin()
 			local quest = _G["ContainerFrame"..i.."Item"..j.."IconQuestTexture"]
 			local border = _G["ContainerFrame"..i.."Item"..j].IconBorder
 
-			border:Kill()
+			if T.Classic then
+				border:Kill()
+			end
 
-			item:SetNormalTexture("")
+			item:SetNormalTexture(0)
 			item:StyleButton()
 			item:SetTemplate("Default")
 
@@ -63,11 +90,27 @@ local function LoadSkin()
 			quest:SetAlpha(0)
 		end
 
+		-- Color QuestItem
+		--BETA hooksecurefunc(frame, "UpdateItems", function()
+		-- local name = frame:GetName()
+		-- local item
+		-- for i = 1, 36 do
+		-- item = _G[name.."Item"..i]
+		-- if _G[name.."Item"..i.."IconQuestTexture"]:IsShown() then
+		-- item:SetBackdropBorderColor(1, 1, 0)
+		-- else
+		-- item:SetBackdropBorderColor(unpack(C.media.border_color))
+		-- end
+		-- end
+		-- end)
+
 		if i == 1 then
 			BackpackTokenFrame:StripTextures(true)
-			for i = 1, MAX_WATCHED_TOKENS do
-				_G["BackpackTokenFrameToken"..i].icon:SkinIcon()
-				_G["BackpackTokenFrameToken"..i].count:SetPoint("RIGHT", _G["BackpackTokenFrameToken"..i].icon, "LEFT", -5, 0)
+			for i = 1, T.Classic and MAX_WATCHED_TOKENS or 10 do
+				if T.Classic then
+					_G["BackpackTokenFrameToken"..i].icon:SkinIcon()
+					_G["BackpackTokenFrameToken"..i].count:SetPoint("RIGHT", _G["BackpackTokenFrameToken"..i].icon, "LEFT", -5, 0)
+				end
 			end
 		end
 	end
@@ -106,9 +149,11 @@ local function LoadSkin()
 		local quest = _G["BankFrameItem"..i].IconQuestTexture
 		local border = _G["BankFrameItem"..i].IconBorder
 
-		border:Kill()
+		if T.Classic then
+			border:Kill()
+		end
 
-		item:SetNormalTexture(nil)
+		item:SetNormalTexture(0)
 		item:StyleButton()
 		item:SetTemplate("Default")
 
@@ -166,7 +211,7 @@ local function LoadSkin()
 
 			border:Kill()
 
-			item:SetNormalTexture(nil)
+			item:SetNormalTexture(0)
 			item:StyleButton()
 			item:SetTemplate("Default")
 
@@ -178,26 +223,43 @@ local function LoadSkin()
 	end)
 
 	-- Color QuestItem
-	hooksecurefunc("ContainerFrame_Update", function(frame)
-		local name = frame:GetName()
-		local item
-		for i = 1, 36 do
-			item = _G[name.."Item"..i]
-			if _G[name.."Item"..i.."IconQuestTexture"]:IsShown() then
-				item:SetBackdropBorderColor(1, 1, 0)
-			else
-				item:SetBackdropBorderColor(unpack(C.media.border_color))
+	if T.Classic then
+		hooksecurefunc("ContainerFrame_Update", function(frame)
+			local name = frame:GetName()
+			local item
+			for i = 1, 36 do
+				item = _G[name.."Item"..i]
+				if _G[name.."Item"..i.."IconQuestTexture"]:IsShown() then
+					item:SetBackdropBorderColor(1, 1, 0)
+				else
+					item:SetBackdropBorderColor(unpack(C.media.border_color))
+				end
 			end
-		end
-	end)
+		end)
+	else
+		hooksecurefunc(ContainerFrame, "UpdateItems", function(frame)
+			local name = frame:GetName()
+			local item
+			for i = 1, 36 do
+				item = _G[name.."Item"..i]
+				if _G[name.."Item"..i.."IconQuestTexture"]:IsShown() then
+					item:SetBackdropBorderColor(1, 1, 0)
+				else
+					item:SetBackdropBorderColor(unpack(C.media.border_color))
+				end
+			end
+		end)
+	end
 
-	hooksecurefunc("BankFrameItemButton_Update", function(frame)
-		if not frame.isBag and frame.IconQuestTexture:IsShown() then
-			frame:SetBackdropBorderColor(1, 1, 0)
-		else
-			frame:SetBackdropBorderColor(unpack(C.media.border_color))
-		end
-	end)
+	if T.Classic then
+		hooksecurefunc("BankFrameItemButton_Update", function(frame)
+			if not frame.isBag and frame.IconQuestTexture:IsShown() then
+				frame:SetBackdropBorderColor(1, 1, 0)
+			else
+				frame:SetBackdropBorderColor(unpack(C.media.border_color))
+			end
+		end)
+	end
 
 	-- Frame Anchors
 	hooksecurefunc("UpdateContainerFrameAnchors", function()
@@ -218,14 +280,16 @@ local function LoadSkin()
 			leftMostPoint = screenWidth - xOffset
 			column = 1
 			local frameHeight
-			for _, frameName in ipairs(ContainerFrame1.bags) do
-				frameHeight = _G[frameName]:GetHeight()
-				if freeScreenHeight < frameHeight then
-					column = column + 1
-					leftMostPoint = screenWidth - (column * 192 * containerScale) - xOffset
-					freeScreenHeight = screenHeight - yOffset
+			if T.Classic then
+				for _, frameName in ipairs(ContainerFrame1.bags) do
+					frameHeight = _G[frameName]:GetHeight()
+					if freeScreenHeight < frameHeight then
+						column = column + 1
+						leftMostPoint = screenWidth - (column * 192 * containerScale) - xOffset
+						freeScreenHeight = screenHeight - yOffset
+					end
+					freeScreenHeight = freeScreenHeight - frameHeight - 3
 				end
-				freeScreenHeight = freeScreenHeight - frameHeight - 3
 			end
 			if leftMostPoint < leftLimit then
 				containerScale = containerScale - 0.01
@@ -245,26 +309,28 @@ local function LoadSkin()
 		column = 0
 
 		local bagsPerColumn = 0
-		for index, frameName in ipairs(ContainerFrame1.bags) do
-			frame = _G[frameName]
-			frame:SetScale(1)
-			if index == 1 then
-				frame:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -21, 22)
-				bagsPerColumn = bagsPerColumn + 1
-			elseif freeScreenHeight < frame:GetHeight() then
-				column = column + 1
-				freeScreenHeight = screenHeight - yOffset
-				if column > 1 then
-					frame:SetPoint("BOTTOMRIGHT", ContainerFrame1.bags[(index - bagsPerColumn) - 1], "BOTTOMLEFT", 0, 0)
+		if T.Classic then
+			for index, frameName in ipairs(ContainerFrame1.bags) do
+				frame = _G[frameName]
+				frame:SetScale(1)
+				if index == 1 then
+					frame:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -21, 22)
+					bagsPerColumn = bagsPerColumn + 1
+				elseif freeScreenHeight < frame:GetHeight() then
+					column = column + 1
+					freeScreenHeight = screenHeight - yOffset
+					if column > 1 then
+						frame:SetPoint("BOTTOMRIGHT", ContainerFrame1.bags[(index - bagsPerColumn) - 1], "BOTTOMLEFT", 0, 0)
+					else
+						frame:SetPoint("BOTTOMRIGHT", ContainerFrame1.bags[index - bagsPerColumn], "BOTTOMLEFT", 0, 0)
+					end
+					bagsPerColumn = 0
 				else
-					frame:SetPoint("BOTTOMRIGHT", ContainerFrame1.bags[index - bagsPerColumn], "BOTTOMLEFT", 0, 0)
+					frame:SetPoint("BOTTOMRIGHT", ContainerFrame1.bags[index - 1], "TOPRIGHT", 0, 0)
+					bagsPerColumn = bagsPerColumn + 1
 				end
-				bagsPerColumn = 0
-			else
-				frame:SetPoint("BOTTOMRIGHT", ContainerFrame1.bags[index - 1], "TOPRIGHT", 0, 0)
-				bagsPerColumn = bagsPerColumn + 1
+				freeScreenHeight = freeScreenHeight - frame:GetHeight() - 3
 			end
-			freeScreenHeight = freeScreenHeight - frame:GetHeight() - 3
 		end
 	end)
 end

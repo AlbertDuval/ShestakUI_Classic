@@ -140,16 +140,11 @@ if T.Classic then
 			self:ClearAllPoints()
 			self:SetPoint("TOP", SideDressUpModelResetButton, "BOTTOM", 0, -3)
 			self.model = SideDressUpModel
-		elseif T.Classic and self.model ~= DressUpModelFrame then
+		elseif self.model ~= DressUpModelFrame then
 			self:SetParent(DressUpModelFrame)
 			self:ClearAllPoints()
 			self:SetPoint("RIGHT", DressUpFrameResetButton, "LEFT", -2, 0)
 			self.model = DressUpModelFrame
-		elseif T.Mainline and self.model ~= DressUpModel then
-			self:SetParent(DressUpModel)
-			self:ClearAllPoints()
-			self:SetPoint("RIGHT", DressUpFrameResetButton, "LEFT", -2, 0)
-			self.model = DressUpModel
 		end
 	end)
 end
@@ -240,6 +235,14 @@ hooksecurefunc(StaticPopupDialogs["DELETE_GOOD_ITEM"], "OnShow", function(s) s.e
 --	Change UIErrorsFrame strata
 ----------------------------------------------------------------------------------------
 UIErrorsFrame:SetFrameLevel(0)
+
+----------------------------------------------------------------------------------------
+--	Increase speed for AddonList scroll
+----------------------------------------------------------------------------------------
+if T.Mainline then
+	AddonList.ScrollBox.wheelPanScalar = 6
+	AddonList.ScrollBar.wheelPanScalar = 6
+end
 
 ----------------------------------------------------------------------------------------
 --	Max Camera Distance

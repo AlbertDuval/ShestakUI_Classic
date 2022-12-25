@@ -1,5 +1,5 @@
 local T, C, L, _ = unpack(select(2, ...))
-if T.Classic or C.skins.ovale ~= true then return end
+if C.skins.ovale ~= true then return end
 
 ----------------------------------------------------------------------------------------
 --	OvaleSpellPriority skin
@@ -26,7 +26,7 @@ frame:SetScript("OnEvent", function()
 			if button and not button.isSkinned then
 				button.cd.noCooldownCount = true
 				button:StyleButton()
-				button:SetNormalTexture("")
+				button:SetNormalTexture(0)
 				button:CreateBackdrop("Transparent")
 				button.backdrop:SetAllPoints()
 

@@ -5,7 +5,7 @@ local T, C, L, _ = unpack(select(2, ...))
 ----------------------------------------------------------------------------------------
 local SetFont = function(obj, font, size, style, r, g, b, sr, sg, sb, sox, soy)
 	if not obj then return end
-	obj:SetFont(font, size, style)
+	obj:SetFont(font, size, style or "")
 	if sr and sg and sb then obj:SetShadowColor(sr, sg, sb) end
 	if sox and soy then obj:SetShadowOffset(sox, soy) end
 	if r and g and b then obj:SetTextColor(r, g, b) end
@@ -83,6 +83,7 @@ frame:SetScript("OnEvent", function(_, _, addon)
 	SetFont(Game13FontShadow, NORMAL, 14)
 	SetFont(Game15Font_o1, NORMAL, 15)
 	SetFont(Fancy14Font, NORMAL, 14)
+	SetFont(Game18Font, NORMAL, 18)
 	SetFont(Game16Font, NORMAL, 16)
 	SetFont(Game12Font, NORMAL, 12)
 	SetFont(Game13Font, NORMAL, 13)
@@ -119,7 +120,7 @@ frame:SetScript("OnEvent", function(_, _, addon)
 
 	-- Player title
 	if T.Mainline then
-		for _, butt in pairs(PaperDollTitlesPane.buttons) do butt.text:SetFontObject(GameFontHighlightSmallLeft) end
+		--BETA for _, butt in pairs(PaperDollTitlesPane.buttons) do butt.text:SetFontObject(GameFontHighlightSmallLeft) end
 	end
 end)
 

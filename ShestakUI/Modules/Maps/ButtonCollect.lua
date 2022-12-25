@@ -5,7 +5,7 @@ if C.minimap.enable ~= true or C.skins.minimap_buttons ~= true then return end
 --	Collect minimap buttons in one line
 ----------------------------------------------------------------------------------------
 local BlackList = {
-	["QueueStatusMinimapButton"] = true,
+	["QueueStatusButton"] = true,
 	["MiniMapTracking"] = true,
 	["MiniMapMailFrame"] = true,
 	["HelpOpenTicketButton"] = true,
@@ -22,9 +22,9 @@ local texList = {
 }
 
 local function SkinButton(f)
-	f:SetPushedTexture(nil)
-	f:SetHighlightTexture(nil)
-	f:SetDisabledTexture(nil)
+	f:SetPushedTexture(0)
+	f:SetHighlightTexture(0)
+	f:SetDisabledTexture(0)
 	f:SetSize(20.8, 20.8)
 
 	for i = 1, f:GetNumRegions() do
@@ -33,7 +33,7 @@ local function SkinButton(f)
 			local tex = tostring(region:GetTexture())
 
 			if tex and (texList[tex] or tex:find("Border") or tex:find("Background") or tex:find("AlphaMask")) then
-				region:SetTexture(nil)
+				region:SetTexture(0)
 			else
 				region:ClearAllPoints()
 				region:SetPoint("TOPLEFT", f, "TOPLEFT", 2, -2)

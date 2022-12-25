@@ -1,5 +1,5 @@
 local major = "LibHealComm-4.0"
-local minor = 107
+local minor = 110
 assert(LibStub, format("%s requires LibStub.", major))
 
 local HealComm = LibStub:NewLibrary(major, minor)
@@ -96,8 +96,9 @@ local spellRankTableData = {
 	[11] = { 25299, 25297, 30020, 27136, 25221, 25391, 27030, 48442, 48071 },
 	[12] = { 26981, 26978, 25222, 25396, 27031, 48781, 48443 },
 	[13] = { 26982, 26979, 48782, 49272, 48067, 45543 },
-	[14] = { 49273, 48377, 48440, 48068, 45544 },
-	[15] = { 48378, 48441 },
+	[14] = { 49273, 48377, 48440, 48068, 51827 },
+	[15] = { 48378, 48441, 45544 },
+	[16] = { 51803 },
 }
 
 local SpellIDToRank = {}
@@ -828,7 +829,7 @@ if( playerClass == "DRUID" ) then
 		local Rejuvenation = GetSpellInfo(774)
 		local Tranquility = GetSpellInfo(740)
 		local Lifebloom = GetSpellInfo(33763) or "Lifebloom"
-		local EmpoweredRejuv = GetSpellInfo(33886) or "Empowered Rejuv"
+		local EmpoweredRejuv = GetSpellInfo(33886) or "Empowered Rejuvenation"
 		local EmpoweredTouch = GetSpellInfo(33879) or "Empowered Touch"
 		local WildGrowth = GetSpellInfo(48438) or "Wild Growth"
 		local Nourish = GetSpellInfo(50464) or "Nourish"
@@ -1200,10 +1201,12 @@ if( playerClass == "PALADIN" ) then
 		local HealingLight = GetSpellInfo(20237)
 		local HolyLight = GetSpellInfo(635)
 		local Divinity = GetSpellInfo(63646) or "Divinity"
-		local TouchedbytheLight = GetSpellInfo(53592) or "TouchedbytheLight"
-		local BeaconofLight = GetSpellInfo(53563) or "BeaconofLight"
-		local SealofLight = GetSpellInfo(20165) or "SealofLight"
-		local DivineIllumination = GetSpellInfo(31842) or "DivineIllumination"
+		local TouchedbytheLight = GetSpellInfo(53590) or "Touched by the Light"
+		local BeaconofLight = GetSpellInfo(53563) or "Beacon of Light"
+		local SealofLight = GetSpellInfo(20165) or "Seal of Light"
+		local DivineIllumination = GetSpellInfo(31842) or "Divine Illumination"
+		local DivinePlea = GetSpellInfo(54428)
+		local AvengingWrath = GetSpellInfo(31884)
 
 		if isWrath then
 			spellData[HolyLight] = { coeff = 2.5 / 3.5, levels = {1, 6, 14, 22, 30, 38, 46, 54, 60, 62, 70, 75, 80}, averages = {
@@ -1345,21 +1348,28 @@ if( playerClass == "PALADIN" ) then
 
 			if( equippedSetCache["Lightbringer"] >= 4 and spellName == FlashofLight ) then healModifier = healModifier + 0.05 end
 
+			if isWrath then
+				if( unitHasAura("player", AvengingWrath) ) then healModifier = healModifier * 1.2 end
+				if( unitHasAura("player", DivinePlea) ) then healModifier = healModifier * 0.5 end
+			end
+
 			spellPower = spellPower * spellData[spellName].coeff * (isWrath and 2.35 or 1)
 			healAmount = calculateGeneralAmount(spellData[spellName].levels[spellRank], healAmount, spellPower, spModifier, healModifier)
 
-			for auraID, values in pairs(blessings) do
-				if unitHasAura(unit, auraID) then
-					if playerCurrentRelic == 28592 then
-						if spellName == FlashofLight then
-							healAmount = calculateGeneralAmount(spellData[spellName].levels[spellRank], healAmount, values[spellName] + 60, healModifier, 1)
+			if not isWrath then -- Blessing of Light was baked in the base healing values of paladin spells in WotLK
+				for auraID, values in pairs(blessings) do
+					if unitHasAura(unit, auraID) then
+						if playerCurrentRelic == 28592 then
+							if spellName == FlashofLight then
+								healAmount = calculateGeneralAmount(spellData[spellName].levels[spellRank], healAmount, values[spellName] + 60, healModifier, 1)
+							else
+								healAmount = calculateGeneralAmount(spellData[spellName].levels[spellRank], healAmount, values[spellName] + 120, healModifier, 1)
+							end
 						else
-							healAmount = calculateGeneralAmount(spellData[spellName].levels[spellRank], healAmount, values[spellName] + 120, healModifier, 1)
+							healAmount = calculateGeneralAmount(spellData[spellName].levels[spellRank], healAmount, values[spellName], healModifier, 1)
 						end
-					else
-						healAmount = calculateGeneralAmount(spellData[spellName].levels[spellRank], healAmount, values[spellName], healModifier, 1)
+						break
 					end
-					break
 				end
 			end
 
@@ -1387,11 +1397,11 @@ if( playerClass == "PRIEST" ) then
 		local BindingHeal = GetSpellInfo(32546) or "Binding Heal"
 		local EmpoweredHealing = GetSpellInfo(33158) or "Empowered Healing"
 		local Renewal = GetSpellInfo(37563) and "37563" -- T4 bonus
-		local Penance = GetSpellInfo(53007) or "Penance"
-		local Grace = GetSpellInfo(47517) or "Grace"
+		local Penance = GetSpellInfo(47540) or "Penance"
+		local Grace = GetSpellInfo(47516) or "Grace"
 		local BlessedResilience = GetSpellInfo(33142) or "Blessed Resilience"
-		local FocusedPower = GetSpellInfo(33190) or "Focused Power"
-		local DivineProvidence = GetSpellInfo(47567) or "Divine Providence"
+		local FocusedPower = GetSpellInfo(33186) or "Focused Power"
+		local DivineProvidence = GetSpellInfo(47562) or "Divine Providence"
 		local EmpoweredRenew = GetSpellInfo(63534) or "Empowered Renew"
 		local TwinDisciplines = GetSpellInfo(47586) or "Twin Disciplines"
 
@@ -1509,6 +1519,8 @@ if( playerClass == "PRIEST" ) then
 
 		CalculateHotHealing = function(guid, spellID)
 			local spellName, spellRank = GetSpellInfo(spellID), SpellIDToRank[spellID]
+			if not spellRank then return end
+
 			local healAmount = getBaseHealAmount(hotData, spellName, spellID, spellRank)
 			local spellPower = GetSpellBonusHealing()
 			local healModifier, spModifier = playerHealModifier, 1
@@ -1567,6 +1579,8 @@ if( playerClass == "PRIEST" ) then
 
 		CalculateHealing = function(guid, spellID)
 			local spellName, spellRank = GetSpellInfo(spellID), SpellIDToRank[spellID]
+			if not spellRank then return end
+
 			local healAmount = getBaseHealAmount(spellData, spellName, spellID, spellRank)
 			local spellPower = GetSpellBonusHealing()
 			local healModifier, spModifier = playerHealModifier, 1
@@ -1640,10 +1654,11 @@ if( playerClass == "SHAMAN" ) then
 		local ImpChainHeal = GetSpellInfo(30872) or "Improved Chain Heal"
 		local HealingWay = GetSpellInfo(29206) or "Healing Way"
 		local Purification = GetSpellInfo(16178) or "Purification"
-		local EarthShield = GetSpellInfo(49284) or "Earth Shield"
-		local TidalWaves = GetSpellInfo(51566) or "Tidal Waves"
+		local EarthShield = GetSpellInfo(974) or "Earth Shield"
+		local TidalWaves = GetSpellInfo(51562) or "Tidal Waves"
 		local Riptide = GetSpellInfo(61295) or "Riptide"
-		local Earthliving = GetSpellInfo(52000) or "Earthliving"
+		local Earthliving = GetSpellInfo(51945) or "Earthliving"
+		local ElementalWeapons = GetSpellInfo(16266) or "Elemental Weapons"
 
 		hotData[Riptide] = {interval = 3, ticks = 5, coeff = 0.50, levels = {60, 70, 75, 80}, averages = {665, 885, 1435, 1670}}
 		hotData[Earthliving] = {interval = 3, ticks = 4, coeff = 0.80, levels = {30, 40, 50, 60, 70, 80}, averages = {116, 160, 220, 348, 456, 652}}
@@ -1686,6 +1701,7 @@ if( playerClass == "SHAMAN" ) then
 		talentData[ImpChainHeal] = {mod = 0.10, current = 0, spent = 0}
 		talentData[Purification] = {mod = 0.02, current = 0, spent = 0}
 		talentData[TidalWaves] = {mod = 0.04, current = 0, spent = 0}
+		talentData[ElementalWeapons] = {mod = 0.10, current = 0, spent = 0}
 
 		itemSetsData["Skyshatter"] = {31016, 31007, 31012, 31019, 31022, 34543, 34438, 34565}
 		itemSetsData["T7 Resto"] = {40508, 40509, 40510, 40512, 40513, 39583, 39588, 39589, 39590, 39591}
@@ -1754,6 +1770,8 @@ if( playerClass == "SHAMAN" ) then
 				spellPower = (spellPower * (hotData[spellName].coeff * 1.88) * 0.45)
 				spellPower = spellPower / hotData[spellName].ticks
 				healAmount = healAmount / hotData[spellName].ticks
+
+				healModifier = healModifier * (1 + talentData[ElementalWeapons].current)
 
 				totalTicks = hotData[spellName].ticks
 			end
@@ -2666,6 +2684,9 @@ function HealComm:COMBAT_LOG_EVENT_UNFILTERED(...)
 
 	local _, spellName = select(12, ...)
 	local destUnit = guidToUnit[destGUID]
+
+	if not destUnit then return end -- We only handle own group units
+
 	local spellID = destUnit and select(10, unitHasAura(destUnit, spellName)) or select(7, GetSpellInfo(spellName))
 
 	-- Heal or hot ticked that the library is tracking
@@ -2917,6 +2938,17 @@ function HealComm:UNIT_SPELLCAST_STOP(unit, castGUID, spellID)
 	end
 
 	spellCastSucceeded[spellID] = nil
+end
+
+function HealComm:UNIT_SPELLCAST_CHANNEL_STOP(unit, _, spellID)
+	local spellName = GetSpellInfo(spellID)
+	if( not spellData[spellName] ) then return end
+
+	-- End heal if a Penance cast is stopped prematurely (e.g. by movement)
+	if( spellName == GetSpellInfo(53007) ) then
+		parseHealEnd(playerGUID, nil, "name", spellID, true)
+		sendMessage(format("S::%d:1", spellID or 0))
+	end
 end
 
 -- Cast didn't go through, recheck any charge data if necessary
@@ -3241,7 +3273,7 @@ function HealComm:OnInitialize()
 
 		local _GetHealTargets = GetHealTargets
 
-		GetHealTargets = function(bitType, guid, spellID)
+		GetHealTargets = function(bitType, guid, spellID, amount)
 			local spellName = GetSpellInfo(spellID)
 
 			if spellName == FirstAid then
@@ -3249,7 +3281,7 @@ function HealComm:OnInitialize()
 			end
 
 			if _GetHealTargets then
-				return _GetHealTargets(bitType, guid, spellID)
+				return _GetHealTargets(bitType, guid, spellID, amount)
 			end
 		end
 
@@ -3302,6 +3334,7 @@ function HealComm:OnInitialize()
 	self.eventFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player", "")
 	self.eventFrame:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player", "")
 	self.eventFrame:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player", "")
+	self.eventFrame:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", "player", "")
 	self.eventFrame:RegisterUnitEvent("UNIT_SPELLCAST_DELAYED", "player", "")
 	self.eventFrame:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_UPDATE", "player", "")
 	self.eventFrame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "player", "")

@@ -74,7 +74,8 @@ local isCaster = {
 	ROGUE = {nil, nil, nil},
 	SHAMAN = {true},				-- Elemental
 	WARLOCK = {true, true, true},
-	WARRIOR = {nil, nil, nil}
+	WARRIOR = {nil, nil, nil},
+	EVOKER = {true}
 }
 
 local function CheckRole()
@@ -215,4 +216,16 @@ T.CalculateMoverPoints = function(mover)
 	end
 
 	return x, y, point
+end
+
+T.IsFramePositionedLeft = function(frame)
+	local x = frame:GetCenter()
+	local screenWidth = GetScreenWidth()
+	local positionedLeft = false
+
+	if x and x < (screenWidth / 2) then
+		positionedLeft = true
+	end
+
+	return positionedLeft
 end

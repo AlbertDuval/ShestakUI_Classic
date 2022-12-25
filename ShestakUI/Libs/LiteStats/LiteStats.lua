@@ -41,6 +41,7 @@ local durability = modules.Durability
 local experience = modules.Experience
 local talents = modules.Talents
 local location = modules.Location
+local damage = modules.Damage
 local coords = modules.Coords
 local ping = modules.Ping
 local gold = modules.Gold
@@ -645,25 +646,29 @@ if friends.enabled then
 			end
 		end
 	end
-	local clientTags = {
-		[BNET_CLIENT_D3] = "Diablo 3",
-		[BNET_CLIENT_D2] = "Diablo 2: Resurrected",
-		[BNET_CLIENT_WTCG] = "Hearthstone",
-		[BNET_CLIENT_HEROES] = "Heroes of the Storm",
-		[BNET_CLIENT_OVERWATCH] = "Overwatch",
-		[BNET_CLIENT_SC] = "StarCraft",
-		[BNET_CLIENT_SC2] = "StarCraft 2",
-		[BNET_CLIENT_DESTINY2] = "Destiny 2",
-		[BNET_CLIENT_COD] = "Call of Duty: Black Ops 4",
-		[BNET_CLIENT_WC3] = "Warcraft 3: Reforged",
-		[BNET_CLIENT_ARCADE] = "Arcade Collection",
-		[BNET_CLIENT_CRASH4] = "Crash Bandicoot 4",
-		[BNET_CLIENT_COD] = "COD: Black Ops 4",
-		[BNET_CLIENT_COD_MW] = "COD: Modern Warfare",
-		[BNET_CLIENT_COD_MW2] = "COD: Modern Warfare 2",
-		[BNET_CLIENT_COD_BOCW] = "COD: Cold War",
-		["BSAp"] = COMMUNITIES_PRESENCE_MOBILE_CHAT
-	}
+	local clientTags = {}
+
+	if T.Classic and not T.Wrath341 then
+		clientTags = {
+			[BNET_CLIENT_D3] = "Diablo 3",
+			[BNET_CLIENT_D2] = "Diablo 2: Resurrected",
+			[BNET_CLIENT_WTCG] = "Hearthstone",
+			[BNET_CLIENT_HEROES] = "Heroes of the Storm",
+			[BNET_CLIENT_OVERWATCH] = "Overwatch",
+			[BNET_CLIENT_SC] = "StarCraft",
+			[BNET_CLIENT_SC2] = "StarCraft 2",
+			[BNET_CLIENT_DESTINY2] = "Destiny 2",
+			[BNET_CLIENT_COD] = "Call of Duty: Black Ops 4",
+			[BNET_CLIENT_WC3] = "Warcraft 3: Reforged",
+			[BNET_CLIENT_ARCADE] = "Arcade Collection",
+			[BNET_CLIENT_CRASH4] = "Crash Bandicoot 4",
+			[BNET_CLIENT_COD] = "COD: Black Ops 4",
+			[BNET_CLIENT_COD_MW] = "COD: Modern Warfare",
+			[BNET_CLIENT_COD_MW2] = "COD: Modern Warfare 2",
+			[BNET_CLIENT_COD_BOCW] = "COD: Cold War",
+			["BSAp"] = COMMUNITIES_PRESENCE_MOBILE_CHAT
+		}
+	end
 	Inject("Friends", {
 		OnLoad = function(self) RegEvents(self, "PLAYER_LOGIN PLAYER_ENTERING_WORLD GROUP_ROSTER_UPDATE FRIENDLIST_UPDATE BN_FRIEND_LIST_SIZE_CHANGED BN_FRIEND_ACCOUNT_ONLINE BN_FRIEND_ACCOUNT_OFFLINE BN_FRIEND_INFO_CHANGED BN_FRIEND_ACCOUNT_ONLINE BN_FRIEND_ACCOUNT_OFFLINE BN_FRIEND_INFO_CHANGED") end,
 		OnEvent = function(self, event)
@@ -800,9 +805,11 @@ if friends.enabled then
 						end
 					else
 						local accountInfo = C_BattleNet.GetFriendAccountInfo(i)
-						BNTableEnter[i] = {accountInfo, accountInfo.gameAccountInfo.clientProgram}
-						if accountInfo.gameAccountInfo.isOnline then
-							BNonline = BNonline + 1
+						if accountInfo then
+							BNTableEnter[i] = {accountInfo, accountInfo.gameAccountInfo.clientProgram}
+							if accountInfo.gameAccountInfo.isOnline then
+								BNonline = BNonline + 1
+							end
 						end
 					end
 				end
@@ -1138,7 +1145,7 @@ end
 if durability.enabled then
 	Inject("Durability", {
 		OnLoad = function(self)
-			CreateFrame("GameTooltip", "LPDURA")
+			CreateFrame("GameTooltip", "LPDURA", nil, "GameTooltipTemplate")
 			LPDURA:SetOwner(WorldFrame, "ANCHOR_NONE")
 			if durability.man then DurabilityFrame.Show = DurabilityFrame.Hide end
 			RegEvents(self, "UPDATE_INVENTORY_DURABILITY MERCHANT_SHOW PLAYER_LOGIN")
@@ -1206,7 +1213,13 @@ if durability.enabled then
 					local perc = dur ~= 0 and dur/dmax or 0
 					local hex = gradient(perc)
 					GameTooltip:AddDoubleLine(durability.gear_icons and format("|T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59:%d|t %s", GetInventoryItemTexture(P, slot), t_icon, string) or string,format("|cffaaaaaa%s/%s | %s%s%%", dur, dmax, hex, floor(perc * 100)), 1, 1, 1)
-					totalcost, nodur = totalcost + select(3, LPDURA:SetInventoryItem(P, slot))
+					if T.Classic then
+						totalcost, nodur = totalcost + select(3, LPDURA:SetInventoryItem(P, slot))
+					else
+						local data = LPDURA:GetTooltipData()
+						repairCost = data and data.repairCost or 0
+						totalcost, nodur = totalcost + repairCost
+					end
 				end
 			end
 			if nodur then
@@ -1366,12 +1379,17 @@ if experience.enabled then
 				playedtotal, playedlevel = ...
 				playedmsg = GetTime()
 			elseif (event == "UPDATE_FACTION" or event == "PLAYER_LOGIN") and conf.ExpMode == "rep" then
-				local standing, factionID
+				local standing, factionID, standingText
 				repname, standing, minrep, maxrep, currep, factionID = GetWatchedFactionInfo()
-				local friendID, _, _, _, _, _, standingText, _, nextThreshold = T.Mainline and GetFriendshipReputation(factionID)
 				if T.Mainline then
-					if friendID then
-						if not nextThreshold then
+					local reputationInfo = C_GossipInfo.GetFriendshipReputation(factionID)
+					local friendshipID = reputationInfo and reputationInfo.friendshipFactionID
+					if friendshipID and friendshipID > 0 then
+						local repInfo = C_GossipInfo.GetFriendshipReputation(factionID)
+						standingText = repInfo.reaction
+						if repInfo.nextThreshold then
+							minrep, maxrep, currep = repInfo.reactionThreshold, repInfo.nextThreshold, repInfo.standing
+						else
 							minrep, maxrep, currep = 0, 1, 1
 						end
 						standing = 5
@@ -1382,6 +1400,7 @@ if experience.enabled then
 							minrep = 0
 							maxrep = nextThreshold
 							standing = 8
+							standingText = PARAGON
 						end
 					end
 				end
@@ -1611,7 +1630,7 @@ if T.Mainline and talents.enabled then
 					LoadAddOn("Blizzard_TalentUI")
 				end
 				if IsShiftKeyDown() then
-					PlayerTalentFrame_Toggle()
+					ToggleTalentFrame()
 				else
 					for index = 1, 4 do
 						local id, name, _, texture = GetSpecializationInfo(index)
@@ -1648,6 +1667,23 @@ if T.Mainline and talents.enabled then
 					end
 				end
 				EasyMenu(lootList, LSMenus, self, 0, 40, "MENU")
+			end
+		end
+	})
+end
+
+----------------------------------------------------------------------------------------
+--	Coordinates
+----------------------------------------------------------------------------------------
+if coords.enabled then
+	Inject("Coords", {
+		text = {string = Coords},
+		OnClick = function()
+			if IsShiftKeyDown() then
+				ChatEdit_ActivateChat(ChatEdit_ChooseBoxForSend())
+				ChatEdit_ChooseBoxForSend():Insert(format(" (%s: %s)", GetZoneText(), Coords()))
+			else
+				ToggleFrame(WorldMapFrame)
 			end
 		end
 	})
@@ -1718,17 +1754,35 @@ if location.enabled then
 end
 
 ----------------------------------------------------------------------------------------
---	Coordinates
+--	Damage
 ----------------------------------------------------------------------------------------
-if coords.enabled then
-	Inject("Coords", {
-		text = {string = Coords},
-		OnClick = function()
-			if IsShiftKeyDown() then
-				ChatEdit_ActivateChat(ChatEdit_ChooseBoxForSend())
-				ChatEdit_ChooseBoxForSend():Insert(format(" (%s: %s)", GetZoneText(), Coords()))
-			else
-				ToggleFrame(WorldMapFrame)
+if damage.enabled then
+	Inject("Damage", {
+		text = {
+			string = function()
+				if IsAddOnLoaded("Details") then
+					local combat = Details:GetCurrentCombat()
+					local player = combat:GetActor(DETAILS_ATTRIBUTE_DAMAGE, T.name)
+					if player then
+						local damageDone = player.total
+						local combatTime = combat:GetCombatTime()
+						local effectiveDPS = damageDone / combatTime
+
+						return format(damage.fmt, DAMAGE, effectiveDPS)
+					end
+				elseif IsAddOnLoaded("Numeration") then
+					local text = LibStub:GetLibrary("LibDataBroker-1.1"):GetDataObjectByName("Numeration").text
+					if text and text ~= "Numeration" then
+						return format(damage.alt_fmt, DAMAGE, text)
+					end
+				end
+			end
+		},
+		OnClick = function(self, button)
+			if IsAddOnLoaded("Details") then
+				_detalhes:ToggleWindows()
+			elseif IsAddOnLoaded("Numeration") then
+				Numeration:ToggleVisibility()
 			end
 		end
 	})

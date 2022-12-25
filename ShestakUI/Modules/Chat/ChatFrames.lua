@@ -78,27 +78,42 @@ local function SetChatStyle(frame)
 
 	-- Hide textures
 	for j = 1, #CHAT_FRAME_TEXTURES do
-		_G[chat..CHAT_FRAME_TEXTURES[j]]:SetTexture(nil)
+		_G[chat..CHAT_FRAME_TEXTURES[j]]:SetTexture(0)
 	end
 
 	-- Removes Default ChatFrame Tabs texture
-	_G[format("ChatFrame%sTabLeft", id)]:Kill()
-	_G[format("ChatFrame%sTabMiddle", id)]:Kill()
-	_G[format("ChatFrame%sTabRight", id)]:Kill()
+	if T.Classic then
+		_G[format("ChatFrame%sTabLeft", id)]:Kill()
+		_G[format("ChatFrame%sTabMiddle", id)]:Kill()
+		_G[format("ChatFrame%sTabRight", id)]:Kill()
 
-	_G[format("ChatFrame%sTabSelectedLeft", id)]:Kill()
-	_G[format("ChatFrame%sTabSelectedMiddle", id)]:Kill()
-	_G[format("ChatFrame%sTabSelectedRight", id)]:Kill()
+		_G[format("ChatFrame%sTabSelectedLeft", id)]:Kill()
+		_G[format("ChatFrame%sTabSelectedMiddle", id)]:Kill()
+		_G[format("ChatFrame%sTabSelectedRight", id)]:Kill()
 
-	_G[format("ChatFrame%sTabHighlightLeft", id)]:Kill()
-	_G[format("ChatFrame%sTabHighlightMiddle", id)]:Kill()
-	_G[format("ChatFrame%sTabHighlightRight", id)]:Kill()
+		_G[format("ChatFrame%sTabHighlightLeft", id)]:Kill()
+		_G[format("ChatFrame%sTabHighlightMiddle", id)]:Kill()
+		_G[format("ChatFrame%sTabHighlightRight", id)]:Kill()
+	else
+		_G[format("ChatFrame%sTab", id)].Left:Kill()
+		_G[format("ChatFrame%sTab", id)].Middle:Kill()
+		_G[format("ChatFrame%sTab", id)].Right:Kill()
+
+		_G[format("ChatFrame%sTab", id)].ActiveLeft:Kill()
+		_G[format("ChatFrame%sTab", id)].ActiveMiddle:Kill()
+		_G[format("ChatFrame%sTab", id)].ActiveRight:Kill()
+
+		_G[format("ChatFrame%sTab", id)].HighlightLeft:Kill()
+		_G[format("ChatFrame%sTab", id)].HighlightMiddle:Kill()
+		_G[format("ChatFrame%sTab", id)].HighlightRight:Kill()
+	end
 
 	-- Killing off the new chat tab selected feature
-	_G[format("ChatFrame%sTabSelectedLeft", id)]:Kill()
-	_G[format("ChatFrame%sTabSelectedMiddle", id)]:Kill()
-	_G[format("ChatFrame%sTabSelectedRight", id)]:Kill()
-
+	if T.Classic then
+		_G[format("ChatFrame%sTabSelectedLeft", id)]:Kill()
+		_G[format("ChatFrame%sTabSelectedMiddle", id)]:Kill()
+		_G[format("ChatFrame%sTabSelectedRight", id)]:Kill()
+	end
 	_G[format("ChatFrame%sButtonFrameMinimizeButton", id)]:Kill()
 	_G[format("ChatFrame%sButtonFrame", id)]:Kill()
 
@@ -261,7 +276,7 @@ local function SetupChatPosAndFont()
 			if C.chat.combatlog ~= true then
 				FCF_DockFrame(chat)
 				ChatFrame2Tab:EnableMouse(false)
-				ChatFrame2TabText:Hide()
+				ChatFrame2Tab.Text:Hide()
 				ChatFrame2Tab:SetWidth(0.001)
 				ChatFrame2Tab.SetWidth = T.dummy
 				FCF_DockUpdate()
@@ -278,7 +293,7 @@ local function SetupChatPosAndFont()
 
 		QuickJoinToastButton.Toast:ClearAllPoints()
 		QuickJoinToastButton.Toast:SetPoint(unpack(C.position.bn_popup))
-		QuickJoinToastButton.Toast.Background:SetTexture("")
+		QuickJoinToastButton.Toast.Background:SetTexture(0)
 		QuickJoinToastButton.Toast:CreateBackdrop("Transparent")
 		QuickJoinToastButton.Toast.backdrop:SetPoint("TOPLEFT", 0, 0)
 		QuickJoinToastButton.Toast.backdrop:SetPoint("BOTTOMRIGHT", 0, 0)
@@ -447,3 +462,18 @@ if T.Mainline and C.chat.role_icons == true then
 	end
 	_G.GetColoredName = GetColoredName_hook
 end
+
+----------------------------------------------------------------------------------------
+--	Prevent reposition ChatFrame
+----------------------------------------------------------------------------------------
+hooksecurefunc(ChatFrame1, "SetPoint", function(self, _, _, _, x)
+	if x ~= C.position.chat[4] then
+		self:ClearAllPoints()
+		self:SetSize(C.chat.width, C.chat.height)
+		if C.chat.background == true then
+			self:SetPoint(C.position.chat[1], C.position.chat[2], C.position.chat[3], C.position.chat[4], C.position.chat[5] + 4)
+		else
+			self:SetPoint(C.position.chat[1], C.position.chat[2], C.position.chat[3], C.position.chat[4], C.position.chat[5])
+		end
+	end
+end)

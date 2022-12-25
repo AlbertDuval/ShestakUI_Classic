@@ -4,13 +4,22 @@ if C.actionbar.enable ~= true then return end
 ----------------------------------------------------------------------------------------
 --	Hide Blizzard ActionBars stuff(by Tukz)
 ----------------------------------------------------------------------------------------
+local NUM_STANCE_SLOTS = NUM_STANCE_SLOTS or 10
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:SetScript("OnEvent", function()
 	MainMenuBar:SetScale(0.00001)
 	MainMenuBar:EnableMouse(false)
-	PetActionBarFrame:EnableMouse(false)
-	StanceBarFrame:EnableMouse(false)
+
+	if T.Classic then
+		PetActionBarFrame:EnableMouse(false)
+		StanceBarFrame:EnableMouse(false)
+	else
+		PetActionBar:EnableMouse(false)
+		PetActionBar:UnregisterAllEvents()
+		StanceBar:EnableMouse(false)
+		StanceBar:UnregisterAllEvents()
+	end
 
 	if T.Mainline or T.Wrath then
 		OverrideActionBar:SetScale(0.00001)
@@ -31,7 +40,8 @@ frame:SetScript("OnEvent", function()
 
 	local elements = {
 		MainMenuBar, MainMenuBarArtFrame, OverrideActionBar, PossessBarFrame, PetActionBarFrame, StanceBarFrame,
-		MultiBarBottomLeft.QuickKeybindGlow, MultiBarLeft.QuickKeybindGlow, MultiBarBottomRight.QuickKeybindGlow, MultiBarRight.QuickKeybindGlow
+		MultiBarBottomLeft.QuickKeybindGlow, MultiBarLeft.QuickKeybindGlow, MultiBarBottomRight.QuickKeybindGlow, MultiBarRight.QuickKeybindGlow,
+		StatusTrackingBarManager
 	}
 
 	if T.Mainline then
@@ -278,6 +288,15 @@ function Bar5MouseOver(alpha)
 	end
 end
 
+function CustomBarMouseOver(alpha)
+	for i = 1, 12 do
+		local b = _G["CustomBarButton"..i]
+		b:SetAlpha(alpha)
+		local c = _G["CustomBarButton"..i.."Cooldown"]
+		T.HideSpiral(c, alpha)
+	end
+end
+
 ----------------------------------------------------------------------------------------
 --	Fix cooldown spiral alpha (WoD bug)
 ----------------------------------------------------------------------------------------
@@ -297,7 +316,7 @@ EventSpiral:SetScript("OnEvent", function()
 		PetBarMouseOver(0)
 	end
 
-	if C.actionbar.stancebar_mouseover == true and C.actionbar.stancebar_horizontal == true then
+	if C.actionbar.stancebar_mouseover == true and C.actionbar.stancebar_horizontal == true and C.actionbar.stancebar_hide ~= true then
 		StanceBarMouseOver(0)
 	end
 
@@ -402,45 +421,45 @@ else
 		SetActionBarToggles(1, 1, 1, 1, 0)
 		if C.actionbar.show_grid == true then
 			SetCVar("alwaysShowActionBars", 1)
-			for i = 1, 12 do
-				local reason = ACTION_BUTTON_SHOW_GRID_REASON_EVENT
-				local button = _G[format("ActionButton%d", i)]
-				button.noGrid = nil
-				button:SetAttribute("showgrid", 1)
-				button:ShowGrid(reason)
-				button:SetAttribute("statehidden", true)
+			-- for i = 1, 12 do
+			-- local reason = ACTION_BUTTON_SHOW_GRID_REASON_CVAR
+			-- local button = _G[format("ActionButton%d", i)]
+			-- button.noGrid = nil
+			-- button:SetAttribute("showgrid", 1)
+			-- --BETA button:ShowGrid(reason)
+			-- button:SetAttribute("statehidden", true)
 
-				button = _G[format("MultiBarRightButton%d", i)]
-				button.noGrid = nil
-				button:SetAttribute("showgrid", 1)
-				button:ShowGrid(reason)
-				button:SetAttribute("statehidden", true)
+			-- button = _G[format("MultiBarRightButton%d", i)]
+			-- button.noGrid = nil
+			-- button:SetAttribute("showgrid", 1)
+			-- -- button:ShowGrid(reason)
+			-- button:SetAttribute("statehidden", true)
 
-				button = _G[format("MultiBarBottomRightButton%d", i)]
-				button.noGrid = nil
-				button:SetAttribute("showgrid", 1)
-				button:ShowGrid(reason)
-				button:SetAttribute("statehidden", true)
+			-- button = _G[format("MultiBarBottomRightButton%d", i)]
+			-- button.noGrid = nil
+			-- button:SetAttribute("showgrid", 1)
+			-- -- button:ShowGrid(reason)
+			-- button:SetAttribute("statehidden", true)
 
-				button = _G[format("MultiBarLeftButton%d", i)]
-				button.noGrid = nil
-				button:SetAttribute("showgrid", 1)
-				button:ShowGrid(reason)
-				button:SetAttribute("statehidden", true)
+			-- button = _G[format("MultiBarLeftButton%d", i)]
+			-- button.noGrid = nil
+			-- button:SetAttribute("showgrid", 1)
+			-- -- button:ShowGrid(reason)
+			-- button:SetAttribute("statehidden", true)
 
-				button = _G[format("MultiBarBottomLeftButton%d", i)]
-				button.noGrid = nil
-				button:SetAttribute("showgrid", 1)
-				button:ShowGrid(reason)
-				button:SetAttribute("statehidden", true)
+			-- button = _G[format("MultiBarBottomLeftButton%d", i)]
+			-- button.noGrid = nil
+			-- button:SetAttribute("showgrid", 1)
+			-- -- button:ShowGrid(reason)
+			-- button:SetAttribute("statehidden", true)
 
-				if _G["VehicleMenuBarActionButton"..i] then
-					_G["VehicleMenuBarActionButton"..i]:SetAttribute("statehidden", true)
-				end
+			-- if _G["VehicleMenuBarActionButton"..i] then
+			-- _G["VehicleMenuBarActionButton"..i]:SetAttribute("statehidden", true)
+			-- end
 
-				_G["MultiCastActionButton"..i]:SetAttribute("showgrid", 1)
-				_G["MultiCastActionButton"..i]:SetAttribute("statehidden", true)
-			end
+			-- _G["MultiCastActionButton"..i]:SetAttribute("showgrid", 1)
+			-- _G["MultiCastActionButton"..i]:SetAttribute("statehidden", true)
+			-- end
 		else
 			SetCVar("alwaysShowActionBars", 0)
 		end
@@ -473,7 +492,11 @@ T.ShiftBarUpdate = function()
 			CooldownFrame_Set(cooldown, start, duration, enable)
 
 			if isActive then
-				StanceBarFrame.lastSelected = button:GetID()
+				if T.Classic then
+					StanceBarFrame.lastSelected = button:GetID()
+				else
+					--BETA StanceBar.lastSelected = button:GetID()
+				end
 				button:SetChecked(true)
 			else
 				button:SetChecked(false)
@@ -494,7 +517,7 @@ T.PetBarUpdate = function()
 		local buttonName = "PetActionButton"..i
 		petActionButton = _G[buttonName]
 		petActionIcon = _G[buttonName.."Icon"]
-		petAutoCastableTexture = _G[buttonName.."AutoCastable"]
+		petAutoCastableTexture = _G["PetActionButton"..i].AutoCastable or _G[buttonName.."AutoCastable"]
 		petAutoCastShine = _G[buttonName.."Shine"]
 		local name, texture, isToken, isActive, autoCastAllowed, autoCastEnabled = GetPetActionInfo(i)
 
@@ -511,12 +534,22 @@ T.PetBarUpdate = function()
 		if isActive and name ~= "PET_ACTION_FOLLOW" then
 			petActionButton:SetChecked(true)
 			if IsPetAttackAction(i) then
-				PetActionButton_StartFlash(petActionButton)
+				if T.Classic then
+					PetActionButton_StartFlash(petActionButton)
+				else
+					petActionButton:StartFlash()
+					petActionButton:GetCheckedTexture():SetAlpha(0.5)
+				end
 			end
 		else
 			petActionButton:SetChecked(false)
 			if IsPetAttackAction(i) then
-				PetActionButton_StopFlash(petActionButton)
+				if T.Classic then
+					PetActionButton_StopFlash(petActionButton)
+				else
+					petActionButton:StopFlash()
+					petActionButton:GetCheckedTexture():SetAlpha(1.0)
+				end
 			end
 		end
 
@@ -554,7 +587,11 @@ T.PetBarUpdate = function()
 		end
 
 		if not PetHasActionBar() and texture and name ~= "PET_ACTION_FOLLOW" then
-			PetActionButton_StopFlash(petActionButton)
+			if T.Classic then
+				PetActionButton_StopFlash(petActionButton)
+			else
+				petActionButton:StopFlash()
+			end
 			SetDesaturation(petActionIcon, 1)
 			petActionButton:SetChecked(false)
 		end

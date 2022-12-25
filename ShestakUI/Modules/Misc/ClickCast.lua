@@ -13,7 +13,7 @@ end
 SpellBinder:SetSize(300, 400)
 SpellBinder:Hide()
 
-_G["SpellBinderPortrait"]:SetTexture("Interface\\Spellbook\\Spellbook-Icon")
+SpellBinderPortrait:SetAlpha(0)
 
 SpellBinder.title = _G["SpellBinderTitle"] or SpellBinder:CreateFontString("SpellBinderTitle", "OVERLAY", "GameFontNormal")
 SpellBinder.title:SetPoint("TOP", _G["SpellBinder"], "TOP", 0, -5)
@@ -75,7 +75,7 @@ SpellBinder.makeSpellsList = function(_, delete)
 		local i = 1
 		while _G["SpellBinder"..i.."_cbs"] do
 			_G["SpellBinder"..i.."_fs"]:SetText("")
-			_G["SpellBinder"..i.."_texture"]:SetTexture(nil)
+			_G["SpellBinder"..i.."_texture"]:SetTexture(0)
 			_G["SpellBinder"..i.."_cbs"].checked = false
 			_G["SpellBinder"..i.."_cbs"]:ClearAllPoints()
 			_G["SpellBinder"..i.."_cbs"]:Hide()

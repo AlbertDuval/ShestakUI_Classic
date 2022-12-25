@@ -21,7 +21,7 @@ ExtraActionBarFrame:SetAllPoints()
 
 -- Prevent reanchor
 ExtraActionBarFrame.ignoreInLayout = true
-UIPARENT_MANAGED_FRAME_POSITIONS.ExtraAbilityContainer = nil
+--BETA UIPARENT_MANAGED_FRAME_POSITIONS.ExtraAbilityContainer = nil
 ExtraAbilityContainer.ignoreFramePositionManager = true
 
 -- Prevent taint
@@ -36,7 +36,7 @@ if C.actionbar.split_bars then
 else
 	zoneAnchor:SetPoint(unpack(C.position.zone_button))
 end
-zoneAnchor:SetSize(109, size)
+zoneAnchor:SetSize(size * 2, size)
 zoneAnchor:SetFrameStrata("LOW")
 RegisterStateDriver(zoneAnchor, "visibility", "[petbattle] hide; show")
 
@@ -67,10 +67,10 @@ local button = ExtraActionButton1
 local texture = button.style
 local disableTexture = function(style, texture)
 	if texture then
-		style:SetTexture(nil)
+		style:SetTexture(0)
 	end
 end
-button.style:SetTexture(nil)
+button.style:SetTexture(0)
 hooksecurefunc(texture, "SetTexture", disableTexture)
 
 button:SetSize(size, size)

@@ -32,7 +32,7 @@ C["media"] = {
 C["general"] = {
 	["welcome_message"] = true,					-- Enable welcome message in chat
 	["auto_scale"] = true,						-- Autoscale
-	["uiscale"] = 0.96,							-- Your value (between 0.2 and 1) if "auto_scale" is disable
+	["uiscale"] = 0.75,							-- Your value (between 0.2 and 1) if "auto_scale" is disable
 	-- Blizzard UI
 	["error_filter"] = "BLACKLIST",				-- Filter Blizzard red errors (BLACKLIST, WHITELIST, COMBAT, NONE)
 	["move_blizzard"] = false,					-- Move some Blizzard frames
@@ -160,6 +160,7 @@ C["unitframe_class_bar"] = {
 	["combo_old"] = false,						-- Show combo point on the target
 	["arcane"] = true,							-- Arcane Charge bar
 	["chi"] = true,								-- Chi bar
+	["essence"] = true,							-- Essence bar
 	["stagger"] = true,							-- Stagger bar (for Monk Tanks)
 	["holy"] = true,							-- Holy Power bar
 	["shard"] = true,							-- Shard/Burning bar
@@ -213,6 +214,8 @@ C["raidframe"] = {
 	["plugins_debuffhighlight_icon"] = false,	-- Show dispellable debuff icon (texture will be shown anyway)
 	["plugins_pvp_debuffs"] = false,			-- Show PvP debuff icons (from the list)
 	["plugins_healcomm"] = true,				-- Incoming heal bar on raid frame
+	["plugins_over_absorb"] = false,			-- Show over absorb bar on raid frame
+	["plugins_over_heal_absorb"] = false,		-- Show over heal absorb on raid frame (from enemy debuffs)
 	["plugins_auto_resurrection"] = false,		-- Auto cast resurrection on middle-click (doesn't work with Clique)
 	-- Heal layout size
 	["heal_party_width"] = 60.2,				-- Party width
@@ -316,11 +319,18 @@ C["actionbar"] = {
 	["bar5_row"] = 1,							-- Buttons per row
 	["bar5_size"] = 25,							-- Buttons size
 	["bar5_mouseover"] = false,					-- Bar on mouseover
+	-- Custom Bar
+	["custom_bar_enable"] = false,				-- Enable custom bar 6
+	["custom_bar_num"] = 12,					-- Number of buttons
+	["custom_bar_row"] = 12,					-- Buttons per row
+	["custom_bar_size"] = 25,					-- Buttons size
+	["custom_bar_mouseover"] = false,			-- Bar on mouseover
 }
 
 if T.Classic then
 	C["actionbar"]["rightbars_mouseover"] = false
 	C["actionbar"]["stancebar_mouseover"] = false
+	C["actionbar"]["custom_bar_enable"] = false
 end
 
 ----------------------------------------------------------------------------------------
@@ -401,6 +411,7 @@ C["nameplate"] = {
 	["show_castbar_name"] = false,				-- Show castbar name
 	["class_icons"] = false,					-- Icons by class in PvP
 	["name_abbrev"] = false,					-- Display abbreviated names
+	["short_name"] = false,						-- Replace names with short ones
 	["clamp"] = false,							-- Clamp nameplates to the top of the screen when outside of view
 	["track_debuffs"] = false,					-- Show your debuffs (from the list)
 	["track_buffs"] = false,					-- Show dispellable enemy buffs and buffs from the list
@@ -453,7 +464,7 @@ C["combattext"] = {
 	["max_lines"] = 15,							-- Max lines to keep in scrollable mode (more lines = more memory)
 	["time_visible"] = 3,						-- Time (seconds) a single message will be visible
 	["short_numbers"] = true,					-- Use short numbers ("25.3k" instead of "25342")
-	["merge_aoe_spam"] = true,					-- Merges multiple aoe damage spam into single message
+	["merge_aoe_spam"] = true,					-- Merges multiple aoe damage/heal spam into single message
 	["merge_melee"] = true,						-- Merges multiple auto attack damage spam
 	["direction"] = true,						-- Change scrolling direction from bottom to top
 	["dk_runes"] = true,						-- Show Death Knight rune recharge
@@ -478,13 +489,18 @@ C["bag"] = {
 	["bag_columns"] = 10,						-- Horizontal number of columns in main bag
 }
 
+if T.Mainline then
+	C["bag"]["enable"] = false
+end
+
 ----------------------------------------------------------------------------------------
 --	Minimap options
 ----------------------------------------------------------------------------------------
 C["minimap"] = {
 	["enable"] = true,							-- Enable minimap
+	["on_top"] = false,							-- Move minimap on top right corner
 	["tracking_icon"] = true,					-- Tracking icon
-	["garrison_icon"] = false,					-- Garrison icon
+	["garrison_icon"] = false,					-- Covenant icon
 	["size"] = 130,								-- Minimap size
 	["hide_combat"] = false,					-- Hide minimap in combat
 	["toggle_menu"] = true,						-- Show toggle menu
@@ -503,16 +519,15 @@ end
 ----------------------------------------------------------------------------------------
 C["loot"] = {
 	["lootframe"] = true,						-- Enable loot frame
-	["rolllootframe"] = true,					-- Enable group roll frame
+	["rolllootframe"] = true,					-- Enable group roll frame (Blizzard doesn't use roll system anymore)
 	["icon_size"] = 22,							-- Icon size
 	["width"] = 221,							-- Loot window width
-	["auto_greed"] = true,						-- Push "greed" or "disenchant" button when green item roll at max level
-	["auto_confirm_de"] = true,					-- Auto confirm disenchant
+	["auto_greed"] = false,						-- Push "greed" or "disenchant" button when green item roll at max level (Blizzard doesn't use roll system anymore)
+	["auto_confirm_de"] = true,					-- Auto confirm disenchant and take BoP loot
 	["faster_loot"] = false,					-- Faster auto looting
 }
 
 if T.Classic then
-	C["loot"]["auto_greed"] = false
 	C["loot"]["auto_confirm_de"] = false
 end
 
@@ -541,7 +556,7 @@ C["filger"] = {
 	["cooldown_space"] = 3,						-- Cooldowns space
 	-- Testing
 	["test_mode"] = false,						-- Test icon mode
-	["max_test_icon"] = 5,						-- Number of icons to the test
+	["max_test_icon"] = 5,						-- Number of icons in test mode
 }
 
 ----------------------------------------------------------------------------------------
@@ -605,8 +620,10 @@ C["reminder"] = {
 	["raid_buffs_alpha"] = 0,					-- Transparent icons when the buff is present
 }
 
-if T.Classic then
+if T.Vanilla or T.TBC then
 	C["reminder"]["raid_buffs_size"] = 16
+elseif T.Wrath then
+	C["reminder"]["raid_buffs_size"] = 19.1
 end
 
 ----------------------------------------------------------------------------------------
@@ -687,12 +704,13 @@ C["stats"] = {
 	["location"] = true,						-- Location
 	["coords"] = true,							-- Coords
 	["battleground"] = false,					-- BG Score
+	["damage"] = false,							-- Show damage per second
 	["bottom_line"] = true,						-- Bottom classcolor line
 	-- Currency (displayed in gold stats)
 	["currency_archaeology"] = false,			-- Archaeology Fragments
 	["currency_cooking"] = true,				-- Cooking Awards
 	["currency_raid"] = true,					-- Raid Seals
-	["currency_misc"] = true,					-- BfA Currency
+	["currency_misc"] = true,					-- Expansion Currency
 }
 
 if T.Classic then

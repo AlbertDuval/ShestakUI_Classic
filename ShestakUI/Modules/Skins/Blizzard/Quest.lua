@@ -16,6 +16,7 @@ local function LoadSkin()
 	QuestGreetingScrollFrame:StripTextures(true)
 	QuestFrameProgressPanel:StripTextures(true)
 	QuestFrameRewardPanel:StripTextures(true)
+	QuestFramePortrait:SetAlpha(0)
 
 	QuestFrameProgressPanelMaterialTopLeft:SetAlpha(0)
 	QuestFrameProgressPanelMaterialTopRight:SetAlpha(0)
@@ -44,7 +45,7 @@ local function LoadSkin()
 		local texture = _G["QuestProgressItem"..i.."IconTexture"]
 
 		if button.NameFrame then button.NameFrame:Hide() end
-		button.Name:SetFont(C.media.normal_font, 12)
+		button.Name:SetFont(C.media.normal_font, 12, "")
 
 		button:CreateBackdrop("Default")
 		button.backdrop:ClearAllPoints()
@@ -182,12 +183,12 @@ local function LoadSkin()
 			SkinReward(button, rewardsFrame == MapQuestInfoRewardsFrame)
 
 			hooksecurefunc(button.IconBorder, "SetVertexColor", function(self, r, g, b)
-				if r ~= 0.65882 and g ~= 0.65882 and b ~= 0.65882 then
+				if r ~= BAG_ITEM_QUALITY_COLORS[1].r ~= r and g ~= BAG_ITEM_QUALITY_COLORS[1].g then
 					self:GetParent().backdrop:SetBackdropBorderColor(r, g, b)
 				else
 					self:GetParent().backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
 				end
-				self:SetTexture("")
+				self:SetTexture(0)
 			end)
 
 			hooksecurefunc(button.IconBorder, "Hide", function(self)
@@ -447,7 +448,7 @@ local function LoadSkin()
 		hooksecurefunc(f, "SetNormalAtlas", function(self, texture)
 			if self.settingTexture then return end
 			self.settingTexture = true
-			self:SetNormalTexture("")
+			self:SetNormalTexture(0)
 
 			if texture and texture ~= "" then
 				if texture:find("Closed") then
@@ -465,14 +466,14 @@ local function LoadSkin()
 		hooksecurefunc(f, "SetPushedAtlas", function(self)
 			if self.settingTexture then return end
 			self.settingTexture = true
-			self:SetPushedTexture("")
+			self:SetPushedTexture(0)
 
 			self.settingTexture = nil
 		end)
 
 		hooksecurefunc(f, "SetHighlightTexture", function(self, texture)
 			if texture == "Interface\\Buttons\\UI-PlusButton-Hilight" then
-				self:SetHighlightTexture("")
+				self:SetHighlightTexture(0)
 			end
 		end)
 

@@ -43,7 +43,7 @@ end
 local function CreateOverlay(f)
 	if f.overlay then return end
 
-	local overlay = f:CreateTexture("$parentOverlay", "BORDER", f)
+	local overlay = f:CreateTexture("$parentOverlay", "BORDER")
 	overlay:SetInside()
 	overlay:SetTexture(C.media.blank)
 	overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
@@ -179,18 +179,23 @@ local StripTexturesBlizzFrames = {
 	"BottomInset",
 	"bgLeft",
 	"bgRight",
-	"FilligreeOverlay"
+	"FilligreeOverlay",
+	"PortraitOverlay",
+	"ArtOverlayFrame",
+	"Portrait",
+	"portrait",
+	"ScrollFrameBorder",
 }
 
 local function StripTextures(object, kill)
 	if object.GetNumRegions then
-		for i = 1, object:GetNumRegions() do
-			local region = select(i, object:GetRegions())
-			if region and region:GetObjectType() == "Texture" then
+		for _, region in next, {object:GetRegions()} do
+			if region and region.IsObjectType and region:IsObjectType("Texture") then
 				if kill then
 					region:Kill()
 				else
-					region:SetTexture(nil)
+					region:SetTexture(0)
+					region:SetAtlas("")
 				end
 			end
 		end
@@ -282,10 +287,10 @@ end
 local function SkinButton(f, strip)
 	if strip then f:StripTextures() end
 
-	if f.SetNormalTexture then f:SetNormalTexture("") end
-	if f.SetHighlightTexture then f:SetHighlightTexture("") end
-	if f.SetPushedTexture then f:SetPushedTexture("") end
-	if f.SetDisabledTexture then f:SetDisabledTexture("") end
+	if f.SetNormalTexture then f:SetNormalTexture(0) end
+	if f.SetHighlightTexture then f:SetHighlightTexture(0) end
+	if f.SetPushedTexture then f:SetPushedTexture(0) end
+	if f.SetDisabledTexture then f:SetDisabledTexture(0) end
 
 	if f.Left then f.Left:SetAlpha(0) end
 	if f.Right then f.Right:SetAlpha(0) end
@@ -411,9 +416,11 @@ function T.SkinScrollBar(frame)
 	frame:StripTextures()
 
 	local frameName = frame.GetName and frame:GetName()
-	local UpButton = frame.ScrollUpButton or frame.ScrollUp or frame.UpButton or _G[frameName and frameName.."ScrollUpButton"] or frame:GetParent().scrollUp
-	local DownButton = frame.ScrollDownButton or frame.ScrollDown or frame.DownButton or _G[frameName and frameName.."ScrollDownButton"] or frame:GetParent().scrollDown
+	local UpButton = frame.ScrollUpButton or frame.ScrollUp or frame.UpButton or frame.Back or _G[frameName and frameName.."ScrollUpButton"] or frame:GetParent().scrollUp
+	local DownButton = frame.ScrollDownButton or frame.ScrollDown or frame.DownButton or frame.Forward or _G[frameName and frameName.."ScrollDownButton"] or frame:GetParent().scrollDown
 	local ThumbTexture = frame.ThumbTexture or frame.thumbTexture or _G[frameName and frameName.."ThumbTexture"]
+
+	local newThumb = frame.Back and frame:GetThumb()
 
 	if UpButton and DownButton then
 		if not UpButton.icon then
@@ -435,7 +442,7 @@ function T.SkinScrollBar(frame)
 		end
 
 		if ThumbTexture then
-			ThumbTexture:SetTexture(nil)
+			ThumbTexture:SetTexture(0)
 			if not frame.thumbbg then
 				frame.thumbbg = CreateFrame("Frame", nil, frame)
 				frame.thumbbg:SetPoint("TOPLEFT", ThumbTexture, "TOPLEFT", 0, -3)
@@ -468,6 +475,28 @@ function T.SkinScrollBar(frame)
 					frame:SetAlpha(1)
 				end)
 			end
+		elseif newThumb then
+			if frame.Background then
+				frame.Background:Hide()
+			end
+			if frame.Track then
+				frame.Track:DisableDrawLayer("ARTWORK")
+			end
+			newThumb:DisableDrawLayer("BACKGROUND")
+			if not frame.thumbbg then
+				frame.thumbbg = CreateFrame("Frame", nil, frame)
+				frame.thumbbg:SetPoint("TOPLEFT", newThumb, "TOPLEFT", 0, -3)
+				frame.thumbbg:SetPoint("BOTTOMRIGHT", newThumb, "BOTTOMRIGHT", 0, 3)
+				frame.thumbbg:SetTemplate("Overlay")
+
+				hooksecurefunc(newThumb, "Hide", function(self)
+					frame:SetAlpha(0)
+				end)
+
+				hooksecurefunc(newThumb, "Show", function(self)
+					frame:SetAlpha(1)
+				end)
+			end
 		end
 	end
 end
@@ -485,14 +514,14 @@ function T.SkinTab(tab, bg)
 	if not tab then return end
 
 	for _, object in pairs(tabs) do
-		local tex = _G[tab:GetName()..object]
+		local tex = tab:GetName() and _G[tab:GetName()..object]
 		if tex then
-			tex:SetTexture(nil)
+			tex:SetTexture(0)
 		end
 	end
 
 	if tab.GetHighlightTexture and tab:GetHighlightTexture() then
-		tab:GetHighlightTexture():SetTexture(nil)
+		tab:GetHighlightTexture():SetTexture(0)
 	else
 		tab:StripTextures()
 	end
@@ -501,12 +530,17 @@ function T.SkinTab(tab, bg)
 	tab.backdrop:SetFrameLevel(tab:GetFrameLevel() - 1)
 	if bg then
 		tab.backdrop:SetTemplate("Overlay")
-		tab.backdrop:SetPoint("TOPLEFT", 3, -7)
-		tab.backdrop:SetPoint("BOTTOMRIGHT", -3, 2)
+		tab.backdrop:SetPoint("TOPLEFT", 2, -9)
+		tab.backdrop:SetPoint("BOTTOMRIGHT", -2, -2)
 	else
 		tab.backdrop:SetTemplate("Transparent")
-		tab.backdrop:SetPoint("TOPLEFT", 10, T.Classic and 0 or -3)
-		tab.backdrop:SetPoint("BOTTOMRIGHT", -10, T.Classic and 6 or 3)
+		if T.Classic then
+			tab.backdrop:SetPoint("TOPLEFT", 10, 0)
+			tab.backdrop:SetPoint("BOTTOMRIGHT", -10, 6)
+		else
+			tab.backdrop:SetPoint("TOPLEFT", 0, -3)
+			tab.backdrop:SetPoint("BOTTOMRIGHT", 0, 3)
+		end
 	end
 end
 
@@ -530,6 +564,14 @@ function T.SkinNextPrevButton(btn, left, scroll)
 	end
 
 	btn:StripTextures()
+
+	if btn.Texture then
+		btn.Texture:SetAlpha(0)
+
+		if btn.Overlay then
+			btn.Overlay:SetAlpha(0)
+		end
+	end
 
 	if scroll == "Up" or scroll == "Down" or scroll == "Any" then
 		normal = nil
@@ -602,8 +644,10 @@ function T.SkinNextPrevButton(btn, left, scroll)
 		if btn:GetPushedTexture() then
 			btn:GetPushedTexture():SetAllPoints(btn:GetNormalTexture())
 		end
-		btn:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.3)
-		btn:GetHighlightTexture():SetAllPoints(btn:GetNormalTexture())
+		if btn:GetHighlightTexture() then
+			btn:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.3)
+			btn:GetHighlightTexture():SetAllPoints(btn:GetNormalTexture())
+		end
 	end
 end
 
@@ -684,8 +728,8 @@ function T.SkinCheckBox(frame, size, default)
 	if size then
 		frame:SetSize(size, size)
 	end
-	frame:SetNormalTexture("")
-	frame:SetPushedTexture("")
+	frame:SetNormalTexture(0)
+	frame:SetPushedTexture(0)
 	frame:CreateBackdrop("Overlay")
 	frame:SetFrameLevel(frame:GetFrameLevel() + 2)
 	frame.backdrop:SetPoint("TOPLEFT", 4, -4)
@@ -757,7 +801,7 @@ function T.SkinCloseButton(f, point, text, pixel)
 end
 
 function T.SkinSlider(f)
-	f:SetBackdrop(nil)
+	f:StripTextures()
 
 	local bd = CreateFrame("Frame", nil, f)
 	bd:SetTemplate("Overlay")
@@ -778,7 +822,7 @@ end
 function T.SkinIconSelectionFrame(frame, numIcons, buttonNameTemplate, frameNameOverride)
 	local frameName = frameNameOverride or frame:GetName()
 	local scrollFrame = frame.ScrollFrame or _G[frameName.."ScrollFrame"]
-	local editBox = frame.EditBox or _G[frameName.."EditBox"]
+	local editBox = frame.EditBox or _G[frameName.."EditBox"] or frame.BorderBox.IconSelectorEditBox
 	local okayButton = frame.OkayButton or frame.BorderBox.OkayButton or _G[frameName.."Okay"]
 	local cancelButton = frame.CancelButton or frame.BorderBox.CancelButton or _G[frameName.."Cancel"]
 
@@ -788,11 +832,15 @@ function T.SkinIconSelectionFrame(frame, numIcons, buttonNameTemplate, frameName
 	frame.backdrop:SetPoint("TOPLEFT", 3, 1)
 	frame:SetHeight(frame:GetHeight() + 13)
 
-	scrollFrame:StripTextures()
-	scrollFrame:CreateBackdrop("Overlay")
-	scrollFrame.backdrop:SetPoint("TOPLEFT", 15, 5)
-	scrollFrame.backdrop:SetPoint("BOTTOMRIGHT", 31, -8)
-	scrollFrame:SetHeight(scrollFrame:GetHeight() + 12)
+	if frame.IconSelector and frame.IconSelector.ScrollBar then
+		T.SkinScrollBar(frame.IconSelector.ScrollBar)
+	elseif T.Classic then
+		scrollFrame:StripTextures()
+		scrollFrame:CreateBackdrop("Overlay")
+		scrollFrame.backdrop:SetPoint("TOPLEFT", 15, 5)
+		scrollFrame.backdrop:SetPoint("BOTTOMRIGHT", 31, -8)
+		scrollFrame:SetHeight(scrollFrame:GetHeight() + 12)
+	end
 
 	okayButton:SkinButton()
 	cancelButton:SkinButton()
@@ -802,19 +850,53 @@ function T.SkinIconSelectionFrame(frame, numIcons, buttonNameTemplate, frameName
 	editBox:DisableDrawLayer("BACKGROUND")
 	T.SkinEditBox(editBox)
 
-	if buttonNameTemplate then
-		for i = 1, numIcons do
-			local button = _G[buttonNameTemplate..i]
-			local icon = _G[button:GetName().."Icon"]
+	if T.Classic then
+		if buttonNameTemplate then
+			for i = 1, numIcons do
+				local button = _G[buttonNameTemplate..i]
+				local icon = _G[button:GetName().."Icon"]
 
+				button:StripTextures()
+				button:StyleButton(true)
+				button:SetTemplate("Default")
+
+				icon:ClearAllPoints()
+				icon:SetPoint("TOPLEFT", 2, -2)
+				icon:SetPoint("BOTTOMRIGHT", -2, 2)
+				icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+			end
+		end
+	else
+		local button = frame.BorderBox.SelectedIconArea and frame.BorderBox.SelectedIconArea.SelectedIconButton
+		if button then
+			button:DisableDrawLayer("BACKGROUND")
+			local texture = button.Icon:GetTexture()
 			button:StripTextures()
 			button:StyleButton(true)
 			button:SetTemplate("Default")
 
-			icon:ClearAllPoints()
-			icon:SetPoint("TOPLEFT", 2, -2)
-			icon:SetPoint("BOTTOMRIGHT", -2, 2)
-			icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+			button.Icon:ClearAllPoints()
+			button.Icon:SetPoint("TOPLEFT", 2, -2)
+			button.Icon:SetPoint("BOTTOMRIGHT", -2, 2)
+			button.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+			if texture then
+				button.Icon:SetTexture(texture)
+			end
+		end
+
+		for _, button in next, {frame.IconSelector.ScrollBox.ScrollTarget:GetChildren()} do
+			local texture = button.Icon:GetTexture()
+			button:StripTextures()
+			button:StyleButton(true)
+			button:SetTemplate("Default")
+
+			button.Icon:ClearAllPoints()
+			button.Icon:SetPoint("TOPLEFT", 2, -2)
+			button.Icon:SetPoint("BOTTOMRIGHT", -2, 2)
+			button.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+			if texture then
+				button.Icon:SetTexture(texture)
+			end
 		end
 	end
 end
@@ -853,8 +935,8 @@ function T.SkinMaxMinFrame(frame, point)
 end
 
 function T.SkinExpandOrCollapse(f)
-	f:SetHighlightTexture("")
-	f:SetPushedTexture("")
+	f:SetHighlightTexture(0)
+	f:SetPushedTexture(0)
 
 	local bg = CreateFrame("Frame", nil, f)
 	bg:SetSize(13, 13)
@@ -876,7 +958,7 @@ function T.SkinExpandOrCollapse(f)
 	hooksecurefunc(f, "SetNormalTexture", function(self, texture)
 		if self.settingTexture then return end
 		self.settingTexture = true
-		self:SetNormalTexture("")
+		self:SetNormalTexture(0)
 
 		if texture and texture ~= "" then
 			if texture:find("Plus") then
@@ -915,6 +997,75 @@ function T.SkinHelpBox(frame)
 	if frame.Arrow then
 		frame.Arrow:Hide()
 	end
+end
+
+function T.SkinFrame(frame, backdrop, x, y)
+	local name = frame and frame.GetName and frame:GetName()
+	local portraitFrame = name and _G[name.."Portrait"] or frame.Portrait or frame.portrait
+	local portraitFrameOverlay = name and _G[name.."PortraitOverlay"] or frame.PortraitOverlay
+	local artFrameOverlay = name and _G[name.."ArtOverlayFrame"] or frame.ArtOverlayFrame
+
+	frame:StripTextures()
+	if backdrop then
+		frame:CreateBackdrop("Transparent")
+		if x and y then
+			frame.backdrop:SetPoint("TOPLEFT", x, -y)
+			frame.backdrop:SetPoint("BOTTOMRIGHT", -x, y)
+		end
+	else
+		frame:SetTemplate("Transparent")
+	end
+
+	if frame.CloseButton then
+		T.SkinCloseButton(frame.CloseButton)
+	end
+
+	if portraitFrame then portraitFrame:SetAlpha(0) end
+	if portraitFrameOverlay then portraitFrameOverlay:SetAlpha(0) end
+	if artFrameOverlay then artFrameOverlay:SetAlpha(0) end
+end
+
+local iconColors = {
+	["auctionhouse-itemicon-border-gray"]		= {r = borderr, g = borderg, b = borderb},
+	["auctionhouse-itemicon-border-white"]		= {r = borderr, g = borderg, b = borderb},
+	["auctionhouse-itemicon-border-green"]		= BAG_ITEM_QUALITY_COLORS[2],
+	["auctionhouse-itemicon-border-blue"]		= BAG_ITEM_QUALITY_COLORS[3],
+	["auctionhouse-itemicon-border-purple"]		= BAG_ITEM_QUALITY_COLORS[4],
+	["auctionhouse-itemicon-border-orange"]		= BAG_ITEM_QUALITY_COLORS[5],
+	["auctionhouse-itemicon-border-artifact"]	= BAG_ITEM_QUALITY_COLORS[6],
+	["auctionhouse-itemicon-border-account"]	= BAG_ITEM_QUALITY_COLORS[7]
+}
+
+function T.SkinIconBorder(frame, border)
+	local backdrop = border or frame:GetParent().backdrop
+	hooksecurefunc(frame, "SetVertexColor", function(self, r, g, b)
+		if r ~= BAG_ITEM_QUALITY_COLORS[1].r ~= r and g ~= BAG_ITEM_QUALITY_COLORS[1].g then
+			backdrop:SetBackdropBorderColor(r, g, b)
+		else
+			backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
+		end
+		frame:SetAlpha(0)
+	end)
+
+	hooksecurefunc(frame, "SetAtlas", function(self, atlas)
+		local color = iconColors[atlas]
+		frame:SetAlpha(0)
+		if color then
+			backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+		else
+			-- backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
+		end
+	end)
+
+	hooksecurefunc(frame, "Hide", function(self)
+		backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
+	end)
+
+	hooksecurefunc(frame, "SetShown", function(self, show)
+		if not show then
+			backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
+		end
+	end)
 end
 
 local LoadBlizzardSkin = CreateFrame("Frame")

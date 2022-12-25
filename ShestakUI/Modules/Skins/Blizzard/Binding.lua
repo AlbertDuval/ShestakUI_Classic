@@ -22,15 +22,9 @@ local function LoadSkin()
 	KeyBindingFrame:StripTextures()
 	KeyBindingFrame:SetTemplate("Transparent")
 
-	if T.Classic then
-		KeyBindingFrame.header:StripTextures()
-		KeyBindingFrame.header:ClearAllPoints()
-		KeyBindingFrame.header:SetPoint("TOP", KeyBindingFrame, "TOP", 0, -4)
-	else
-		KeyBindingFrame.Header:StripTextures()
-		KeyBindingFrame.Header:ClearAllPoints()
-		KeyBindingFrame.Header:SetPoint("TOP", KeyBindingFrame, "TOP", 0, -4)
-	end
+	KeyBindingFrame.header:StripTextures()
+	KeyBindingFrame.header:ClearAllPoints()
+	KeyBindingFrame.header:SetPoint("TOP", KeyBindingFrame, "TOP", 0, -4)
 
 	KeyBindingFrame.bindingsContainer:StripTextures()
 	KeyBindingFrame.bindingsContainer:SetTemplate("Overlay")
@@ -75,25 +69,77 @@ local function LoadSkin()
 			button.IsSkinned = true
 		end
 	end)
-
-	-- QuickKeybind
-	if T.Mainline then
-		QuickKeybindFrame:StripTextures()
-		QuickKeybindFrame.Header:StripTextures()
-		QuickKeybindFrame:SetTemplate("Transparent")
-
-		local buttons = {
-			"okayButton",
-			"defaultsButton",
-			"cancelButton"
-		}
-
-		for _, v in pairs(buttons) do
-			QuickKeybindFrame[v]:SkinButton(true)
-		end
-
-		T.SkinCheckBox(QuickKeybindFrame.characterSpecificButton)
-	end
 end
 
 T.SkinFuncs["Blizzard_BindingUI"] = LoadSkin
+
+----------------------------------------------------------------------------------------
+--	ClickBindingUI skin
+----------------------------------------------------------------------------------------
+local function LoadSecondarySkin()
+	local frame = ClickBindingFrame
+	T.SkinFrame(frame)
+
+	frame.TutorialButton.Ring:Hide()
+	frame.TutorialButton:SetPoint("TOPLEFT", frame, "TOPLEFT", -12, 12)
+
+	local function updateNewGlow(self)
+		if self.NewOutline:IsShown() then
+			self.backdrop:SetBackdropBorderColor(0, 0.8, 0)
+		else
+			self.backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
+		end
+	end
+
+	local function HandleScrollChild(self)
+		for i = 1, self.ScrollTarget:GetNumChildren() do
+			local button = select(i, self.ScrollTarget:GetChildren())
+			local icon = button and button.Icon
+			if icon and not icon.IsSkinned then
+				button:CreateBackdrop("Overlay")
+				button.backdrop:SetPoint("TOPLEFT", -4, 0)
+				button.backdrop:SetPoint("BOTTOMRIGHT", 2, 0)
+
+				icon:SkinIcon(true)
+				icon:SetSize(32, 32)
+				icon:ClearAllPoints()
+				icon:SetPoint("TOPLEFT", button, "TOPLEFT", 3, -7)
+
+				button.Background:Hide()
+
+				button.DeleteButton:SkinButton()
+				button.DeleteButton:SetSize(20, 20)
+				button.FrameHighlight:SetInside(button.backdrop)
+				button.FrameHighlight:SetColorTexture(1, 1, 1, 0.3)
+
+				button.NewOutline:SetTexture(0)
+				hooksecurefunc(button, "Init", updateNewGlow)
+
+				icon.IsSkinned = true
+			end
+		end
+	end
+
+	hooksecurefunc(frame.ScrollBox, "Update", HandleScrollChild)
+
+	frame.ScrollBar:StripTextures()
+	frame.ScrollBar.Background:Hide()
+	frame.ScrollBoxBackground:Hide()
+
+	local buttons = {
+		"ResetButton",
+		"AddBindingButton",
+		"SaveButton"
+	}
+
+	for _, v in pairs(buttons) do
+		frame[v]:SkinButton(true)
+	end
+
+	local tutorial = frame.TutorialFrame
+	tutorial.NineSlice:StripTextures()
+	tutorial:CreateBackdrop("Transparent")
+	tutorial.backdrop:SetInside()
+end
+
+T.SkinFuncs["Blizzard_ClickBindingUI"] = LoadSecondarySkin

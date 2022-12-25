@@ -570,6 +570,172 @@ C["filger_spells"] = {
 			{spellID = 33891, filter = "CD"},
 		},
 	},
+	["EVOKER"] = {
+		{
+			Name = "P_BUFF_ICON",
+			Direction = "LEFT",
+			Mode = "ICON",
+			Interval = C.filger.buffs_space,
+			Alpha = 1,
+			IconSize = C.filger.buffs_size,
+			Position = {"TOP", P_BUFF_ICON_Anchor},
+
+			-- Tip the scales
+			{spellID = 370553, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Living Flame Healing
+			{spellID = 361509, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Obsidian Scales
+			{spellID = 363916, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Time Spiral
+			{spellID = 375234, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Renewing Blaze
+			{spellID = 374348, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Dragonrage
+			{spellID = 375087, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Hover
+			{spellID = 358267, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Deep Breath
+			{spellID = 357210, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Recall
+			{spellID = 371807, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Time Dilation
+			{spellID = 357170, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Time Stop (PVP Talent)
+			{spellID = 378441, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Echo
+			{spellID = 364343, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Reversion
+			{spellID = 366155, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Dream Flight
+			{spellID = 363502, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Dream Breath
+			{spellID = 355941, unitID = "player", caster = "player", filter = "BUFF"},
+		},
+		{
+			Name = "P_PROC_ICON",
+			Direction = "RIGHT",
+			Mode = "ICON",
+			Interval = C.filger.buffs_space,
+			Alpha = 1,
+			IconSize = C.filger.buffs_size,
+			Position = {"TOP", P_PROC_ICON_Anchor},
+
+			-- Buffs
+			-- Snapfire
+			{spellID = 370818, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Essence burst
+			{spellID = 359618, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Leaping Flames
+			{spellID = 370901, unitID = "player", caster = "player", filter = "BUFF"},
+		},
+		{
+			Name = "T_DEBUFF_ICON",
+			Direction = "RIGHT",
+			Mode = "ICON",
+			Interval = C.filger.buffs_space,
+			Alpha = 1,
+			IconSize = C.filger.buffs_size,
+			Position = {"TOP", T_DEBUFF_ICON_Anchor},
+
+			-- Living Flame Debuff
+			{spellID = 361500, unitID = "target", caster = "player", filter = "DEBUFF"},
+			-- Leaping Flames Healing
+			{spellID = 361509, unitID = "target", caster = "player", filter = "BUFF"},
+			-- Fire Breath
+			{spellID = 357209, unitID = "target", caster = "player", filter = "DEBUFF"},
+			-- Landslide
+			{spellID = 355689, unitID = "target", caster = "player", filter = "DEBUFF"},
+			-- Permeating Chill
+			{spellID = 370898, unitID = "target", caster = "player", filter = "DEBUFF"},
+			-- Disintegrate
+			{spellID = 356995, unitID = "target", caster = "player", filter = "DEBUFF"},
+			-- Echo
+			{spellID = 364343, unitID = "target", caster = "player", filter = "BUFF"},
+			-- Reversion
+			{spellID = 366155, unitID = "target", caster = "player", filter = "BUFF"},
+			-- Dream Flight
+			{spellID = 363502, unitID = "target", caster = "player", filter = "BUFF"},
+			-- Dream Breath
+			{spellID = 355941, unitID = "target", caster = "player", filter = "BUFF"},
+		},
+		{
+			Name = "T_DE/BUFF_BAR",
+			Direction = "UP",
+			IconSide = "LEFT",
+			Mode = "BAR",
+			Interval = 3,
+			Alpha = 1,
+			IconSize = 25,
+			BarWidth = 186,
+			Position = {"LEFT", T_DE_BUFF_BAR_Anchor},
+
+			-- Obsidian Scales
+			{spellID = 363916, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Renewing Blaze
+			{spellID = 374348, unitID = "player", caster = "player", filter = "BUFF"},
+		},
+		{
+			Name = "PVE/PVP_CC",
+			Direction = "DOWN",
+			IconSide = "LEFT",
+			Mode = "BAR",
+			Interval = 3,
+			Alpha = 1,
+			IconSize = 25,
+			BarWidth = 189,
+			Position = {"LEFT", PVE_PVP_CC_Anchor},
+
+			-- Landslide
+			{spellID = 355689, unitID = "focus", caster = "all", filter = "DEBUFF"},
+			-- Sleep Walk
+			{spellID = 360806, unitID = "focus", caster = "all", filter = "DEBUFF"},
+			-- Permeating Chill
+			{spellID = 370898, unitID = "focus", caster = "all", filter = "DEBUFF"},
+		},
+		{
+			Name = "COOLDOWN",
+			Direction = "RIGHT",
+			Mode = "ICON",
+			Interval = C.filger.cooldown_space,
+			Alpha = 1,
+			IconSize = C.filger.cooldown_size,
+			Position = {"TOP", COOLDOWN_Anchor},
+
+			-- Self
+			-- Tip the scales
+			{spellID = 370553, filter = "CD"},
+			-- Emerald Blossom
+			{spellID = 355913, filter = "CD"},
+			-- Deep Breath
+			{spellID = 357210, filter = "CD"},
+			-- Fire Storm
+			{spellID = 368847, filter = "CD"},
+			-- Time Spiral
+			{spellID = 374968, filter = "CD"},
+			-- Landslide
+			{spellID = 358385, filter = "CD"},
+			-- Oppressing Roar
+			{spellID = 372048, filter = "CD"},
+			-- Obsidian Scales
+			{spellID = 363916, filter = "CD"},
+			-- Eternity Surge
+			{spellID = 382411, filter = "CD"},
+			-- Dragonrage
+			{spellID = 375087, filter = "CD"},
+			-- Cauterizing Flame
+			{spellID = 374251, filter = "CD"},
+			-- Fire Breath
+			{spellID = 382266, filter = "CD"},
+			-- Time Dilation
+			{spellID = 357170, filter = "CD"},
+			-- Time Stop (PVP Talent)
+			{spellID = 378441, filter = "CD"},
+			-- Chrono Loop (PVP Talent)
+			{spellID = 383005, filter = "CD"},
+			-- Emerald Communion
+			{spellID = 370960, filter = "CD"},
+		},
+	},
 	["HUNTER"] = {
 		{
 			Name = "P_BUFF_ICON",
@@ -1374,7 +1540,7 @@ C["filger_spells"] = {
 			-- Power of the Dark Side
 			{spellID = 198069, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Lingering Insanity
-			{spellID = 197937, unitID = "player", caster = "player", filter = "BUFF"},
+			--BETA {spellID = 197937, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Shadowy Insight
 			{spellID = 124430, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Surge of Light
@@ -1590,6 +1756,8 @@ C["filger_spells"] = {
 			{spellID = 1966, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Subterfuge
 			{spellID = 115192, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Dreadblades
+			{spellID = 343142, unitID = "player", caster = "player", filter = "DEBUFF"},
 		},
 		{
 			Name = "P_PROC_ICON",
@@ -1705,7 +1873,7 @@ C["filger_spells"] = {
 			-- Adrenaline Rush
 			{spellID = 13750, filter = "CD"},
 			-- Between the Eyes
-			{spellID = 199804, filter = "CD"},
+			{spellID = 315341, filter = "CD"},
 			-- Riposte
 			{spellID = 199754, filter = "CD"},
 			-- Cloak of Shadows
@@ -1755,7 +1923,7 @@ C["filger_spells"] = {
 			-- Fury of Air
 			{spellID = 197211, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Windsong
-			{spellID = 201898, unitID = "player", caster = "player", filter = "BUFF"},
+			--BETA {spellID = 201898, unitID = "player", caster = "player", filter = "BUFF"},
 		},
 		{
 			Name = "P_PROC_ICON",
@@ -1780,7 +1948,7 @@ C["filger_spells"] = {
 			-- Crash Lightning
 			{spellID = 187878, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Frostbrand
-			{spellID = 196834, unitID = "player", caster = "player", filter = "BUFF"},
+			--BETA {spellID = 196834, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Flametongue
 			{spellID = 194084, unitID = "player", caster = "player", filter = "BUFF"},
 		},
@@ -1802,7 +1970,7 @@ C["filger_spells"] = {
 			-- Earthgrab
 			{spellID = 64695, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Earthen Spike
-			{spellID = 188089, unitID = "target", caster = "player", filter = "DEBUFF"},
+			--BETA {spellID = 188089, unitID = "target", caster = "player", filter = "DEBUFF"},
 		},
 		{
 			Name = "T_DE/BUFF_BAR",
@@ -1863,7 +2031,7 @@ C["filger_spells"] = {
 			-- Elemental Blast
 			{spellID = 117014, filter = "CD"},
 			-- Flametongue
-			{spellID = 193796, filter = "CD"},
+			--BETA {spellID = 193796, filter = "CD"},
 			-- Feral Lunge
 			{spellID = 196884, filter = "CD"},
 			-- Cloudburst Totem
@@ -1873,7 +2041,7 @@ C["filger_spells"] = {
 			-- Thunderstorm
 			{spellID = 51490, filter = "CD"},
 			-- Windsong
-			{spellID = 201898, filter = "CD"},
+			--BETA {spellID = 201898, filter = "CD"},
 			-- Stone Bulwark Totem
 			{spellID = 108270, filter = "CD"},
 			-- Capacitor Totem
@@ -2826,7 +2994,7 @@ C["filger_spells"] = {
 			-- Phantasm
 			{spellID = 114239, unitID = "target", caster = "all", filter = "BUFF"},
 			-- Greater Fade
-			{spellID = 213602, unitID = "target", caster = "all", filter = "BUFF"},
+			--BETA {spellID = 213602, unitID = "target", caster = "all", filter = "BUFF"},
 			-- Holy Ward
 			{spellID = 213610, unitID = "target", caster = "all", filter = "BUFF"},
 			-- Debuffs

@@ -25,7 +25,7 @@ local function LoadSkin()
 		end
 
 		-- Background
-		frame.Background:SetTexture(nil)
+		frame.Background:SetTexture(0)
 		frame.glow:Kill()
 		frame.shine:Kill()
 		frame.GuildBanner:Kill()
@@ -153,7 +153,7 @@ local function LoadSkin()
 		-- Background
 		local region = select(2, frame:GetRegions())
 		if region:GetObjectType() == "Texture" then
-			if region:GetTexture() == "Interface\\GuildFrame\\GuildChallenges" then
+			if region:GetTexture() == T.Classic and "Interface\\GuildFrame\\GuildChallenges" or 516664 then
 				region:Kill()
 			end
 		end
@@ -580,7 +580,7 @@ local function LoadSkin()
 		lootItem.Icon:ClearAllPoints()
 		lootItem.Icon:SetPoint("LEFT", frame.backdrop, 9, 0)
 		lootItem.IconBorder:Kill()
-		lootItem.SpecRing:SetTexture("")
+		lootItem.SpecRing:SetTexture(0)
 
 		-- Icon border
 		if not lootItem.Icon.b then

@@ -9,7 +9,6 @@ local function LoadSkin()
 		FriendsFrame,
 		FriendsListFrame,
 		FriendsTabHeader,
-		FriendsListFrameScrollFrame,
 		WhoFrameColumnHeader1,
 		WhoFrameColumnHeader2,
 		WhoFrameColumnHeader3,
@@ -25,7 +24,6 @@ local function LoadSkin()
 		LFRQueueFrameCommentInset,
 		FriendsFrameBattlenetFrame,
 		BattleTagInviteFrame,
-		QuickJoinScrollFrame,
 		QuickJoinRoleSelectionFrame,
 		FriendsFrameBattlenetFrame.BroadcastFrame,
 		FriendsFrameBattlenetFrame.UnavailableInfoFrame,
@@ -62,13 +60,13 @@ local function LoadSkin()
 		QuickJoinFrame.JoinQueueButton,
 		QuickJoinRoleSelectionFrame.AcceptButton,
 		QuickJoinRoleSelectionFrame.CancelButton,
-		FriendsListFrameScrollFrame.PendingInvitesHeaderButton,
+		-- FriendsListFrameScrollFrame.PendingInvitesHeaderButton,
 		FriendsFrameBattlenetFrame.BroadcastFrame.CancelButton,
 		FriendsFrameBattlenetFrame.BroadcastFrame.UpdateButton,
 		RecruitAFriendFrame.RewardClaiming.ClaimOrViewRewardButton,
 		RecruitAFriendFrame.RecruitmentButton,
 		RecruitAFriendFrame.SplashFrame.OKButton,
-		RecruitAFriendRecruitmentFrame.GenerateOrCopyLinkButton
+		RecruitAFriendRecruitmentFrame.GenerateOrCopyLinkButton,
 	}
 
 	for i = 1, #buttons do
@@ -76,12 +74,11 @@ local function LoadSkin()
 	end
 
 	local scrollbars = {
-		FriendsListFrameScrollFrame.scrollBar,
-		FriendsFriendsScrollFrame.scrollBar,
-		IgnoreListFrameScrollFrame.scrollBar,
-		WhoListScrollFrame.scrollBar,
-		QuickJoinScrollFrame.scrollBar,
-		RecruitAFriendFrame.RecruitList.ScrollFrame.Slider
+		FriendsListFrame.ScrollBar,
+		IgnoreListFrame.ScrollBar,
+		WhoFrame.ScrollBar,
+		QuickJoinFrame.ScrollBar,
+		RecruitAFriendFrame.RecruitList.ScrollBar,
 	}
 
 	for i = 1, #scrollbars do
@@ -161,30 +158,18 @@ local function LoadSkin()
 	T.SkinCheckBox(QuickJoinRoleSelectionFrame.RoleButtonDPS.CheckButton)
 
 	-- Pending invites
-	local function SkinFriendRequest(frame)
-		if not frame.isSkinned then
-			frame.DeclineButton:SetPoint("RIGHT", frame, "RIGHT", -2, 1)
-			frame.DeclineButton:SkinButton()
-			frame.AcceptButton:SkinButton()
-			frame.isSkinned = true
-		end
-	end
-	hooksecurefunc(FriendsListFrameScrollFrame.invitePool, "Acquire", function()
-		for object in pairs(FriendsListFrameScrollFrame.invitePool.activeObjects) do
-			SkinFriendRequest(object)
+	hooksecurefunc("FriendsFrame_UpdateFriendInviteButton", function(button)
+		if not button.IsSkinned then
+			button.AcceptButton:SkinButton()
+			button.DeclineButton:SkinButton()
+
+			button.IsSkinned = true
 		end
 	end)
 
 	-- Who Frame
-	local function UpdateWhoSkins()
-		WhoListScrollFrame:StripTextures()
-	end
-
-	WhoFrame:HookScript("OnShow", UpdateWhoSkins)
-	hooksecurefunc("FriendsFrame_OnEvent", UpdateWhoSkins)
-
-	WhoListScrollFrame:ClearAllPoints()
-	WhoListScrollFrame:SetPoint("TOPRIGHT", WhoFrameListInset, -25, 0)
+	WhoFrame.ScrollBar:SetPoint("TOPLEFT", WhoFrame.ScrollBox, "TOPRIGHT", 2, 1)
+	WhoFrame.ScrollBar:SetPoint("BOTTOMLEFT", WhoFrame.ScrollBox, "BOTTOMRIGHT", 5, -16)
 
 	-- BNet Frame
 	FriendsFrameBattlenetFrame.BroadcastButton:SetAlpha(0)
@@ -212,8 +197,8 @@ local function LoadSkin()
 	FriendsFrame:SetTemplate("Transparent")
 	FriendsFrameStatusDropDown:SetPoint("TOPLEFT", 1, -27)
 
-	for i = 1, FRIENDS_TO_DISPLAY do
-		local button = _G["FriendsListFrameScrollFrameButton"..i]
+	local function ReskinFriendButton(button)
+		if button.styled then return end
 		local icon = button.gameIcon
 
 		icon.b = CreateFrame("Frame", nil, button)
@@ -223,22 +208,32 @@ local function LoadSkin()
 
 		icon:SetParent(icon.b)
 		icon:SetSize(22, 22)
-		icon:SetTexCoord(.15, .85, .15, .85)
+		icon:SetTexCoord(.17, .83, .17, .83)
 		icon:ClearAllPoints()
-		icon:SetPoint("RIGHT", button, "RIGHT", -24, 0)
+		icon:SetPoint("RIGHT", button, "RIGHT", -27, 0)
 		icon.SetPoint = T.dummy
 
-		button.travelPassButton:SetSize(20, 32)
+		button.travelPassButton:SetSize(20, 30)
 		button.travelPassButton:SkinButton()
-		button.background:Hide()
+		button.travelPassButton.NormalTexture:SetAlpha(0)
+		button.travelPassButton.PushedTexture:SetAlpha(0)
+		button.travelPassButton.DisabledTexture:SetAlpha(0)
+		button.travelPassButton:SetPoint("TOPRIGHT", -1, -2)
 
 		button.inv = button.travelPassButton:CreateTexture(nil, "OVERLAY", nil, 7)
 		button.inv:SetTexture([[Interface\FriendsFrame\PlusManz-PlusManz]])
 		button.inv:SetPoint("TOPRIGHT", 1, -4)
 		button.inv:SetSize(22, 22)
+
+		button.background:Hide()
+		button.styled = true
 	end
 
 	hooksecurefunc("FriendsFrame_UpdateFriendButton", function(button)
+		if button.gameIcon then
+			ReskinFriendButton(button)
+		end
+
 		if button.buttonType == FRIENDS_BUTTON_TYPE_BNET and button.travelPassButton then
 			local isEnabled = button.travelPassButton:IsEnabled()
 			button.travelPassButton:SetAlpha(isEnabled and 1 or 0.4)

@@ -19,7 +19,7 @@ if C.combattext.merge_aoe_spam then
 	T.aoespam = {}
 	T.aoespam[6603] = 3				-- Auto Attack
 	T.aoespam[195222] = 4			-- Stormlash [Shaman]
-	T.aoespam[195256] = 4			-- Stormlash [Shaman]
+	--BETA T.aoespam[195256] = 4			-- Stormlash [Shaman]
 	T.aoespam[259756] = 6			-- Entropic Embrace (Void Elves)
 	T.aoespam[321519] = 5			-- Paralytic Poison (Covenant Night Fae)
 	T.aoespam[344155] = 1			-- Gluttonous Spike (Trinket)
@@ -33,6 +33,17 @@ if C.combattext.merge_aoe_spam then
 	T.aoespam[355769] = 3			-- Blood Link (Blood Shard)
 	T.aoespam[355829] = 3			-- Chaos Bane (Unholy Shard)
 	T.aoespam[355605] = 3			-- Fusion Amplification (Trinket)
+	T.aoespam[351687] = 3			-- Mnemonic Equipment (Maldraxxus)
+	T.aoespam[353248] = 3			-- Effusive Anima Accelerator
+	T.aoespam[368651] = 3			-- Vicious Wound
+	T.aoespam[336463] = 5			-- Shadowcore Oil Blast
+	T.aoespam[353466] = 4			-- Sadistic Glee
+	T.aoespam[321937] = 4			-- Phantom Fire
+
+	-- GUI list
+	for _, spell in pairs(C.combattext.spells_list) do
+		T.aoespam[spell[1]] = spell[2]
+	end
 end
 
 -- Class config
@@ -144,6 +155,8 @@ elseif T.class == "DEMONHUNTER" then
 		T.aoespam[345423] = 6		-- The Hunt (Heal)
 		T.aoespam[342857] = 3		-- Glaive Tempest
 		T.aoespam[346278] = 3		-- Burning Wound (Legendary)
+		T.aoespam[346503] = 3		-- Fel Devastation
+		T.aoespam[317009] = 3		-- Sinful Brand (Venthyr)
 	end
 elseif T.class == "DRUID" then
 	if C.combattext.merge_aoe_spam then
@@ -186,6 +199,7 @@ elseif T.class == "DRUID" then
 		T.aoespam[124991] = 3		-- Nature's Vigil
 		T.aoespam[202347] = 3		-- Stellar Flare
 		T.aoespam[155625] = 3		-- Moonfire (Cat Form)
+		T.aoespam[365640] = 4		-- Fury of Elune
 	end
 	if C.combattext.healing then
 		T.healfilter[145109] = true	-- Ysera's Gift (Self)
@@ -364,6 +378,7 @@ elseif T.class == "PALADIN" then
 		T.aoespam[119952] = 3		-- Arcing Light
 		T.aoespam[183811] = 6		-- Judgment of Light
 		T.aoespam[225311] = 1		-- Light of Dawn
+		T.aoespam[377129] = 3		-- Golden Path
 		-- Damaging spells
 		T.aoespam[53600] = 0.5		-- Shield of the Righteous
 		T.aoespam[184689] = 1		-- Shield of Vengeance
@@ -402,7 +417,6 @@ elseif T.class == "PRIEST" then
 		T.aoespam[139] = 3			-- Renew
 		T.aoespam[596] = 0			-- Prayer of Healing
 		T.aoespam[64844] = 3		-- Divine Hymn
-		T.aoespam[32546] = 3		-- Binding Heal
 		T.aoespam[77489] = 3		-- Echo of Light
 		T.aoespam[33110] = 3		-- Prayer of Mending
 		T.aoespam[34861] = 3		-- Holy Word: Sanctify
@@ -466,10 +480,15 @@ elseif T.class == "ROGUE" then
 		T.aoespam[152150] = 3		-- Death from Above
 		T.aoespam[114014] = 3		-- Shuriken Toss
 		T.aoespam[319175] = 3		-- Black Powder
+		T.aoespam[279043] = 3		-- Shadow Blades
+		T.aoespam[315585] = 3		-- Instant Poison
 		T.aoespam[358126] = 3		-- Banshee's Blight [Edge of Night, Dagger]
 		T.merge[27576] = 5374		-- Mutilate Off-Hand
 		T.merge[113780] = 2818		-- Deadly Poison
 		T.merge[57842] = 57841		-- Killing Spree Off-Hand
+		T.aoespam[324073] = 3		-- Serrated Bone Spike (Necrolord)
+		T.merge[328547] = 324073	-- Serrated Bone Spike (Necrolord)
+		T.merge[341277] = 324073	-- Serrated Bone Spike (Necrolord)
 	end
 elseif T.class == "SHAMAN" then
 	if C.combattext.merge_aoe_spam then
@@ -517,9 +536,9 @@ elseif T.class == "SHAMAN" then
 		T.merge[115360] = 115357	-- Windstrike Off-Hand
 		T.aoespam[192231] = 3		-- Liquid Magma
 		T.aoespam[157331] = 3		-- Wind Gust
-		T.aoespam[197385] = 6		-- Fury of Air
-		T.aoespam[210801] = 6		-- Crashing Storm
-		T.aoespam[210854] = 4		-- Hailstorm
+		--BETA T.aoespam[197385] = 6		-- Fury of Air
+		--BETA T.aoespam[210801] = 6		-- Crashing Storm
+		--BETA T.aoespam[210854] = 4		-- Hailstorm
 		T.aoespam[187874] = 1		-- Crash Lightning
 		T.aoespam[195592] = 1		-- Crash Lightning
 	end

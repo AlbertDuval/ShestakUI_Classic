@@ -3,7 +3,7 @@ local T, C, L, _ = unpack(select(2, ...))
 ----------------------------------------------------------------------------------------
 --	UIWidget position
 ----------------------------------------------------------------------------------------
-local top, below, maw = _G["UIWidgetTopCenterContainerFrame"], _G["UIWidgetBelowMinimapContainerFrame"], _G["MawBuffsBelowMinimapFrame"]
+local top, below, power, maw = _G["UIWidgetTopCenterContainerFrame"], _G["UIWidgetBelowMinimapContainerFrame"], _G["UIWidgetPowerBarContainerFrame"], _G["MawBuffsBelowMinimapFrame"]
 
 -- Top Widget
 local topAnchor = CreateFrame("Frame", "UIWidgetTopAnchor", UIParent)
@@ -36,18 +36,28 @@ hooksecurefunc(below, "SetPoint", function(self, _, anchor)
 	end
 end)
 
--- Maw Buff Widget
 if T.Mainline then
-	local mawAnchor = CreateFrame("Frame", "UIWidgetMawAnchor", UIParent)
-	mawAnchor:SetSize(210, 30)
-	mawAnchor:SetPoint("TOPRIGHT", BuffsAnchor, "BOTTOMRIGHT", 0, -3)
+	-- Power Bar Widget
+	local powerAnchor = CreateFrame("Frame", "UIWidgetPowerBarAnchor", UIParent)
+	powerAnchor:SetSize(210, 30)
+	powerAnchor:SetPoint(unpack(C.position.uiwidget_below))
 
-	hooksecurefunc(maw, "SetPoint", function(self, _, anchor)
-		if anchor and anchor ~= mawAnchor then
-			self:ClearAllPoints()
-			self:SetPoint("TOPRIGHT", mawAnchor)
-		end
-	end)
+	power:ClearAllPoints()
+	power:SetPoint("TOP", powerAnchor)
+
+	-- Maw Buff Widget
+	if T.Mainline then
+		local mawAnchor = CreateFrame("Frame", "UIWidgetMawAnchor", UIParent)
+		mawAnchor:SetSize(210, 30)
+		mawAnchor:SetPoint("TOPRIGHT", BuffsAnchor, "BOTTOMRIGHT", 0, -3)
+
+		hooksecurefunc(maw, "SetPoint", function(self, _, anchor)
+			if anchor and anchor ~= mawAnchor then
+				self:ClearAllPoints()
+				self:SetPoint("TOPRIGHT", mawAnchor)
+			end
+		end)
+	end
 end
 
 -- Mover for all widgets
@@ -90,11 +100,27 @@ local atlasColors = {
 
 local function SkinStatusBar(widget)
 	local bar = widget.Bar
-	local atlas = bar:GetStatusBarAtlas()
+
+	if widget:IsForbidden() then
+		if bar and bar.tooltip then
+			bar.tooltip = nil
+		end
+		return
+	end
+
+	local atlas = bar:GetStatusBarTexture()
 	if atlasColors[atlas] then
 		bar:SetStatusBarTexture(C.media.texture)
 		bar:SetStatusBarColor(unpack(atlasColors[atlas]))
 	end
+
+	if widget:GetParent() == power then
+		-- Don't skin Cosmic Energy bar
+		if widget.widgetID == 3463 then
+			bar.styled = true
+		end
+	end
+
 	if not bar.styled then
 		bar.BGLeft:SetAlpha(0)
 		bar.BGRight:SetAlpha(0)
@@ -122,7 +148,7 @@ end
 
 local function SkinDoubleStatusBar(widget)
 	for _, bar in pairs({widget.LeftBar, widget.RightBar}) do
-		local atlas = bar:GetStatusBarAtlas()
+		local atlas = bar:GetStatusBarTexture()
 		if atlasColors[atlas] then
 			bar:SetStatusBarTexture(C.media.texture)
 			bar:SetStatusBarColor(unpack(atlasColors[atlas]))
@@ -208,8 +234,8 @@ if T.Mainline then
 	maw.Container.List:SetPoint("TOPRIGHT", maw.Container, "TOPLEFT", -15, 0)
 
 	maw.Container.List:HookScript("OnShow", function(self)
-		self.button:SetPushedTexture("")
-		self.button:SetHighlightTexture("")
+		self.button:SetPushedTexture(0)
+		self.button:SetHighlightTexture(0)
 		self.button:SetWidth(200)
 		self.button:SetButtonState("NORMAL")
 		self.button:SetPushedTextOffset(0, 0)
@@ -217,8 +243,8 @@ if T.Mainline then
 	end)
 
 	maw.Container.List:HookScript("OnHide", function(self)
-		self.button:SetPushedTexture("")
-		self.button:SetHighlightTexture("")
+		self.button:SetPushedTexture(0)
+		self.button:SetHighlightTexture(0)
 		self.button:SetWidth(200)
 	end)
 

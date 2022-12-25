@@ -27,19 +27,19 @@ local function LoadSkin()
 	end
 
 	local buttons = {
-		"MountJournalMountButton",
-		"PetJournalSummonButton",
-		"PetJournalFindBattle",
-		"PetJournalFilterButton",
-		"MountJournalFilterButton",
-		"HeirloomsJournalFilterButton",
-		"ToyBoxFilterButton"
+		MountJournalMountButton,
+		PetJournalSummonButton,
+		PetJournalFindBattle,
+		PetJournalFilterButton,
+		MountJournalFilterButton,
+		HeirloomsJournal.FilterButton,
+		ToyBoxFilterButton,
+		WardrobeCollectionFrame.FilterButton
 	}
 
 	for i = 1, #buttons do
-		_G[buttons[i]]:SkinButton()
+		buttons[i]:SkinButton()
 	end
-
 
 	for i = 1, 3 do
 		T.SkinTab(_G["PetJournalParentTab"..i])
@@ -71,12 +71,15 @@ local function LoadSkin()
 	MountJournal.MountDisplay.backdrop:SetPoint("BOTTOMRIGHT", 1, -2)
 
 	T.SkinEditBox(MountJournalSearchBox, nil, 18)
-	T.SkinScrollBar(MountJournalListScrollFrameScrollBar)
+	T.SkinScrollBar(MountJournal.ScrollBar)
 	T.SkinRotateButton(MountJournal.MountDisplay.ModelScene.RotateLeftButton)
 	T.SkinRotateButton(MountJournal.MountDisplay.ModelScene.RotateRightButton)
 
-	MountJournalListScrollFrameScrollBar:SetPoint("TOPLEFT", MountJournalListScrollFrame, "TOPRIGHT", 4, 17)
+	--MountJournal.ScrollBar:SetPoint("TOPLEFT", MountJournalListScrollFrame, "TOPRIGHT", 4, 17)
 	MountJournalFilterButton:SetPoint("TOPLEFT", MountJournalSearchBox, "TOPRIGHT", 5, 2)
+	T.SkinCloseButton(_G.MountJournalFilterButton.ResetButton)
+	_G.MountJournalFilterButton.ResetButton:ClearAllPoints()
+	_G.MountJournalFilterButton.ResetButton:SetPoint("CENTER", _G.MountJournalFilterButton, "TOPRIGHT", 0, 0)
 
 	-- New Mount Equip. 8.2
 	MountJournal.BottomLeftInset:StripTextures()
@@ -88,12 +91,12 @@ local function LoadSkin()
 
 	T.SkinCheckBox(MountJournal.MountDisplay.ModelScene.TogglePlayer, 26)
 
-	for i = 1, #MountJournal.ListScrollFrame.buttons do
+	for i = 1, #MountJournal.ScrollBox do
 		local button = _G["MountJournalListScrollFrameButton"..i]
 
 		if not button.isSkinned then
 			button:GetRegions():Hide()
-			button.selectedTexture:SetTexture(nil)
+			button.selectedTexture:SetTexture(0)
 			button:CreateBackdrop("Overlay")
 			button.backdrop:SetPoint("TOPLEFT", 2, -2)
 			button.backdrop:SetPoint("BOTTOMRIGHT", -2, 2)
@@ -121,7 +124,7 @@ local function LoadSkin()
 	end
 
 	local function ColorSelectedMount()
-		for i = 1, #MountJournal.ListScrollFrame.buttons do
+		for i = 1, #MountJournal.ScrollBox do
 			local button = _G["MountJournalListScrollFrameButton"..i]
 
 			if button.selectedTexture:IsShown() then
@@ -137,8 +140,8 @@ local function LoadSkin()
 	end
 	hooksecurefunc("MountJournal_UpdateMountList", ColorSelectedMount)
 
-	MountJournalListScrollFrame:HookScript("OnVerticalScroll", ColorSelectedMount)
-	MountJournalListScrollFrame:HookScript("OnMouseWheel", ColorSelectedMount)
+	--MountJournal.ScrollBox:HookScript("OnVerticalScroll", ColorSelectedMount)
+	MountJournal.ScrollBox:HookScript("OnMouseWheel", ColorSelectedMount)
 
 	StyleItemButton(MountJournalSummonRandomFavoriteButton)
 
@@ -165,22 +168,25 @@ local function LoadSkin()
 	T.SkinEditBox(PetJournalSearchBox, nil, 18)
 
 	PetJournalFilterButton:SetPoint("TOPLEFT", PetJournalSearchBox, "TOPRIGHT", 5, 2)
+	T.SkinCloseButton(_G.PetJournalFilterButton.ResetButton)
+	_G.PetJournalFilterButton.ResetButton:ClearAllPoints()
+	_G.PetJournalFilterButton.ResetButton:SetPoint("CENTER", _G.PetJournalFilterButton, "TOPRIGHT", 0, 0)
 
 	PetJournalLoadoutBorderSlotHeaderText:SetParent(PetJournal)
 	PetJournalLoadoutBorderSlotHeaderText:SetPoint("CENTER", PetJournalLoadoutBorderTop, "TOP", 0, 4)
 
-	PetJournalListScrollFrameScrollBar:SetPoint("TOPLEFT", PetJournalListScrollFrame, "TOPRIGHT", 4, 17)
-	PetJournalListScrollFrameScrollBar:SetPoint("BOTTOMLEFT", PetJournalListScrollFrame, "BOTTOMRIGHT", 4, 14)
-	T.SkinScrollBar(PetJournalListScrollFrameScrollBar)
+	--PetJournalListScrollFrameScrollBar:SetPoint("TOPLEFT", PetJournalListScrollFrame, "TOPRIGHT", 4, 17)
+	--PetJournalListScrollFrameScrollBar:SetPoint("BOTTOMLEFT", PetJournalListScrollFrame, "BOTTOMRIGHT", 4, 14)
+	T.SkinScrollBar(PetJournal.ScrollBar)
 
-	for i = 1, #PetJournal.listScroll.buttons do
-		local button = _G["PetJournalListScrollFrameButton"..i]
-		local name = _G["PetJournalListScrollFrameButton"..i.."Name"]
-		local level = _G["PetJournalListScrollFrameButton"..i.."Level"]
+	for i = 1, #PetJournal.ScrollBox do
+		local button = _G["PetJournalScrollBoxButton"..i]
+		local name = _G["PetJournalScrollBoxButton"..i.."Name"]
+		local level = _G["PetJournalScrollBoxButton"..i.."Level"]
 
 		if not button.isSkinned then
 			button:GetRegions():Hide()
-			button.selectedTexture:SetTexture(nil)
+			button.selectedTexture:SetTexture(0)
 			button:CreateBackdrop("Overlay")
 			button.backdrop:SetPoint("TOPLEFT", 2, -2)
 			button.backdrop:SetPoint("BOTTOMRIGHT", -2, 2)
@@ -217,12 +223,12 @@ local function LoadSkin()
 	end
 
 	local function ColorSelectedPet()
-		if PetJournal.listScroll.buttons then
-			for i = 1, #PetJournal.listScroll.buttons do
-				local button = PetJournal.listScroll.buttons[i]
+		if PetJournal.ScrollBox then
+			for i = 1, #PetJournal.ScrollBox do
+				local button = PetJournal.ScrollBox.buttons[i]
 
-				if PetJournal.listScroll.buttons[i].index then
-					local petID, _, isOwned = C_PetJournal.GetPetInfoByIndex(PetJournal.listScroll.buttons[i].index)
+				if PetJournal.ScrollBox.buttons[i].index then
+					local petID, _, isOwned = C_PetJournal.GetPetInfoByIndex(PetJournal.ScrollBox.buttons[i].index)
 
 					if petID and isOwned then
 						local _, _, _, _, rarity = C_PetJournal.GetPetStats(petID)
@@ -252,7 +258,7 @@ local function LoadSkin()
 	end
 
 	hooksecurefunc("PetJournal_UpdatePetList", ColorSelectedPet)
-	hooksecurefunc(PetJournalListScrollFrame, "update", ColorSelectedPet)
+	hooksecurefunc(PetJournal.ScrollBox, 'Update', ColorSelectedPet)
 	PetJournalAchievementStatus:DisableDrawLayer("BACKGROUND")
 
 	StyleItemButton(PetJournalHealPetButton)
@@ -298,12 +304,12 @@ local function LoadSkin()
 			spell.icon:SetPoint("TOPLEFT", 2, -2)
 			spell.icon:SetPoint("BOTTOMRIGHT", -2, 2)
 
-			_G["PetJournalLoadoutPet"..i.."Spell"..j.."Background"]:SetTexture(nil)
-			_G["PetJournalLoadoutPet"..i.."Spell"..j.."Selected"]:SetTexture(nil)
+			_G["PetJournalLoadoutPet"..i.."Spell"..j.."Background"]:SetTexture(0)
+			_G["PetJournalLoadoutPet"..i.."Spell"..j.."Selected"]:SetTexture(0)
 		end
 
 		button.iconBorder:SetAlpha(0)
-		button.qualityBorder:SetTexture("")
+		button.qualityBorder:SetTexture(0)
 		button.levelBG:SetAlpha(0)
 		button.helpFrame:StripTextures()
 
@@ -368,10 +374,10 @@ local function LoadSkin()
 
 	PetJournalPetCardPetInfoIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 
-	PetJournalPetCardPetInfoLevelBubble:SetTexture(nil)
+	PetJournalPetCardPetInfoLevelBubble:SetTexture(0)
 	PetJournalPetCardPetInfoLevel:SetFontObject("SystemFont_Outline_Small")
 
-	PetJournalPetCardPetInfoQualityBorder:SetTexture(nil)
+	PetJournalPetCardPetInfoQualityBorder:SetTexture(0)
 
 	PetJournalPetCardHealthFrame.healthBar:StripTextures()
 	PetJournalPetCardHealthFrame.healthBar:CreateBackdrop("Overlay")
@@ -392,15 +398,19 @@ local function LoadSkin()
 	T.SkinEditBox(ToyBox.searchBox, nil, 18)
 	T.SkinNextPrevButton(ToyBox.PagingFrame.PrevPageButton)
 	T.SkinNextPrevButton(ToyBox.PagingFrame.NextPageButton)
-	ToyBoxFilterButton:SetPoint("TOPLEFT", ToyBox.searchBox, "TOPRIGHT", 5, 2)
 	ToyBox.progressBar:StripTextures()
 	ToyBox.progressBar:CreateBackdrop("Overlay")
 	ToyBox.progressBar:SetStatusBarTexture(C.media.texture)
 	ToyBox.progressBar:SetFrameLevel(ToyBox.progressBar:GetFrameLevel() + 2)
 
+	ToyBoxFilterButton:SetPoint("TOPLEFT", ToyBox.searchBox, "TOPRIGHT", 5, 2)
+	T.SkinCloseButton(_G.ToyBoxFilterButton.ResetButton)
+	_G.ToyBoxFilterButton.ResetButton:ClearAllPoints()
+	_G.ToyBoxFilterButton.ResetButton:SetPoint("CENTER", _G.ToyBoxFilterButton, "TOPRIGHT", 0, 0)
+
 	for i = 1, 18 do
-		ToyBox.iconsFrame["spellButton"..i].slotFrameCollected:SetTexture("")
-		ToyBox.iconsFrame["spellButton"..i].slotFrameUncollected:SetTexture("")
+		ToyBox.iconsFrame["spellButton"..i].slotFrameCollected:SetTexture(0)
+		ToyBox.iconsFrame["spellButton"..i].slotFrameUncollected:SetTexture(0)
 		local button = ToyBox.iconsFrame["spellButton"..i]
 		local icon = ToyBox.iconsFrame["spellButton"..i].iconTexture
 		local uicon = ToyBox.iconsFrame["spellButton"..i].iconTextureUncollected
@@ -423,12 +433,16 @@ local function LoadSkin()
 	T.SkinEditBox(HeirloomsJournal.SearchBox, nil, 18)
 	T.SkinNextPrevButton(HeirloomsJournal.PagingFrame.PrevPageButton)
 	T.SkinNextPrevButton(HeirloomsJournal.PagingFrame.NextPageButton)
-	HeirloomsJournalFilterButton:SetPoint("TOPLEFT", HeirloomsJournal.SearchBox, "TOPRIGHT", 5, 2)
 	HeirloomsJournal.progressBar:StripTextures()
 	HeirloomsJournal.progressBar:CreateBackdrop("Overlay")
 	HeirloomsJournal.progressBar:SetStatusBarTexture(C.media.texture)
 	HeirloomsJournal.progressBar:SetFrameLevel(HeirloomsJournal.progressBar:GetFrameLevel() + 2)
 	T.SkinDropDownBox(HeirloomsJournalClassDropDown, 170)
+
+	HeirloomsJournal.FilterButton:SetPoint("TOPLEFT", HeirloomsJournal.SearchBox, "TOPRIGHT", 5, 2)
+	T.SkinCloseButton(_G.HeirloomsJournal.FilterButton.ResetButton)
+	_G.HeirloomsJournal.FilterButton.ResetButton:ClearAllPoints()
+	_G.HeirloomsJournal.FilterButton.ResetButton:SetPoint("CENTER", _G.HeirloomsJournal.FilterButton, "TOPRIGHT", 0, 0)
 
 	hooksecurefunc(HeirloomsJournal, "LayoutCurrentPage", function(self)
 		for i = 1, #self.heirloomHeaderFrames do
@@ -454,8 +468,8 @@ local function LoadSkin()
 
 			button.levelBackground:SetAlpha(0)
 
-			button.slotFrameCollected:SetTexture("")
-			button.slotFrameUncollected:SetTexture("")
+			button.slotFrameCollected:SetTexture(0)
+			button.slotFrameUncollected:SetTexture(0)
 
 			button.iconTexture:SetPoint("TOPLEFT")
 			button.iconTexture:SetPoint("BOTTOMRIGHT")
@@ -491,6 +505,11 @@ local function LoadSkin()
 	WardrobeTransmogFrame.ModelScene.ClearAllPendingButton:SkinButton()
 	T.SkinCheckBox(WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox)
 
+	WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrameSearchBox, "TOPRIGHT", 5, 2)
+	T.SkinCloseButton(WardrobeCollectionFrame.FilterButton.ResetButton)
+	WardrobeCollectionFrame.FilterButton.ResetButton:ClearAllPoints()
+	WardrobeCollectionFrame.FilterButton.ResetButton:SetPoint("CENTER", WardrobeCollectionFrame.FilterButton, "TOPRIGHT", 0, 0)
+
 	for i = 1, #WardrobeTransmogFrame.SlotButtons do
 		local slot = WardrobeTransmogFrame.SlotButtons[i]
 		local icon = slot.Icon
@@ -519,8 +538,6 @@ local function LoadSkin()
 	WardrobeCollectionFrame.progressBar:SetFrameLevel(WardrobeCollectionFrame.progressBar:GetFrameLevel() + 2)
 	T.SkinEditBox(WardrobeCollectionFrameSearchBox, nil, 18)
 	WardrobeCollectionFrameSearchBox:SetFrameLevel(WardrobeCollectionFrameSearchBox:GetFrameLevel() + 2)
-	WardrobeCollectionFrame.FilterButton:SkinButton()
-	WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrameSearchBox, "TOPRIGHT", 5, 2)
 	T.SkinDropDownBox(WardrobeCollectionFrameWeaponDropDown, 170)
 	T.SkinNextPrevButton(WardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.PrevPageButton)
 	T.SkinNextPrevButton(WardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.NextPageButton)
@@ -534,9 +551,9 @@ local function LoadSkin()
 	WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame.backdrop:SetPoint("TOPLEFT", 4, -4)
 	WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame.backdrop:SetPoint("BOTTOMRIGHT", 1, 4)
 	WardrobeSetsCollectionVariantSetsButton:SkinButton()
-	T.SkinScrollBar(WardrobeCollectionFrameScrollFrameScrollBar)
-	WardrobeCollectionFrameScrollFrameScrollBar:SetPoint("TOPLEFT", WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame, "TOPRIGHT", 4, 15)
-	WardrobeCollectionFrameScrollFrameScrollBar:SetPoint("BOTTOMLEFT", WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame, "BOTTOMRIGHT", 4, 14)
+	--T.SkinScrollBar(WardrobeCollectionFrameScrollFrameScrollBar)
+	--WardrobeCollectionFrameScrollFrameScrollBar:SetPoint("TOPLEFT", WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame, "TOPRIGHT", 4, 15)
+	--WardrobeCollectionFrameScrollFrameScrollBar:SetPoint("BOTTOMLEFT", WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame, "BOTTOMRIGHT", 4, 14)
 
 	local function SetItemQuality(_, itemFrame)
 		if (itemFrame.backdrop) then
@@ -560,7 +577,7 @@ local function LoadSkin()
 		T.SkinTab(_G["WardrobeCollectionFrameTab"..i], true)
 	end
 
-	for i = 1, #WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.buttons do
+	for i = 1, #WardrobeCollectionFrame.SetsCollectionFrame do
 		local button = _G["WardrobeCollectionFrameScrollFrameButton"..i]
 
 		if not button.isSkinned then
@@ -570,8 +587,8 @@ local function LoadSkin()
 			button.backdrop:SetPoint("BOTTOMRIGHT", -2, 2)
 			button:StyleButton(nil, 4)
 
-			button.HighlightTexture:SetTexture(nil)
-			button.SelectedTexture:SetTexture(nil)
+			button.HighlightTexture:SetTexture(0)
+			button.SelectedTexture:SetTexture(0)
 
 			button.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 
@@ -599,8 +616,8 @@ local function LoadSkin()
 			end
 		end
 	end
-	hooksecurefunc(WardrobeCollectionFrame.SetsCollectionFrame, "SelectSet", ColorSelectedSet)
-	hooksecurefunc(WardrobeCollectionFrameScrollFrame, "update", ColorSelectedSet)
+	--hooksecurefunc(WardrobeCollectionFrame.SetsCollectionFrame, "SelectSet", ColorSelectedSet)
+	--hooksecurefunc(WardrobeCollectionFrameScrollFrame, "update", ColorSelectedSet)
 
 	hooksecurefunc(WardrobeCollectionFrame.SetsCollectionFrame, "DisplaySet", function()
 		for _, child in ipairs({WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame:GetChildren()}) do

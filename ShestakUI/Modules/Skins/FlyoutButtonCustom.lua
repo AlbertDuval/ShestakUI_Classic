@@ -1,5 +1,5 @@
 local T, C, L, _ = unpack(select(2, ...))
-if T.Classic or  C.actionbar.enable ~= true or C.skins.flyout_button ~= true then return end
+if C.actionbar.enable ~= true or C.skins.flyout_button ~= true then return end
 
 ----------------------------------------------------------------------------------------
 --	FlyoutButtonCustom skin
@@ -27,7 +27,7 @@ frame:SetScript("OnEvent", function()
 		local normal = _G[name.."NormalTexture"]
 
 		button:StyleButton()
-		button:SetNormalTexture("")
+		button:SetNormalTexture(0)
 
 		if border then
 			border:Hide()

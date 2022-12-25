@@ -18,6 +18,8 @@ local spell7Buffs = T.ReminderBuffs["Spell7Buff"]
 local customBuffs = T.ReminderBuffs["Custom"]
 
 local visible
+local icons = {}
+local UpdatePositions
 
 local isPresent = {
 	flask = false,
@@ -37,7 +39,7 @@ local function CheckVanillaElixir()
 	local requireFlask, otherBuffsRequired = T.ReminderFlaskRequirements()
 	local hasFlask, otherBuffsCount, meetsRequirements = false, 0, false
 
-	FlaskFrame.t:SetTexture("")
+	FlaskFrame.t:SetTexture(0)
 
 	if requireFlask then
 		if #flaskBuffs > 0 then
@@ -185,7 +187,9 @@ local function OnAuraChange(_, event, unit)
 	CheckBuff(spell4Buffs, Spell4Frame, "spell4")
 	CheckBuff(spell5Buffs, Spell5Frame, "spell5")
 	CheckBuff(spell6Buffs, Spell6Frame, "spell6")
-	CheckBuff(spell7Buffs, Spell7Frame, "spell7")
+	if not T.Wrath then
+		CheckBuff(spell7Buffs, Spell7Frame, "spell7")
+	end
 
 	if customBuffs and #customBuffs > 0 then
 		CheckBuff(customBuffs, CustomFrame, "custom")
@@ -194,11 +198,12 @@ local function OnAuraChange(_, event, unit)
 		isPresent.custom = true
 	end
 
+	UpdatePositions()
 	local _, instanceType = IsInInstance()
 	if (not IsInGroup() or instanceType ~= "raid") and C.reminder.raid_buffs_always == false then
 		RaidBuffReminder:SetAlpha(0)
 		visible = false
-	elseif isPresent.flask == true and isPresent.food == true and isPresent.spell3 == true and isPresent.spell4 == true and isPresent.spell5 == true and isPresent.spell6 == true and isPresent.spell7 == true and isPresent.custom == true then
+	elseif isPresent.flask == true and isPresent.food == true and isPresent.spell3 == true and isPresent.spell4 == true and isPresent.spell5 == true and isPresent.spell6 == true and (T.Wrath or isPresent.spell7 == true) and isPresent.custom == true then
 		if not visible then
 			RaidBuffReminder:SetAlpha(0)
 			visible = false
@@ -230,8 +235,6 @@ raidbuff_reminder:RegisterEvent("CHARACTER_POINTS_CHANGED")
 raidbuff_reminder:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 raidbuff_reminder:SetScript("OnEvent", OnAuraChange)
 
-local line = math.ceil(C.minimap.size / (C.reminder.raid_buffs_size + 2))
-
 local buffButtons = {
 	"FlaskFrame",
 	"FoodFrame",
@@ -242,6 +245,12 @@ local buffButtons = {
 	"Spell7Frame",
 	"CustomFrame"
 }
+
+if T.Wrath then
+	tremove(buffButtons, 7)
+end
+
+local line = math.ceil(C.minimap.size / (C.reminder.raid_buffs_size + 2))
 
 for i = 1, #buffButtons do
 	local name = buffButtons[i]
@@ -256,7 +265,30 @@ for i = 1, #buffButtons do
 	button:SetFrameLevel(RaidBuffReminder:GetFrameLevel() + 2)
 
 	button.t = button:CreateTexture(name..".t", "OVERLAY")
-	button.t:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-	button.t:SetPoint("TOPLEFT", 2, -2)
-	button.t:SetPoint("BOTTOMRIGHT", -2, 2)
+	button.t:CropIcon()
+end
+
+function UpdatePositions()
+	local first, previousBuff
+	for i = 1, #icons do
+		local buff = icons[i]
+		buff:ClearAllPoints()
+		if buff:GetAlpha() == C.reminder.raid_buffs_alpha then
+			-- buff:SetPoint("TOP", UIParent, "TOP", 0, 900)
+			line = line + 1
+		else
+			if not first then
+				buff:SetPoint("BOTTOMLEFT", RaidBuffReminder, "BOTTOMLEFT", 0, 0)
+				first = true
+			else
+				buff:SetPoint("LEFT", previousBuff, "RIGHT", 3, 0)
+			end
+			previousBuff = buff
+			if i >= line then
+				buff:SetAlpha(0)
+			else
+				buff:SetAlpha(1)
+			end
+		end
+	end
 end

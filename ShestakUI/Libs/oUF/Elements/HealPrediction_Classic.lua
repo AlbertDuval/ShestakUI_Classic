@@ -17,6 +17,7 @@ local function Update(self, event, unit)
 	local OverTimeHeals = (HealComm:GetHealAmount(GUID, HealComm.OVERTIME_AND_BOMB_HEALS) or 0) * (HealComm:GetHealModifier(GUID) or 1)
 	local DirectHeals = UnitGetIncomingHeals(unit) or 0
 	local IncomingHeals = DirectHeals >= DirectHeals + OverTimeHeals and DirectHeals or DirectHeals + OverTimeHeals
+	-- local IncomingHeals = (HealComm:GetHealAmount(GUID, HealComm.ALL_HEALS) or 0) * (HealComm:GetHealModifier(GUID) or 1)
 	local Health = UnitHealth(unit)
 	local MaxHealth = UnitHealthMax(unit)
 

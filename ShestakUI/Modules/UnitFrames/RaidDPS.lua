@@ -235,8 +235,8 @@ local function Shared(self, unit)
 		self.Debuffs.num = 7
 		self.Debuffs["growth-y"] = "DOWN"
 		self.Debuffs["growth-x"] = "RIGHT"
-		self.Debuffs.PostCreateIcon = T.PostCreateIcon
-		self.Debuffs.PostUpdateIcon = T.PostUpdateIcon
+		self.Debuffs.PostCreateButton = T.PostCreateButton
+		self.Debuffs.PostUpdateButton = T.PostUpdateButton
 	end
 
 	-- Debuff highlight
@@ -248,7 +248,7 @@ local function Shared(self, unit)
 	self.DebuffHighlightAlpha = 1
 	self.DebuffHighlightFilter = true
 
-	-- Incoming heal text/bar
+	-- Incoming heals and heal/damage absorbs
 	if C.raidframe.plugins_healcomm == true then
 		if T.Classic then
 			local healBar = CreateFrame("StatusBar", nil, self)
@@ -257,37 +257,7 @@ local function Shared(self, unit)
 			healBar:SetStatusBarColor(0, 1, 0, 0.2)
 			self.HealPrediction = healBar
 		else
-			local mhpb = self.Health:CreateTexture(nil, "ARTWORK")
-			mhpb:SetTexture(C.media.texture)
-			mhpb:SetVertexColor(0, 1, 0.5, 0.2)
-
-			local ohpb = self.Health:CreateTexture(nil, "ARTWORK")
-			ohpb:SetTexture(C.media.texture)
-			ohpb:SetVertexColor(0, 1, 0, 0.2)
-
-			local ahpb = self.Health:CreateTexture(nil, "ARTWORK")
-			ahpb:SetTexture(C.media.texture)
-			ahpb:SetVertexColor(1, 1, 0, 0.2)
-
-			local hab = self.Health:CreateTexture(nil, "ARTWORK")
-			hab:SetTexture(C.media.texture)
-			hab:SetVertexColor(1, 0, 0, 0.4)
-
-			local oa = self.Health:CreateTexture(nil, "ARTWORK")
-			oa:SetTexture([[Interface\AddOns\ShestakUI\Media\Textures\Cross.tga]], "REPEAT", "REPEAT")
-			oa:SetVertexColor(0.5, 0.5, 1)
-			oa:SetHorizTile(true)
-			oa:SetVertTile(true)
-			oa:SetAlpha(0.4)
-			oa:SetBlendMode("ADD")
-
-			self.HealthPrediction = {
-				myBar = mhpb,
-				otherBar = ohpb,
-				absorbBar = ahpb,
-				healAbsorbBar = hab,
-				overAbsorb = oa
-			}
+			T.CreateHealthPrediction(self)
 
 			if T.Classic then
 				self.HealthPrediction.frequentUpdates = true
@@ -468,10 +438,14 @@ local party_pet = CreateFrame("Frame", "PartyPetDPSAnchor", UIParent)
 party_pet:SetPoint("BOTTOMLEFT", party, "BOTTOMRIGHT", partytarget_width + 14, 0)
 
 local raidtank = CreateFrame("Frame", "RaidTankDPSAnchor", UIParent)
-if C.actionbar.split_bars then
-	raidtank:SetPoint(C.position.unitframes.tank[1], SplitBarRight, C.position.unitframes.tank[3], C.position.unitframes.tank[4], C.position.unitframes.tank[5])
+if C.threat.enable then
+	raidtank:SetPoint(C.position.unitframes.tank[1], C.position.unitframes.tank[2], C.position.unitframes.tank[3], C.position.unitframes.tank[4] + C.threat.width + 6, C.position.unitframes.tank[5])
 else
-	raidtank:SetPoint(unpack(C.position.unitframes.tank))
+	if C.actionbar.split_bars then
+		raidtank:SetPoint(C.position.unitframes.tank[1], SplitBarRight, C.position.unitframes.tank[3], C.position.unitframes.tank[4], C.position.unitframes.tank[5])
+	else
+		raidtank:SetPoint(unpack(C.position.unitframes.tank))
+	end
 end
 
 ----------------------------------------------------------------------------------------
@@ -559,4 +533,68 @@ if C.raidframe.layout == "AUTO" then
 		frame:RegisterUnitEvent("PLAYER_SPECIALIZATION_CHANGED", "player", "")
 		frame:SetScript("OnEvent", CheckSpec)
 	end
+end
+
+----------------------------------------------------------------------------------------
+--	Test RaidFrames
+----------------------------------------------------------------------------------------
+do
+	local frames = {}
+	local moving = false
+	SlashCmdList.TEST_RAID_DPS = function()
+		if InCombatLockdown() then print("|cffffff00"..ERR_NOT_IN_COMBAT.."|r") return end
+		if not moving then
+			oUF_RaidDPS1:Show()
+			local raid = {}
+			local raid_j = {}
+			if #frames == 0 then
+				for j = 1, C.raidframe.raid_groups do
+					for i = 1, 5 do
+						local frame = CreateFrame("Frame", nil, UIParent)
+						frame:SetSize(raid_width, raid_height)
+						if j == 1 then
+							if i == 1 then
+								frame:SetPoint("TOPLEFT", oUF_RaidDPS1, "TOPLEFT", 0, 0)
+							else
+								frame:SetPoint("TOP", raid[i-1], "BOTTOM", 0, -7)
+							end
+						elseif j == 5 then
+							if i == 1 then
+								frame:SetPoint("TOPLEFT", oUF_RaidDPS1, "TOPRIGHT", 7, 0)
+							else
+								frame:SetPoint("TOP", raid[i-1], "BOTTOM", 0, -7)
+							end
+						else
+							if i == 1 then
+								frame:SetPoint("TOPLEFT", raid_j[j-1], "BOTTOMLEFT", 0, -7)
+							else
+								frame:SetPoint("TOP", raid[i-1], "BOTTOM", 0, -7)
+							end
+						end
+						if i == 5 then
+							raid_j[j] = frame
+						end
+						frame:CreateBackdrop("Overlay")
+						frame.backdrop.overlay:SetVertexColor(0.1, 0.9 - (j * 0.08) , 0.1)
+						raid[i] = frame
+						table.insert(frames, frame)
+					end
+				end
+			else
+				for _, frame in pairs(frames) do
+					frame:Show()
+				end
+			end
+			moving = true
+		else
+			for _, frame in pairs(frames) do
+				frame:Hide()
+			end
+			moving = false
+		end
+	end
+	SLASH_TEST_RAID_DPS1 = "/testraiddps"
+	SLASH_TEST_RAID_DPS2 = "/еуыекфшввзы"
+	SLASH_TEST_RAID_DPS3 = "/raiddpstest"
+	SLASH_TEST_RAID_DPS4 = "/кфшввзыеуые"
 end

@@ -13,6 +13,13 @@ ObjectiveTrackerFrame:SetHeight(T.screenHeight / 1.6)
 
 ObjectiveTrackerFrame.IsUserPlaced = function() return true end
 
+hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(_, _, parent)
+	if parent ~= frame then
+		ObjectiveTrackerFrame:ClearAllPoints()
+		ObjectiveTrackerFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, -20)
+	end
+end)
+
 local headers = {
 	SCENARIO_CONTENT_TRACKER_MODULE,
 	BONUS_OBJECTIVE_TRACKER_MODULE,
@@ -20,7 +27,8 @@ local headers = {
 	CAMPAIGN_QUEST_TRACKER_MODULE,
 	QUEST_TRACKER_MODULE,
 	ACHIEVEMENT_TRACKER_MODULE,
-	WORLD_QUEST_TRACKER_MODULE
+	WORLD_QUEST_TRACKER_MODULE,
+	PROFESSION_RECIPE_TRACKER_MODULE
 }
 
 for i = 1, #headers do
@@ -64,7 +72,7 @@ hooksecurefunc("QuestObjectiveSetupBlockButton_Item", function(block)
 		item:SetTemplate("Default")
 		item:StyleButton()
 
-		item:SetNormalTexture(nil)
+		item:SetNormalTexture(0)
 
 		item.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 		item.icon:SetPoint("TOPLEFT", item, 2, -2)
@@ -97,9 +105,9 @@ hooksecurefunc("QuestObjectiveSetupBlockButton_FindGroup", function(block)
 	if block.groupFinderButton and not block.groupFinderButton.styled then
 		local icon = block.groupFinderButton
 		icon:SetSize(26, 26)
-		icon:SetNormalTexture("")
-		icon:SetHighlightTexture("")
-		icon:SetPushedTexture("")
+		icon:SetNormalTexture(0)
+		icon:SetHighlightTexture(0)
+		icon:SetPushedTexture(0)
 		icon.b = CreateFrame("Frame", nil, icon)
 		icon.b:SetTemplate("Overlay")
 		icon.b:SetPoint("TOPLEFT", icon, "TOPLEFT", 2, -3)
@@ -144,7 +152,7 @@ frame:SetScript("OnEvent", function()
 				b:SetSize(20, 20)
 				b.texture:SetAtlas("socialqueuing-icon-eye")
 				b.texture:SetSize(12, 12)
-				b:SetHighlightTexture("")
+				b:SetHighlightTexture(0)
 
 				local point, anchor, point2, x, y = b:GetPoint()
 				if x == -18 then
@@ -220,8 +228,8 @@ if C.skins.blizzard_frames == true then
 	button.plus:Hide()
 	hooksecurefunc("ObjectiveTracker_Collapse", function()
 		button.plus:Show()
-		button:SetNormalTexture("")
-		button:SetPushedTexture("")
+		button:SetNormalTexture(0)
+		button:SetPushedTexture(0)
 		if C.general.minimize_mouseover then
 			button:SetAlpha(0)
 			button:HookScript("OnEnter", function() button:SetAlpha(1) end)
@@ -231,8 +239,8 @@ if C.skins.blizzard_frames == true then
 
 	hooksecurefunc("ObjectiveTracker_Expand", function()
 		button.plus:Hide()
-		button:SetNormalTexture("")
-		button:SetPushedTexture("")
+		button:SetNormalTexture(0)
+		button:SetPushedTexture(0)
 		if C.general.minimize_mouseover then
 			button:SetAlpha(1)
 			button:HookScript("OnEnter", function() button:SetAlpha(1) end)
@@ -266,8 +274,8 @@ if C.skins.blizzard_frames == true then
 			else
 				button.plus:Hide()
 			end
-			button:SetNormalTexture("")
-			button:SetPushedTexture("")
+			button:SetNormalTexture(0)
+			button:SetPushedTexture(0)
 		end)
 	end
 
@@ -296,12 +304,14 @@ if C.automation.auto_collapse ~= "NONE" then
 			local inInstance, instanceType = IsInInstance()
 			if inInstance then
 				if instanceType == "party" or instanceType == "scenario" then
-					for i = 3, #headers do
-						local button = headers[i].Header.MinimizeButton
-						if button and not headers[i].collapsed then
-							button:Click()
+					C_Timer.After(0.1, function() -- for some reason it got error after reload in instance
+						for i = 3, #headers do
+							local button = headers[i].Header.MinimizeButton
+							if button and not headers[i].collapsed then
+								button:Click()
+							end
 						end
-					end
+					end)
 				else
 					ObjectiveTracker_Collapse()
 				end
@@ -333,11 +343,12 @@ local function SkinBar(_, _, line)
 	local label = bar.Label
 
 	if not progressBar.styled then
-		bar:SetSize(200, 20)
+		if bar.BorderLeft then bar.BorderLeft:SetAlpha(0) end
+		if bar.BorderRight then bar.BorderRight:SetAlpha(0) end
+		if bar.BorderMid then bar.BorderMid:SetAlpha(0) end
+		bar:SetSize(200, 16)
 		bar:SetStatusBarTexture(C.media.texture)
-		bar:SetTemplate("Transparent")
-		bar:SetBackdropColor(0, 0, 0, 0)
-		bar:DisableDrawLayer("ARTWORK")
+		bar:CreateBackdrop("Transparent")
 
 		label:ClearAllPoints()
 		label:SetPoint("CENTER", 0, -1)
@@ -366,18 +377,17 @@ local function SkinBarIcon(_, _, line)
 		bar.BarGlow:Kill()
 		bar.Sheen:Hide()
 		bar.IconBG:Kill()
-		bar:SetSize(200, 20)
+		bar:SetSize(200, 16)
 		bar:SetStatusBarTexture(C.media.texture)
-		bar:SetTemplate("Transparent")
-		bar:SetBackdropColor(0, 0, 0, 0)
+		bar:CreateBackdrop("Transparent")
 
 		label:ClearAllPoints()
 		label:SetPoint("CENTER", 0, -1)
 		label:SetFont(C.media.pixel_font, C.media.pixel_font_size, C.media.pixel_font_style)
 
-		icon:SetPoint("RIGHT", 24, 0)
+		icon:SetPoint("RIGHT", 26, 0)
 		icon:SetSize(20, 20)
-		icon:SetMask(nil)
+		icon:SetMask("")
 
 		local border = CreateFrame("Frame", "$parentBorder", bar)
 		border:SetAllPoints(icon)
@@ -423,27 +433,15 @@ hooksecurefunc(ACHIEVEMENT_TRACKER_MODULE, "AddTimerBar", SkinTimer)
 ----------------------------------------------------------------------------------------
 --	Set tooltip depending on position
 ----------------------------------------------------------------------------------------
-local function IsFramePositionedLeft(frame)
-	local x = frame:GetCenter()
-	local screenWidth = GetScreenWidth()
-	local positionedLeft = false
-
-	if x and x < (screenWidth / 2) then
-		positionedLeft = true
-	end
-
-	return positionedLeft
-end
-
 hooksecurefunc("BonusObjectiveTracker_ShowRewardsTooltip", function(block)
-	if IsFramePositionedLeft(ObjectiveTrackerFrame) then
+	if T.IsFramePositionedLeft(ObjectiveTrackerFrame) then
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint("TOPLEFT", block, "TOPRIGHT", 0, 0)
 	end
 end)
 
 ScenarioStageBlock:HookScript("OnEnter", function(self)
-	if IsFramePositionedLeft(ObjectiveTrackerFrame) then
+	if T.IsFramePositionedLeft(ObjectiveTrackerFrame) then
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint("TOPLEFT", self, "TOPRIGHT", 50, -3)
 	end
@@ -469,7 +467,7 @@ StageBlock.backdrop:SetPoint("BOTTOMRIGHT", ScenarioStageBlock.NormalBG, -6, 5)
 
 StageBlock.NormalBG:SetAlpha(0)
 StageBlock.FinalBG:SetAlpha(0)
-StageBlock.GlowTexture:SetTexture("")
+StageBlock.GlowTexture:SetTexture(0)
 
 ----------------------------------------------------------------------------------------
 --	Skin ScenarioStageBlock
@@ -505,12 +503,13 @@ frame:SetScript("OnEvent", function()
 		local list = ScenarioBlocksFrame.MawBuffsBlock.Container.List
 		if list then
 			list:ClearAllPoints()
-			if IsFramePositionedLeft(ObjectiveTrackerFrame) then
+			if T.IsFramePositionedLeft(ObjectiveTrackerFrame) then
 				list:SetPoint("TOPLEFT", ScenarioBlocksFrame.MawBuffsBlock.Container, "TOPRIGHT", 15, 0)
 			else
 				list:SetPoint("TOPRIGHT", ScenarioBlocksFrame.MawBuffsBlock.Container, "TOPLEFT", -15, 0)
 			end
 		end
+		ObjectiveTracker_Update()	-- Fixed position of MinimizeButton if frame on right side
 
 		-- TODO check
 		-- BottomScenarioWidgetContainerBlock.WidgetContainer:ClearAllPoints()
@@ -527,8 +526,8 @@ Maw.List:StripTextures()
 Maw.List:SetTemplate("Overlay")
 
 Maw.List:HookScript("OnShow", function(self)
-	self.button:SetPushedTexture("")
-	self.button:SetHighlightTexture("")
+	self.button:SetPushedTexture(0)
+	self.button:SetHighlightTexture(0)
 	self.button:SetWidth(234)
 	self.button:SetButtonState("NORMAL")
 	self.button:SetPushedTextOffset(0, 0)
@@ -536,8 +535,8 @@ Maw.List:HookScript("OnShow", function(self)
 end)
 
 Maw.List:HookScript("OnHide", function(self)
-	self.button:SetPushedTexture("")
-	self.button:SetHighlightTexture("")
+	self.button:SetPushedTexture(0)
+	self.button:SetHighlightTexture(0)
 	self.button:SetWidth(234)
 end)
 

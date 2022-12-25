@@ -295,7 +295,7 @@ local function Shared(self, unit)
 		end
 
 		-- LFD role icons
-		if C.raidframe.icons_role == true then
+		if T.Mainline and C.raidframe.icons_role == true then
 			self.GroupRoleIndicator = self.Health:CreateTexture(nil, "OVERLAY")
 			self.GroupRoleIndicator:SetSize(12, 12)
 			self.GroupRoleIndicator:SetPoint("TOPLEFT", 10, 8)
@@ -450,6 +450,32 @@ local function Shared(self, unit)
 			end
 		end
 
+		-- Essence bar
+		if T.Mainline and C.unitframe_class_bar.essence == true and T.class == "EVOKER" then
+			self.Essence = CreateFrame("Frame", self:GetName().."_Essence", self, "BackdropTemplate", "BackdropTemplate")
+			local maxEssence = UnitPowerMax(self.unit, Enum.PowerType.Essence)
+			self.Essence:CreateBackdrop("Default")
+			self.Essence:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
+			self.Essence:SetSize(player_width, 7)
+
+			for i = 1, 6 do
+				self.Essence[i] = CreateFrame("StatusBar", self:GetName().."_Essence"..i, self.Essence, "BackdropTemplate")
+				self.Essence[i]:SetSize((player_width - 5) / 6, 7)
+				if i == 1 then
+					self.Essence[i]:SetPoint("LEFT", self.Essence)
+				else
+					self.Essence[i]:SetPoint("TOPLEFT", self.Essence[i-1], "TOPRIGHT", 1, 0)
+				end
+				self.Essence[i]:SetStatusBarTexture(C.media.texture)
+				self.Essence[i]:SetStatusBarColor(0.2, 0.58, 0.5)
+
+				self.Essence[i].bg = self.Essence[i]:CreateTexture(nil, "BORDER")
+				self.Essence[i].bg:SetAllPoints()
+				self.Essence[i].bg:SetTexture(C.media.texture)
+				self.Essence[i].bg:SetVertexColor(0.2, 0.58, 0.5, 0.2)
+			end
+		end
+
 		-- Rogue/Druid Combo bar
 		if C.unitframe_class_bar.combo == true and C.unitframe_class_bar.combo_old ~= true and (T.class == "ROGUE" or T.class == "DRUID") then
 			self.ComboPoints = CreateFrame("Frame", self:GetName().."_ComboBar", self)
@@ -457,7 +483,7 @@ local function Shared(self, unit)
 			self.ComboPoints:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 			self.ComboPoints:SetSize(player_width, 7)
 
-			local maxComboPoints = T.Classic and 5 or 6
+			local maxComboPoints = T.Classic and 5 or 7
 			for i = 1, maxComboPoints do
 				self.ComboPoints[i] = CreateFrame("StatusBar", self:GetName().."_Combo"..i, self.ComboPoints)
 				self.ComboPoints[i]:SetSize((player_width - 5) / maxComboPoints, 7)
@@ -668,9 +694,9 @@ local function Shared(self, unit)
 			self.Debuffs.initialAnchor = "TOPLEFT"
 			self.Debuffs["growth-x"] = "RIGHT"
 		end
-		self.Debuffs.PostCreateIcon = T.PostCreateIcon
-		self.Debuffs.PostUpdateIcon = T.PostUpdateIcon
-		self.Debuffs.CustomFilter = T.CustomFilter
+		self.Debuffs.PostCreateButton = T.PostCreateButton
+		self.Debuffs.PostUpdateButton = T.PostUpdateButton
+		self.Debuffs.FilterAura = T.CustomFilter
 
 		if unit == "pet" then
 			self:RegisterEvent("UNIT_PET", T.UpdateAllElements)
@@ -758,8 +784,8 @@ local function Shared(self, unit)
 				self.Debuffs:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 5)
 			end
 
-			self.Debuffs.PostCreateIcon = T.PostCreateIcon
-			self.Debuffs.PostUpdateIcon = T.PostUpdateIcon
+			self.Debuffs.PostCreateButton = T.PostCreateButton
+			self.Debuffs.PostUpdateButton = T.PostUpdateButton
 		end
 
 		if unit == "target" then
@@ -771,13 +797,13 @@ local function Shared(self, unit)
 			self.Auras.numDebuffs = 16
 			self.Auras.numBuffs = 32
 			self.Auras:SetHeight(165)
-			self.Auras:SetWidth(player_width + 4 - (C.aura.debuff_size - 25) * 4)
+			self.Auras:SetWidth(player_width + 4)
 			self.Auras.spacing = T.Scale(3)
 			self.Auras.size = T.Scale(C.aura.debuff_size)
 			self.Auras.gap = true
-			self.Auras.PostCreateIcon = T.PostCreateIcon
-			self.Auras.PostUpdateIcon = T.PostUpdateIcon
-			self.Auras.CustomFilter = T.CustomFilter
+			self.Auras.PostCreateButton = T.PostCreateButton
+			self.Auras.PostUpdateButton = T.PostUpdateButton
+			self.Auras.FilterAura = T.CustomFilter
 
 			-- Rogue/Druid Combo bar
 			if C.unitframe_class_bar.combo == true and (C.unitframe_class_bar.combo_old == true or (T.class ~= "DRUID" and T.class ~= "ROGUE")) then
@@ -786,7 +812,7 @@ local function Shared(self, unit)
 				self.ComboPoints:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 				self.ComboPoints:SetSize(player_width, 7)
 
-				local maxComboPoints = T.Classic and 5 or 6
+				local maxComboPoints = T.Classic and 5 or 7
 				for i = 1, maxComboPoints do
 					self.ComboPoints[i] = CreateFrame("StatusBar", self:GetName().."_Combo"..i, self.ComboPoints)
 					self.ComboPoints[i]:SetSize((player_width - 5) / maxComboPoints, 7)
@@ -1128,9 +1154,9 @@ local function Shared(self, unit)
 			self.Auras.spacing = T.Scale(3)
 			self.Auras.size = T.Scale(31 + T.extraHeight)
 			self.Auras.gap = true
-			self.Auras.PostCreateIcon = T.PostCreateIcon
-			self.Auras.PostUpdateIcon = T.PostUpdateIcon
-			self.Auras.CustomFilter = T.CustomFilterBoss
+			self.Auras.PostCreateButton = T.PostCreateButton
+			self.Auras.PostUpdateButton = T.PostUpdateButton
+			self.Auras.FilterAura = T.CustomFilterBoss
 		end
 
 		self:HookScript("OnShow", T.UpdateAllElements)
@@ -1161,7 +1187,7 @@ local function Shared(self, unit)
 		self.DebuffHighlightFilter = true
 	end
 
-	-- Incoming heal text/bar
+	-- Incoming heals and heal/damage absorbs
 	if C.raidframe.plugins_healcomm == true then
 		if T.Classic then
 			local healBar = CreateFrame("StatusBar", nil, self)
@@ -1170,37 +1196,7 @@ local function Shared(self, unit)
 			healBar:SetStatusBarColor(0, 1, 0, 0.2)
 			self.HealPrediction = healBar
 		else
-			local mhpb = self.Health:CreateTexture(nil, "ARTWORK")
-			mhpb:SetTexture(C.media.texture)
-			mhpb:SetVertexColor(0, 1, 0.5, 0.2)
-
-			local ohpb = self.Health:CreateTexture(nil, "ARTWORK")
-			ohpb:SetTexture(C.media.texture)
-			ohpb:SetVertexColor(0, 1, 0, 0.2)
-
-			local ahpb = self.Health:CreateTexture(nil, "ARTWORK")
-			ahpb:SetTexture(C.media.texture)
-			ahpb:SetVertexColor(1, 1, 0, 0.2)
-
-			local hab = self.Health:CreateTexture(nil, "ARTWORK")
-			hab:SetTexture(C.media.texture)
-			hab:SetVertexColor(1, 0, 0, 0.4)
-
-			local oa = self.Health:CreateTexture(nil, "ARTWORK")
-			oa:SetTexture([[Interface\AddOns\ShestakUI\Media\Textures\Cross.tga]], "REPEAT", "REPEAT")
-			oa:SetVertexColor(0.5, 0.5, 1)
-			oa:SetHorizTile(true)
-			oa:SetVertTile(true)
-			oa:SetAlpha(0.4)
-			oa:SetBlendMode("ADD")
-
-			self.HealthPrediction = {
-				myBar = mhpb,
-				otherBar = ohpb,
-				absorbBar = ahpb,
-				healAbsorbBar = hab,
-				overAbsorb = oa
-			}
+			T.CreateHealthPrediction(self)
 
 			if T.Classic then
 				self.HealthPrediction.frequentUpdates = true
@@ -1283,7 +1279,7 @@ end
 
 if C.unitframe.show_boss == true then
 	local boss = {}
-	for i = 1, MAX_BOSS_FRAMES do
+	for i = 1, 8 do
 		boss[i] = oUF:Spawn("boss"..i, "oUF_Boss"..i)
 		if i == 1 then
 			if C.unitframe.boss_on_right == true then
@@ -1453,7 +1449,7 @@ SlashCmdList.TEST_UF = function()
 		-- end
 
 		if C.unitframe.show_boss == true then
-			for i = 1, MAX_BOSS_FRAMES do
+			for i = 1, 8 do
 				_G["oUF_Boss"..i].oldunit = _G["oUF_Boss"..i].unit
 				_G["oUF_Boss"..i]:SetAttribute("unit", "player")
 			end
@@ -1485,7 +1481,7 @@ SlashCmdList.TEST_UF = function()
 		-- end
 
 		if C.unitframe.show_boss == true then
-			for i = 1, MAX_BOSS_FRAMES do
+			for i = 1, 8 do
 				_G["oUF_Boss"..i].unit = _G["oUF_Boss"..i].oldunit
 				_G["oUF_Boss"..i]:SetAttribute("unit", _G["oUF_Boss"..i].unit)
 			end
