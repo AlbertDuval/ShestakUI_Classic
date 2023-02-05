@@ -1905,8 +1905,6 @@ C["filger_spells"] = {
 			{spellID = 1850, filter = "CD"},
 			-- Enrage
 			{spellID = 5229, filter = "CD", absID = true},
-			-- Enraged Defense
-			{spellID = 6542, filter = "CD"},
 			-- Faerie Fire (Feral)
 			{spellID = 16857, filter = "CD"},
 			-- Feral Charge - Bear
@@ -2052,7 +2050,7 @@ C["filger_spells"] = {
 			-- The Beast Within
 			{spellID = 34471, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Trueshot Aura
-			{spellID = 20905, unitID = "pet", caster = "player", filter = "BUFF"},
+			{spellID = 19506, unitID = "pet", caster = "player", filter = "BUFF"},
 			-- Warp (Warp Stalker)
 			-- {spellID = 35346, unitID = "pet", caster = "all", filter = "BUFF"},
 		},
@@ -2604,7 +2602,7 @@ C["filger_spells"] = {
 
 			-- Pets
 			-- Charge (Boar)
-			{spellID = 7371, filter = "CD"},
+			{spellID = 31426, filter = "CD"},
 			-- Dash (Boar / Cat / Hyena / Raptor / Ravager / Tallstrider / Wolf)
 			{spellID = 61684, filter = "CD"},
 			-- Dive (Bat / Bird of Prey / Carrion Bird / Dragonhawk / Nether Ray / Wind Serpent)
@@ -5237,8 +5235,6 @@ C["filger_spells"] = {
 			-- Self
 			-- Circle of Healing
 			{spellID = 34861, filter = "CD"},
-			-- Desperate Prayer
-			{spellID = 13908, filter = "CD"},
 			-- Devouring Plague
 			{spellID = 2944, filter = "CD"},
 			-- Dispersion
@@ -7818,8 +7814,16 @@ C["filger_spells"] = {
 			{spellID = 12292, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Enrage (Improved Defensive Stance)
 			{spellID = 57514, unitID = "player", caster = "player", filter = "BUFF", absID = true},
-			-- Enrage (Wrecking Crew)
+			-- Enrage r1 (Wrecking Crew)
 			{spellID = 57518, unitID = "player", caster = "player", filter = "BUFF", absID = true},
+			-- Enrage r2 (Wrecking Crew)
+			{spellID = 57519, unitID = "player", caster = "player", filter = "BUFF", absID = true},
+			-- Enrage r3 (Wrecking Crew)
+			{spellID = 57520, unitID = "player", caster = "player", filter = "BUFF", absID = true},
+			-- Enrage r4 (Wrecking Crew)
+			{spellID = 57521, unitID = "player", caster = "player", filter = "BUFF", absID = true},
+			-- Enrage r5 (Wrecking Crew)
+			{spellID = 57522, unitID = "player", caster = "player", filter = "BUFF", absID = true},
 			-- Enraged Regeneration
 			{spellID = 55694, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Flurry
@@ -8904,11 +8908,13 @@ C["filger_spells"] = {
 
 			-- Raids: Wrath of the Lich King Classic
 			-- Power Spark [Malygos]
-			{spellID = 56152, unitID = "player", caster = "all", filter = "BUFF"},
+			{spellID = 56152, unitID = "player", caster = "all", filter = "DEBUFF"},
 			-- Slag Imbued [Ignis the Furnace Master]
 			{spellID = 63536, unitID = "player", caster = "all", filter = "BUFF"},
 			-- Rune of Power [The Assembly of Iron]
 			{spellID = 64320, unitID = "player", caster = "all", filter = "BUFF"},
+			-- Singed [Hodir]
+			{spellID = 65280, unitID = "target", caster = "all", filter = "DEBUFF"},
 			-- Starlight [Hodir]
 			{spellID = 62807, unitID = "player", caster = "all", filter = "BUFF"},
 			-- Storm Cloud [Hodir]
@@ -8917,6 +8923,10 @@ C["filger_spells"] = {
 			{spellID = 62807, unitID = "player", caster = "all", filter = "BUFF"},
 			-- Toasty Fire [Hodir]
 			{spellID = 62821, unitID = "player", caster = "all", filter = "BUFF"},
+			-- Shadow Crash [General Vezax]
+			{spellID = 63277, unitID = "player", caster = "all", filter = "DEBUFF"},
+			-- Saronite Vapors [General Vezax]
+			{spellID = 63322, unitID = "player", caster = "all", filter = "BUFF"},
 			-- Surge of Adrenaline [The Northrend Beasts]
 			{spellID = 68667, unitID = "player", caster = "all", filter = "BUFF"},
 			-- Empowered Darkness [Twin Val'kyr]
