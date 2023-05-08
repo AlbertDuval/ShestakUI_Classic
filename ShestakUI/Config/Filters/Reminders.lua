@@ -18,9 +18,16 @@ end
 if C.reminder.raid_buffs_enable == true or C.announcements.flask_food == true then
 	T.ReminderBuffs = {
 		Flask = {
-			SpellName(307185),	-- Spectral Flask of Power (Main Stat)
-			SpellName(307187),	-- Spectral Flask of Stamina (Stamina)
-			SpellName(307166),	-- Eternal Flask (Cauldron)
+			SpellName(370652),	-- Phial of Static Empowerment
+			SpellName(373257),	-- Phial of Glacial Fury
+			SpellName(374000),	-- Iced Phial of Corrupting Rage
+			SpellName(371036),	-- Phial of Icy Preservation
+			SpellName(371186),	-- Charged Phial of Alacrity
+			SpellName(371339),	-- Phial of Elemental Chaos
+			SpellName(371204),	-- Phial of Still Air
+			SpellName(371354),	-- Phial of the Eye in the Storm
+			SpellName(371386),	-- Phial of Charged Isolation
+			SpellName(371172),	-- Phial of Tepid Versatility
 		},
 		BattleElixir = {
 			-- SpellName(spellID),	-- Spell name
@@ -37,6 +44,9 @@ if C.reminder.raid_buffs_enable == true or C.announcements.flask_food == true th
 		},
 		Vers = {
 			SpellName(1126),	-- Mark of the Wild
+		},
+		Reduce = {
+			SpellName(381748),	-- Blessing of the Bronze
 		},
 		Custom = {
 			-- SpellName(spellID),	-- Spell name
@@ -87,6 +97,16 @@ if C.reminder.solo_buffs_enable == true then
 			[1] = {	-- Mark of the Wild group
 				["spells"] = {
 					SpellName(1126),	-- Mark of the Wild
+				},
+				["combat"] = true,
+				["instance"] = true,
+				["pvp"] = true,
+			},
+		},
+		EVOKER = {
+			[1] = {	-- Blessing of the Bronze
+				["spells"] = {
+					SpellName(381748),	-- Blessing of the Bronze
 				},
 				["combat"] = true,
 				["instance"] = true,
@@ -182,16 +202,6 @@ if C.reminder.solo_buffs_enable == true then
 			[1] = {	-- Battle Shout group
 				["spells"] = {
 					SpellName(6673),	-- Battle Shout
-				},
-				["combat"] = true,
-				["instance"] = true,
-				["pvp"] = true,
-			},
-		},
-		EVOKER = {
-			[1] = {	-- Blessing of the Bronze
-				["spells"] = {
-					SpellName(381748),	-- Blessing of the Bronze
 				},
 				["combat"] = true,
 				["instance"] = true,

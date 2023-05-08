@@ -4,11 +4,10 @@ if C.actionbar.enable ~= true then return end
 ----------------------------------------------------------------------------------------
 --	Hide Blizzard ActionBars stuff(by Tukz)
 ----------------------------------------------------------------------------------------
-local NUM_STANCE_SLOTS = NUM_STANCE_SLOTS or 10
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:SetScript("OnEvent", function()
-	MainMenuBar:SetScale(0.00001)
+	-- MainMenuBar:SetScale(0.00001)
 	MainMenuBar:EnableMouse(false)
 
 	if T.Classic then
@@ -106,18 +105,6 @@ function RightBarMouseOver(alpha)
 		MultiBarLeft:SetAlpha(alpha)
 	end
 
-	if C.actionbar.rightbars > 2 then
-		if MultiBarBottomRight:IsShown() then
-			for i = 1, 12 do
-				local b = _G["MultiBarBottomRightButton"..i]
-				b:SetAlpha(alpha)
-				local c = _G["MultiBarBottomRightButton"..i.."Cooldown"]
-				T.HideSpiral(c, alpha)
-			end
-			MultiBarBottomRight:SetAlpha(alpha)
-		end
-	end
-
 	if MultiBarRight:IsShown() then
 		for i = 1, 12 do
 			local b = _G["MultiBarRightButton"..i]
@@ -126,6 +113,18 @@ function RightBarMouseOver(alpha)
 			T.HideSpiral(c, alpha)
 		end
 		MultiBarRight:SetAlpha(alpha)
+	end
+
+	if C.actionbar.rightbars > 2 then
+		if MultiBar5:IsShown() then
+			for i = 1, 12 do
+				local b = _G["MultiBar5Button"..i]
+				b:SetAlpha(alpha)
+				local c = _G["MultiBar5Button"..i.."Cooldown"]
+				T.HideSpiral(c, alpha)
+			end
+			MultiBar5:SetAlpha(alpha)
+		end
 	end
 
 	if C.actionbar.petbar_horizontal == false and C.actionbar.petbar_hide == false then
@@ -142,7 +141,7 @@ function RightBarMouseOver(alpha)
 
 	if C.actionbar.stancebar_horizontal == false and C.actionbar.stancebar_hide == false then
 		if StanceHolder:IsShown() then
-			for i = 1, NUM_STANCE_SLOTS do
+			for i = 1, 10 do
 				local b = _G["StanceButton"..i]
 				b:SetAlpha(alpha)
 				local c = _G["StanceButton"..i.."Cooldown"]
@@ -154,7 +153,7 @@ function RightBarMouseOver(alpha)
 end
 
 function StanceBarMouseOver(alpha)
-	for i = 1, NUM_STANCE_SLOTS do
+	for i = 1, 10 do
 		local b = _G["StanceButton"..i]
 		b:SetAlpha(alpha)
 		local c = _G["StanceButton"..i.."Cooldown"]
@@ -196,7 +195,7 @@ function BottomBarMouseOver(alpha)
 		end
 	end
 
-	if C.actionbar.rightbars < 3 and MultiBarBottomRight:IsShown() then
+	if C.actionbar.bottombars > 2 and MultiBarBottomRight:IsShown() then
 		if C.actionbar.toggle_mode == true and ShestakUISettingsPerChar.BottomBars == 1 then
 			for i = 4, 6 do
 				local b = _G["MultiBarBottomRightButton"..i]
@@ -288,12 +287,36 @@ function Bar5MouseOver(alpha)
 	end
 end
 
-function CustomBarMouseOver(alpha)
-	for i = 1, 12 do
-		local b = _G["CustomBarButton"..i]
-		b:SetAlpha(alpha)
-		local c = _G["CustomBarButton"..i.."Cooldown"]
-		T.HideSpiral(c, alpha)
+function Bar6MouseOver(alpha)
+	if MultiBar5:IsShown() then
+		for i = 1, 12 do
+			local b = _G["MultiBar6Button"..i]
+			b:SetAlpha(alpha)
+			local c = _G["MultiBar6Button"..i.."Cooldown"]
+			T.HideSpiral(c, alpha)
+		end
+	end
+end
+
+function Bar7MouseOver(alpha)
+	if MultiBar6:IsShown() then
+		for i = 1, 12 do
+			local b = _G["MultiBar6Button"..i]
+			b:SetAlpha(alpha)
+			local c = _G["MultiBar6Button"..i.."Cooldown"]
+			T.HideSpiral(c, alpha)
+		end
+	end
+end
+
+function Bar8MouseOver(alpha)
+	if MultiBar7:IsShown() then
+		for i = 1, 12 do
+			local b = _G["MultiBar7Button"..i]
+			b:SetAlpha(alpha)
+			local c = _G["MultiBar7Button"..i.."Cooldown"]
+			T.HideSpiral(c, alpha)
+		end
 	end
 end
 
@@ -344,7 +367,20 @@ EventSpiral:SetScript("OnEvent", function()
 		if C.actionbar.bar5_mouseover then
 			Bar5MouseOver(0)
 		end
+
+		if T.Mainline and C.actionbar.bar6_mouseover then
+			Bar6MouseOver(0)
+		end
 	end
+
+	if T.Mainline and C.actionbar.bar7_mouseover then
+		Bar7MouseOver(0)
+	end
+
+	if T.Mainline and C.actionbar.bar8_mouseover then
+		Bar8MouseOver(0)
+	end
+
 	EventSpiral:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end)
 
@@ -414,56 +450,53 @@ if T.Classic then
 		end
 	end)
 else
-	local frame = CreateFrame("Frame")
-	frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-	frame:SetScript("OnEvent", function(self)
-		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-		SetActionBarToggles(1, 1, 1, 1, 0)
-		if C.actionbar.show_grid == true then
-			SetCVar("alwaysShowActionBars", 1)
-			-- for i = 1, 12 do
-			-- local reason = ACTION_BUTTON_SHOW_GRID_REASON_CVAR
-			-- local button = _G[format("ActionButton%d", i)]
-			-- button.noGrid = nil
-			-- button:SetAttribute("showgrid", 1)
-			-- --BETA button:ShowGrid(reason)
-			-- button:SetAttribute("statehidden", true)
-
-			-- button = _G[format("MultiBarRightButton%d", i)]
-			-- button.noGrid = nil
-			-- button:SetAttribute("showgrid", 1)
-			-- -- button:ShowGrid(reason)
-			-- button:SetAttribute("statehidden", true)
-
-			-- button = _G[format("MultiBarBottomRightButton%d", i)]
-			-- button.noGrid = nil
-			-- button:SetAttribute("showgrid", 1)
-			-- -- button:ShowGrid(reason)
-			-- button:SetAttribute("statehidden", true)
-
-			-- button = _G[format("MultiBarLeftButton%d", i)]
-			-- button.noGrid = nil
-			-- button:SetAttribute("showgrid", 1)
-			-- -- button:ShowGrid(reason)
-			-- button:SetAttribute("statehidden", true)
-
-			-- button = _G[format("MultiBarBottomLeftButton%d", i)]
-			-- button.noGrid = nil
-			-- button:SetAttribute("showgrid", 1)
-			-- -- button:ShowGrid(reason)
-			-- button:SetAttribute("statehidden", true)
-
-			-- if _G["VehicleMenuBarActionButton"..i] then
-			-- _G["VehicleMenuBarActionButton"..i]:SetAttribute("statehidden", true)
-			-- end
-
-			-- _G["MultiCastActionButton"..i]:SetAttribute("showgrid", 1)
-			-- _G["MultiCastActionButton"..i]:SetAttribute("statehidden", true)
-			-- end
-		else
-			SetCVar("alwaysShowActionBars", 0)
-		end
-	end)
+	--local actionFrame = {
+	--	MultiBarBottomLeft,
+	--	MultiBarLeft,
+	--	MultiBarRight,
+	--	MultiBarBottomRight,
+	--	MultiBar5,
+	--	MultiBar6,
+	--	MultiBar7,
+	--}
+	--
+	--EditModeUtil.GetRightContainerAnchor = T.dummy -- Prevent error with offset
+	--
+	--local frame = CreateFrame("Frame")
+	--frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+	--frame:SetScript("OnEvent", function(self)
+	--	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	--
+	--	-- Fix errors from EditMode
+	--	for i = 1, #actionFrame do
+	--		actionFrame[i].SetPointBase = T.dummy
+	--		actionFrame[i].SetScaleBase = T.dummy
+	--		actionFrame[i].ShowBase = T.dummy
+	--		actionFrame[i].HideBase = T.dummy
+	--	end
+	--	if C.actionbar.show_grid == true then
+	--		SetCVar("alwaysShowActionBars", 1)
+	--	else
+	--		SetCVar("alwaysShowActionBars", 0)
+	--		for i = 1, 12 do
+	--			local button = _G[format("MultiBarRightButton%d", i)]
+	--			button:SetAttribute("showgrid", 0)
+	--
+	--			button = _G[format("MultiBarBottomRightButton%d", i)]
+	--			button:SetAttribute("showgrid", 0)
+	--
+	--			button = _G[format("MultiBarLeftButton%d", i)]
+	--			button:SetAttribute("showgrid", 0)
+	--
+	--			button = _G[format("MultiBarBottomLeftButton%d", i)]
+	--			button:SetAttribute("showgrid", 0)
+	--		end
+	--		local reason = ACTION_BUTTON_SHOW_GRID_REASON_EVENT
+	--		for i = 1, #actionFrame do
+	--			actionFrame[i]:SetShowGrid(false, reason)
+	--		end
+	--	end
+	--end)
 end
 
 ----------------------------------------------------------------------------------------
@@ -474,7 +507,7 @@ T.ShiftBarUpdate = function()
 	local texture, isActive, isCastable
 	local button, icon, cooldown
 	local start, duration, enable
-	for i = 1, NUM_STANCE_SLOTS do
+	for i = 1, 10 do
 		button = _G["StanceButton"..i]
 		icon = _G["StanceButton"..i.."Icon"]
 		if i <= numForms then

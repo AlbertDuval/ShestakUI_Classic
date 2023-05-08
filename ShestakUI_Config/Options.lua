@@ -1948,20 +1948,55 @@ do
 		local subheader = ns.addSubCategory(parent, BINDING_HEADER_ACTIONBAR.." 6")
 		subheader:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, -10)
 
-		local custom_bar_enable = ns.CreateCheckBox(parent, "custom_bar_enable", ENABLE)
-		custom_bar_enable:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -10)
+		local bar6_num = ns.CreateNumberSlider(parent, "bar6_num", nil, nil, 0, 12, 1, true, L.actionbar_bar1_num)
+		bar6_num:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -30)
 
-		local custom_bar_num = ns.CreateNumberSlider(parent, "custom_bar_num", nil, nil, 0, 12, 1, true, L.actionbar_bar1_num)
-		custom_bar_num:SetPoint("TOPLEFT", custom_bar_enable, "BOTTOMLEFT", 0, -20)
+		local bar6_row = ns.CreateNumberSlider(parent, "bar6_row", nil, nil, 1, 12, 1, true, L.actionbar_bar1_row)
+		bar6_row:SetPoint("LEFT", bar6_num, "RIGHT", 120, 0)
 
-		local custom_bar_row = ns.CreateNumberSlider(parent, "custom_bar_row", nil, nil, 1, 12, 1, true, L.actionbar_bar1_row)
-		custom_bar_row:SetPoint("LEFT", custom_bar_num, "RIGHT", 120, 0)
+		local bar6_size = ns.CreateNumberSlider(parent, "bar6_size", nil, nil, 0, 50, 1, true, L_GUI_ACTIONBAR_BUTTON_SIZE)
+		bar6_size:SetPoint("TOPLEFT", bar6_num, "BOTTOMLEFT", 0, -20)
 
-		local custom_bar_size = ns.CreateNumberSlider(parent, "custom_bar_size", nil, nil, 0, 50, 1, true, L_GUI_ACTIONBAR_BUTTON_SIZE)
-		custom_bar_size:SetPoint("TOPLEFT", custom_bar_num, "BOTTOMLEFT", 0, -20)
+		local bar6_mouseover = ns.CreateCheckBox(parent, "bar6_mouseover", L.actionbar_bar1_mouseover)
+		bar6_mouseover:SetPoint("LEFT", bar6_size, "RIGHT", 130, 0)
 
-		local custom_bar_mouseover = ns.CreateCheckBox(parent, "custom_bar_mouseover", L.actionbar_bar1_mouseover)
-		custom_bar_mouseover:SetPoint("LEFT", custom_bar_size, "RIGHT", 130, 0)
+		-- Bar 7
+		local subheader = ns.addSubCategory(parent, BINDING_HEADER_ACTIONBAR.." 7")
+		subheader:SetPoint("TOPLEFT", bar6_size, "BOTTOMLEFT", 0, -10)
+
+		local bar7_enable = ns.CreateCheckBox(parent, "bar7_enable", ENABLE)
+		bar7_enable:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -10)
+
+		local bar7_num = ns.CreateNumberSlider(parent, "bar7_num", nil, nil, 0, 12, 1, true, L.actionbar_bar1_num)
+		bar7_num:SetPoint("TOPLEFT", bar7_enable, "BOTTOMLEFT", 0, -20)
+
+		local bar7_row = ns.CreateNumberSlider(parent, "bar7_row", nil, nil, 1, 12, 1, true, L.actionbar_bar1_row)
+		bar7_row:SetPoint("LEFT", bar7_num, "RIGHT", 120, 0)
+
+		local bar7_size = ns.CreateNumberSlider(parent, "bar7_size", nil, nil, 0, 50, 1, true, L_GUI_ACTIONBAR_BUTTON_SIZE)
+		bar7_size:SetPoint("TOPLEFT", bar7_num, "BOTTOMLEFT", 0, -20)
+
+		local bar7_mouseover = ns.CreateCheckBox(parent, "bar7_mouseover", L.actionbar_bar1_mouseover)
+		bar7_mouseover:SetPoint("LEFT", bar7_size, "RIGHT", 130, 0)
+
+		-- Bar 8
+		local subheader = ns.addSubCategory(parent, BINDING_HEADER_ACTIONBAR.." 8")
+		subheader:SetPoint("TOPLEFT", bar7_size, "BOTTOMLEFT", 0, -10)
+
+		local bar8_enable = ns.CreateCheckBox(parent, "bar8_enable", ENABLE)
+		bar8_enable:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -10)
+
+		local bar8_num = ns.CreateNumberSlider(parent, "bar8_num", nil, nil, 0, 12, 1, true, L.actionbar_bar1_num)
+		bar8_num:SetPoint("TOPLEFT", bar8_enable, "BOTTOMLEFT", 0, -20)
+
+		local bar8_row = ns.CreateNumberSlider(parent, "bar8_row", nil, nil, 1, 12, 1, true, L.actionbar_bar1_row)
+		bar8_row:SetPoint("LEFT", bar8_num, "RIGHT", 120, 0)
+
+		local bar8_size = ns.CreateNumberSlider(parent, "bar8_size", nil, nil, 0, 50, 1, true, L_GUI_ACTIONBAR_BUTTON_SIZE)
+		bar8_size:SetPoint("TOPLEFT", bar8_num, "BOTTOMLEFT", 0, -20)
+
+		local bar8_mouseover = ns.CreateCheckBox(parent, "bar8_mouseover", L.actionbar_bar1_mouseover)
+		bar8_mouseover:SetPoint("LEFT", bar8_size, "RIGHT", 130, 0)
 	end
 
 	local classic = {
@@ -2481,8 +2516,11 @@ do
 	local new_items = ns.CreateCheckBox(parent, "new_items")
 	new_items:SetPoint("TOPLEFT", ilvl, "BOTTOMLEFT", 0, 0)
 
+	local filter = ns.CreateCheckBox(parent, "filter")
+	filter:SetPoint("TOPLEFT", new_items, "BOTTOMLEFT", 0, 0)
+
 	local button_size = ns.CreateNumberSlider(parent, "button_size", nil, nil, 0, 50, 1, true, L_GUI_BAGS_BUTTON_SIZE)
-	button_size:SetPoint("TOPLEFT", new_items, "BOTTOMLEFT", 0, -20)
+	button_size:SetPoint("TOPLEFT", filter, "BOTTOMLEFT", 0, -20)
 
 	local button_space = ns.CreateNumberSlider(parent, "button_space", nil, nil, 0, 10, 1, true, L_GUI_BAGS_BUTTON_SPACE)
 	button_space:SetPoint("LEFT", button_size, "RIGHT", 120, 0)
@@ -2507,7 +2545,7 @@ do
 	local tracking_icon = ns.CreateCheckBox(parent, "tracking_icon", L_GUI_MINIMAP_ICON)
 	tracking_icon:SetPoint("TOPLEFT", on_top, "BOTTOMLEFT", 0, 0)
 
-	local garrison_icon = ns.CreateCheckBox(parent, "garrison_icon", L_GUI_GARRISON_ICON)
+	local garrison_icon = ns.CreateCheckBox(parent, "garrison_icon", DRAGONFLIGHT_LANDING_PAGE_TITLE)
 	garrison_icon:SetPoint("TOPLEFT", tracking_icon, "BOTTOMLEFT", 0, 0)
 
 	local size = ns.CreateNumberSlider(parent, "size", nil, nil, 0, 300, 1, true, L_GUI_MINIMAP_SIZE)
@@ -2926,7 +2964,7 @@ do
 		end
 		if not C.options["raidcooldown"]["spells_list"] then
 			C.options["raidcooldown"]["spells_list"] = T.raid_spells
-			C.options.raidcooldown.spells_list_ver = 2
+			C.options.raidcooldown.spells_list_ver = 3
 		end
 		if IsControlKeyDown() then
 			C.options["raidcooldown"]["spells_list"] = nil

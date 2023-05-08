@@ -30,6 +30,12 @@ elseif T.class == "DRUID" then
 		{Enum.ItemArmorSubclass.Mail, Enum.ItemArmorSubclass.Plate, Enum.ItemArmorSubclass.Shield},
 		true
 	}
+elseif T.class == "EVOKER" then
+	unusable = {
+		{Enum.ItemWeaponSubclass.Bows, Enum.ItemWeaponSubclass.Guns, Enum.ItemWeaponSubclass.Polearm, Enum.ItemWeaponSubclass.Warglaive, Enum.ItemWeaponSubclass.Thrown, Enum.ItemWeaponSubclass.Crossbow, Enum.ItemWeaponSubclass.Wand},
+		{Enum.ItemArmorSubclass.Plate, Enum.ItemArmorSubclass.Shield},
+		true
+	}
 elseif T.class == "HUNTER" then
 	unusable = {
 		{Enum.ItemWeaponSubclass.Mace1H, Enum.ItemWeaponSubclass.Mace2H, Enum.ItemWeaponSubclass.Warglaive, Enum.ItemWeaponSubclass.Thrown, Enum.ItemWeaponSubclass.Wand},
@@ -160,7 +166,11 @@ local function Stuffing_Open()
 end
 
 local function Stuffing_Close()
-	Stuffing.frame:Hide()
+	C_Timer.After(0.01, function() -- fix showing GameMenu when pressing ESC
+		if Stuffing.frame:IsShown() then
+			Stuffing.frame:Hide()
+		end
+	end)
 end
 
 local function Stuffing_Toggle()
@@ -204,7 +214,8 @@ function Stuffing:SlotUpdate(b)
 		-- isQuestItem, questId, isActiveQuest
 		if b.itemClassID == Enum.ItemClass.Questitem then isQuestItem = true end
 	else
-		isQuestItem, questId, isActiveQuest = GetContainerItemQuestInfo(b.bag, b.slot)
+		local questData = C_Container.GetContainerItemQuestInfo(b.bag, b.slot)
+		isQuestItem, questId, isActiveQuest = questData.isQuestItem, questData.questID, questData.isActive
 	end
 
 	-- Set all slot color to default ShestakUI on update
@@ -591,8 +602,8 @@ function Stuffing:BagFrameSlotNew(p, slot)
 		local tooltip_show = function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_LEFT", 19, 7)
 			GameTooltip:ClearLines()
-			if GetInventoryItemLink("player", ret.frame.ID) then
-				GameTooltip:SetInventoryItem("player", self:GetID())
+			if ret.quality then
+				GameTooltip:SetInventoryItem('player', self:GetID())
 			else
 				local text = ret.slot == 4 and EQUIP_CONTAINER_REAGENT or EQUIP_CONTAINER
 				GameTooltip:AddLine(text)
@@ -812,9 +823,9 @@ function Stuffing:SearchUpdate(str)
 				local _, setName = T.Mainline and GetContainerItemEquipmentSetInfo(b.bag, b.slot)
 				setName = setName or ""
 				local _, _, _, _, minLevel, class, subclass, _, equipSlot, _, _, _, _, bindType = GetItemInfo(ilink)
-				class = _G[class] or ""
-				subclass = _G[subclass] or ""
-				equipSlot = _G[equipSlot] or ""
+				class = class or ""
+				subclass = subclass or ""
+				equipSlot = equipSlot or ""
 				bindType = bind[bindType] or ""
 				minLevel = minLevel or 1
 				if not string.find(string.lower(b.name), str) and not string.find(string.lower(setName), str) and not string.find(string.lower(class), str) and not string.find(string.lower(subclass), str) and not string.find(string.lower(equipSlot), str) and not string.find(string.lower(bindType), str) then
@@ -866,9 +877,14 @@ function Stuffing:SearchReset()
 		if IsItemUnusable(b.name) or (b.level and b.level > T.level) then
 			_G[b.frame:GetName().."IconTexture"]:SetVertexColor(1, 0.1, 0.1)
 		end
-		b.frame:SetAlpha(1)
+		b.frame.searchOverlay:Hide()
 		SetItemButtonDesaturated(b.frame, false)
 	end
+
+	self.frame.editbox:SetText("")
+	self.frame.editbox:Hide()
+	self.frame.editbox:ClearFocus()
+	self.frame.detail:Show()
 end
 
 local function DragFunction(self, mode)
@@ -1053,24 +1069,24 @@ function Stuffing:InitBags()
 	-- Search editbox (tekKonfigAboutPanel.lua)
 	local editbox = CreateFrame("EditBox", nil, f)
 	editbox:Hide()
-	editbox:SetAutoFocus(true)
+	editbox:SetAutoFocus(false)
 	editbox:SetHeight(32)
-	editbox:CreateBackdrop("Default")
+	editbox:CreateBackdrop("Overlay")
 	editbox.backdrop:SetPoint("TOPLEFT", -2, 1)
 	editbox.backdrop:SetPoint("BOTTOMRIGHT", 2, -1)
 
 	local fullReset = function(self)
-		self:GetParent().detail:Show()
-		self:ClearFocus()
-		editbox:SetText("")
-		Stuffing:SearchUpdate("")
+		Stuffing:SearchReset()
 	end
 
-	-- local resetAndClear = function(self)
-	-- self:GetParent().detail:Show()
-	-- self:ClearFocus()
-	-- Stuffing:SearchReset()
-	-- end
+	local clearFocus = function(self)
+		self:HighlightText(0, 0)
+		self:ClearFocus()
+	end
+
+	local gainFocus = function(self)
+		self:HighlightText()
+	end
 
 	local updateSearch = function(self, t)
 		if t == true then
@@ -1078,26 +1094,73 @@ function Stuffing:InitBags()
 		end
 	end
 
-	local hideSearch = function(self)
-		self:Hide()
-		self:GetParent().detail:Show()
-	end
-
 	editbox:SetScript("OnEscapePressed", fullReset)
-	editbox:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
-	editbox:SetScript("OnEditFocusLost", hideSearch)
-	editbox:SetScript("OnEditFocusGained", function(self) self:HighlightText() end)
+	editbox:SetScript("OnEnterPressed", clearFocus)
+	editbox:SetScript("OnEditFocusLost", clearFocus)
+	editbox:SetScript("OnEditFocusGained", gainFocus)
 	editbox:SetScript("OnTextChanged", updateSearch)
-	editbox:SetText(SEARCH)
+	-- editbox:SetText(SEARCH)
 
 	local detail = f:CreateFontString(nil, "ARTWORK", "GameFontHighlightLarge")
-	detail:SetPoint("TOPLEFT", f, 11, -10)
-	detail:SetPoint("RIGHT", f, -140, -10)
+	detail:SetPoint("TOPLEFT", f, 12, -8)
+	detail:SetPoint("RIGHT", f, -150, -8)
 	detail:SetHeight(13)
 	detail:SetShadowColor(0, 0, 0, 0)
 	detail:SetJustifyH("LEFT")
 	detail:SetText("|cff9999ff"..SEARCH.."|r")
 	editbox:SetAllPoints(detail)
+
+	local buttons = {}
+	local filterTable = {
+		[1] = {3566860, GetItemClassInfo(0)},	-- Consumable
+		[2] = {135280, GetItemClassInfo(2)},	-- Weapon
+		[3] = {132341, GetItemClassInfo(4)},	-- Armor
+		[4] = {132281, GetItemClassInfo(7)},	-- Tradeskill
+		[5] = {236667, ITEM_BIND_QUEST},		-- Quest
+		[6] = {133784, ITEM_BIND_ON_EQUIP},		-- BoE
+	}
+	for i = 1, #filterTable do
+		local button = CreateFrame("Button", "BagsFilterButton"..i, C.bag.filter and f or editbox)
+		button:SetSize(25, 25)
+		button:SetTemplate("Overlay")
+		button:EnableMouse(true)
+		button:RegisterForClicks("AnyUp")
+		if i == 1 then
+			button:SetPoint("TOPRIGHT", f, "TOPLEFT", -1, 0)
+		else
+			button:SetPoint("TOP", buttons[i-1], "BOTTOM", 0, -1)
+		end
+		buttons[i] = button
+		local icon, text = unpack(filterTable[i])
+		button.Icon = button:CreateTexture(nil, "OVERLAY")
+		button.Icon:SetTexture(icon)
+		button.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+		button.Icon:SetPoint("TOPLEFT", button, 2, -2)
+		button.Icon:SetPoint("BOTTOMRIGHT", button, -2, 2)
+		button:SetScript("OnClick", function(self)
+			if editbox:GetText() == text then
+				Stuffing:SearchReset()
+			else
+				detail:Hide()
+				editbox:Show()
+				editbox:SetText(text)
+				Stuffing:SearchUpdate(text)
+			end
+		end)
+
+		local tooltip_hide = function()
+			GameTooltip:Hide()
+		end
+
+		local tooltip_show = function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT", -5, 5)
+			GameTooltip:ClearLines()
+			GameTooltip:SetText(text)
+		end
+
+		button:SetScript("OnEnter", tooltip_show)
+		button:SetScript("OnLeave", tooltip_hide)
+	end
 
 	local button = CreateFrame("Button", nil, f)
 	button:EnableMouse(true)
@@ -1109,11 +1172,9 @@ function Stuffing:InitBags()
 			self:GetParent().detail:Hide()
 			self:GetParent().editbox:Show()
 			self:GetParent().editbox:HighlightText()
+			self:GetParent().editbox:SetFocus()
 		else
 			if self:GetParent().editbox:IsShown() then
-				self:GetParent().editbox:Hide()
-				self:GetParent().editbox:ClearFocus()
-				self:GetParent().detail:Show()
 				Stuffing:SearchReset()
 			end
 		end
@@ -1158,10 +1219,6 @@ function Stuffing:Layout(isBank)
 		f.editbox:SetFont(C.media.normal_font, C.font.bags_font_size + 3, "")
 		f.detail:SetFont(C.font.bags_font, C.font.bags_font_size, C.font.bags_font_style)
 		f.detail:SetShadowOffset(C.font.bags_font_shadow and 1 or 0, C.font.bags_font_shadow and -1 or 0)
-
-		f.detail:ClearAllPoints()
-		f.detail:SetPoint("TOPLEFT", f, 12, -8)
-		f.detail:SetPoint("RIGHT", f, -140, 0)
 	end
 
 	f:SetClampedToScreen(1)
@@ -1371,11 +1428,13 @@ function Stuffing:ADDON_LOADED(addon)
 	self:RegisterEvent("BANKFRAME_CLOSED")
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
 	self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
-	if not T.Vanilla then
+	if T.TBC or T.Wrath then
 		self:RegisterEvent("GUILDBANKFRAME_OPENED")
 		self:RegisterEvent("GUILDBANKFRAME_CLOSED")
 	end
 	if T.Mainline then
+		self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
+		self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
 		self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
 		self:RegisterEvent("BAG_CONTAINER_UPDATE")
 	end
@@ -1509,6 +1568,24 @@ function Stuffing:GUILDBANKFRAME_CLOSED()
 	Stuffing_Close()
 end
 
+function Stuffing:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(...)
+	local type = ...
+	if type == 10 then	-- Guild bank
+		Stuffing_Open()
+	elseif type == 40 then	-- ScrappingMachine
+		for i = 0, #BAGS_BACKPACK - 1 do
+			Stuffing:BAG_UPDATE(i)
+		end
+	end
+end
+
+function Stuffing:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(...)
+	local type = ...
+	if type == 10 then	-- Guild bank
+		Stuffing_Close()
+	end
+end
+
 function Stuffing:BAG_CLOSED(id)
 	local b = self.bags[id]
 	if b then
@@ -1546,12 +1623,6 @@ end
 function Stuffing:BAG_UPDATE_COOLDOWN()
 	for _, v in pairs(self.buttons) do
 		self:UpdateCooldowns(v)
-	end
-end
-
-function Stuffing:SCRAPPING_MACHINE_SHOW()
-	for i = 0, #BAGS_BACKPACK - 1 do
-		Stuffing:BAG_UPDATE(i)
 	end
 end
 
@@ -1670,16 +1741,19 @@ function Stuffing:SortBags()
 		group.itemList = {}
 		for _, bagSlot in pairs(group.bagSlotNumbers) do
 			for itemSlot = 1, GetContainerNumSlots(bagSlot) do
-
 				local itemLink = GetContainerItemLink(bagSlot, itemSlot)
 				if itemLink ~= nil then
-
 					local newItem = {}
 
-					local n, _, q, iL, rL, c1, c2, _, Sl = GetItemInfo(itemLink)
+					local n, _, q, iL, rL, c1, c2, _, Sl, _, _, classID = GetItemInfo(itemLink)
+					local p = 1
 					-- Hearthstone
 					if n == GetItemInfo(6948) or n == GetItemInfo(110560) or n == GetItemInfo(140192) then
-						q = 9
+						p = 99
+					elseif n == GetItemInfo(141605) then -- Flight Master's Whistle
+						p = 98
+					elseif n == GetItemInfo(128353) then -- Admiral's Compass
+						p = 97
 					end
 					-- Fix for battle pets
 					if not n then
@@ -1692,7 +1766,19 @@ function Stuffing:SortBags()
 						Sl = ""
 					end
 
-					newItem.sort = q..c1..c2..rL..n..iL..Sl
+					-- Keystone
+					local ks = strmatch(itemLink, "keystone:(%d+)")
+					if ks then
+						p = 10
+					end
+
+					if classID == 0 then	-- Consumable
+						p = 9
+					elseif classID == 2 or classID == 4 then	-- Weapon and Armor
+						p = 8
+					end
+
+					newItem.sort = p..q..c1..c2..rL..n..iL..Sl
 
 					tinsert(group.itemList, newItem)
 

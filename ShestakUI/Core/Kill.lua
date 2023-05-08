@@ -71,6 +71,7 @@ frame:SetScript("OnEvent", function(_, _, addon)
 	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_PET_JOURNAL, true)
 	if T.Mainline then
 		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_GARRISON_BUILDING, true)
+		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TALENT_CHANGES, true)
 	end
 
 	SetCVar("countdownForCooldowns", 0)
@@ -107,6 +108,10 @@ frame:SetScript("OnEvent", function(_, _, addon)
 			if not InCombatLockdown() then
 				SetCVar("multiBarRightVerticalLayout", 0)
 			end
+		else
+			--if not InCombatLockdown() then
+			--	SetCVar("multiBarRightVerticalLayout", 0)
+			--end
 		end
 	end
 
@@ -142,10 +147,6 @@ frame:SetScript("OnEvent", function(_, _, addon)
 		else
 			SetCVar("enableFloatingCombatText", 0)
 		end
-	end
-
-	if T.Mainline then
-		SetCVar("ActionButtonUseKeyDown", 0) -- BETA
 	end
 end)
 

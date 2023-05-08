@@ -4,7 +4,6 @@ if C.actionbar.enable ~= true then return end
 ----------------------------------------------------------------------------------------
 --	Style ActionBars buttons(by Tukz)
 ----------------------------------------------------------------------------------------
-local NUM_STANCE_SLOTS = NUM_STANCE_SLOTS or 10
 local function StyleNormalButton(button, size)
 	if not button.isSkinned then
 		local name = button:GetName()
@@ -136,7 +135,7 @@ local function StyleNormalButton(button, size)
 		button.iborder:SetFrameLevel(button:GetFrameLevel())
 
 		if button.QuickKeybindHighlightTexture then
-			button.QuickKeybindHighlightTexture:SetTexture(0)
+			button.QuickKeybindHighlightTexture:SetScale(0.0001)
 		end
 
 		if flyoutBorder then
@@ -232,7 +231,7 @@ local function StyleSmallButton(normal, button, icon, name, pet)
 end
 
 function T.StyleShift()
-	for i = 1, NUM_STANCE_SLOTS do
+	for i = 1, 10 do
 		local name = "StanceButton"..i
 		local button = _G[name]
 		local icon = _G[name.."Icon"]
@@ -263,11 +262,10 @@ frame:SetScript("OnEvent", function(self, event)
 		if T.Wrath then
 			StyleNormalButton(_G["MultiCastActionButton"..i])
 		end
-	end
-
-	if T.Mainline and C.actionbar.custom_bar_enable then
-		for i = 1, 12 do
-			StyleNormalButton(_G["CustomBarButton"..i], C.actionbar.custom_bar_size)
+		if T.Mainline then
+			StyleNormalButton(_G["MultiBar5Button"..i], C.actionbar.editor and C.actionbar.bar6_size)
+			StyleNormalButton(_G["MultiBar6Button"..i], C.actionbar.bar7_size)
+			StyleNormalButton(_G["MultiBar7Button"..i], C.actionbar.bar8_size)
 		end
 	end
 
@@ -313,10 +311,6 @@ end
 
 if T.Mainline then
 	SpellFlyout:HookScript("OnShow", StyleFlyoutButton)
-	--BETA hooksecurefunc("SpellButton_OnClick", StyleFlyoutButton)
-	-- SpellFlyoutHorizontalBackground:SetAlpha(0)
-	-- SpellFlyoutVerticalBackground:SetAlpha(0)
-	-- SpellFlyoutBackgroundEnd:SetAlpha(0)
 	SpellFlyout.Background:Hide()
 end
 
@@ -368,6 +362,11 @@ if C.actionbar.hotkey == true then
 			UpdateHotkey(_G["MultiBarRightButton"..i])
 			if T.Wrath then
 				UpdateHotkey(_G["MultiCastActionButton"..i])
+			end
+			if T.Mainline then
+				UpdateHotkey(_G["MultiBar5Button"..i])
+				UpdateHotkey(_G["MultiBar6Button"..i])
+				UpdateHotkey(_G["MultiBar7Button"..i])
 			end
 		end
 		for i = 1, 10 do

@@ -40,7 +40,9 @@ T.MoverFrames = {
 	T_DE_BUFF_BAR_Anchor,
 	SplitBarLeft,
 	SplitBarRight,
-	CustomBarAnchor
+	Bar7Holder,
+	Bar8Holder,
+	UIWidgetPowerBarAnchor
 }
 
 local unitFrames = {
@@ -82,6 +84,7 @@ if C.actionbar.editor then
 	tinsert(T.MoverFrames, Bar3Holder)
 	tinsert(T.MoverFrames, Bar4Holder)
 	tinsert(T.MoverFrames, Bar5Holder)
+	tinsert(T.MoverFrames, Bar6Holder)
 	tremove(T.MoverFrames, 5)	-- RightActionBarAnchor
 	tremove(T.MoverFrames, 4)	-- ActionBarAnchor
 end
@@ -456,24 +459,6 @@ local RestoreUI = function(self)
 		return
 	end
 	if ShestakUIPositions then
-		-- TODO: delete after while
-		if ShestakUIPositions.UnitFrame then
-			for frame_name, point in pairs(ShestakUIPositions.UnitFrame) do
-				if _G[frame_name] then
-					for _, frame in pairs(unitFrames) do
-						if frame:GetName() and frame:GetName() == _G[frame_name]:GetName() then
-							_G[frame_name]:ClearAllPoints()
-							_G[frame_name]:SetPoint(unpack(point))
-							ShestakUIPositions[frame_name] = point
-						end
-					end
-				end
-			end
-			ShestakUIPositions.UnitFrame = nil
-			ShestakUIPositions.UFPos = nil
-		end
-		-- End of block to delete
-
 		for frame_name, point in pairs(ShestakUIPositions) do
 			if _G[frame_name] then
 				_G[frame_name]:ClearAllPoints()

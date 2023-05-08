@@ -316,15 +316,26 @@ C["actionbar"] = {
 	["bar4_mouseover"] = false,					-- Bar on mouseover
 	-- Bar 5
 	["bar5_num"] = 12,							-- Number of buttons
-	["bar5_row"] = 1,							-- Buttons per row
+	["bar5_row"] = 12,							-- Buttons per row
 	["bar5_size"] = 25,							-- Buttons size
 	["bar5_mouseover"] = false,					-- Bar on mouseover
-	-- Custom Bar
-	["custom_bar_enable"] = false,				-- Enable custom bar 6
-	["custom_bar_num"] = 12,					-- Number of buttons
-	["custom_bar_row"] = 12,					-- Buttons per row
-	["custom_bar_size"] = 25,					-- Buttons size
-	["custom_bar_mouseover"] = false,			-- Bar on mouseover
+	-- Bar 6
+	["bar6_num"] = 12,							-- Number of buttons
+	["bar6_row"] = 1,							-- Buttons per row
+	["bar6_size"] = 25,							-- Buttons size
+	["bar6_mouseover"] = false,					-- Bar on mouseover
+	-- Bar 7
+	["bar7_enable"] = false,					-- Enable custom bar 7
+	["bar7_num"] = 12,							-- Number of buttons
+	["bar7_row"] = 12,							-- Buttons per row
+	["bar7_size"] = 25,							-- Buttons size
+	["bar7_mouseover"] = false,					-- Bar on mouseover
+	-- Bar 8
+	["bar8_enable"] = false,					-- Enable custom bar 8
+	["bar8_num"] = 12,							-- Number of buttons
+	["bar8_row"] = 12,							-- Buttons per row
+	["bar8_size"] = 25,							-- Buttons size
+	["bar8_mouseover"] = false,					-- Bar on mouseover
 }
 
 if T.Classic then
@@ -483,6 +494,7 @@ C["bag"] = {
 	["enable"] = true,							-- Enable bags
 	["ilvl"] = false,							-- Show item level for weapons and armor
 	["new_items"] = false,						-- Show animation for new items
+	["filter"] = false,							-- Always show filter buttons
 	["button_size"] = 27,						-- Buttons size
 	["button_space"] = 3,						-- Buttons space
 	["bank_columns"] = 17,						-- Horizontal number of columns in bank

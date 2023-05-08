@@ -10,8 +10,9 @@ local guardianelixirbuffs = T.ReminderBuffs["GuardianElixir"]
 local foodbuffs = T.ReminderBuffs["Food"]
 local staminabuffs = T.ReminderBuffs["Stamina"]
 local versbuffs = T.ReminderBuffs["Vers"]
+local reducebuffs = T.ReminderBuffs["Reduce"]
 local custombuffs = T.ReminderBuffs["Custom"]
-local visible, flask, battleelixir, guardianelixir, food, stamina, vers, spell4, custom, weapon, armor
+local visible, flask, battleelixir, guardianelixir, food, stamina, vers, spell4, reduce, custom, weapon, armor
 local playerBuff = {}
 local icons = {}
 local UpdatePositions
@@ -77,9 +78,6 @@ local function CheckWeaponBuff()
 	end
 end
 
-local scanner = CreateFrame("GameTooltip", "ArmorScanningTooltip", nil, "GameTooltipTemplate")
-scanner:SetOwner(UIParent, "ANCHOR_NONE")
-
 local KitPattern = "(.+) %(%d+ .+%)$"
 if T.client == "zhTW" then
 	KitPattern = "%(%+%d+.+"
@@ -91,13 +89,15 @@ end
 
 local function CheckArmorBuff()
 	local armorBuff = false
-	local hasItem = scanner:SetInventoryItem("player", 5)
-	if hasItem then
-		for i = 2, scanner:NumLines() do
-			local tooltipLine = _G["ArmorScanningTooltipTextLeft"..i]
-			local text = tooltipLine:GetText()
-			if text and text ~= "" then
-				if text:find(KitPattern) then
+	local data = C_TooltipInfo.GetInventoryItem("player", 5)
+	if data then
+		for i = 2, #data.lines do
+			local lineData = data.lines[i]
+			local argVal = lineData and lineData.args
+			if argVal then
+				local text = argVal[2] and argVal[2].stringVal
+				local found = text and strfind(text, KitPattern)
+				if found then
 					armorBuff = true
 					break
 				end
@@ -217,6 +217,21 @@ local function OnAuraChange()
 		end
 	end
 
+	for i = 1, #reducebuffs do
+		local name, icon = unpack(reducebuffs[i])
+		if i == 1 then
+			ReduceFrame.t:SetTexture(icon)
+		end
+		if playerBuff[name] then
+			ReduceFrame:SetAlpha(C.reminder.raid_buffs_alpha)
+			reduce = true
+			break
+		else
+			ReduceFrame:SetAlpha(1)
+			reduce = false
+		end
+	end
+
 	if #custombuffs > 0 then
 		for i = 1, #custombuffs do
 			local name, icon = unpack(custombuffs[i])
@@ -242,7 +257,7 @@ local function OnAuraChange()
 	if (not IsInGroup() or instanceType ~= "raid") and C.reminder.raid_buffs_always == false then
 		RaidBuffReminder:SetAlpha(0)
 		visible = false
-	elseif flask == true and food == true and stamina == true and spell4 == true and custom == true and weapon == true and armor == true and vers == true then
+	elseif flask == true and food == true and stamina == true and spell4 == true and custom == true and weapon == true and armor == true and vers == true and reduce == true then
 		if not visible then
 			RaidBuffReminder:SetAlpha(0)
 			visible = false
@@ -283,6 +298,7 @@ local buffButtons = {
 	"StaminaFrame",
 	"VersFrame",
 	"Spell4Frame",
+	"ReduceFrame",
 	"CustomFrame",
 }
 
@@ -311,7 +327,6 @@ function UpdatePositions()
 		local buff = icons[i]
 		buff:ClearAllPoints()
 		if buff:GetAlpha() == C.reminder.raid_buffs_alpha then
-			-- buff:SetPoint("TOP", UIParent, "TOP", 0, 900)
 			line = line + 1
 		else
 			if not first then

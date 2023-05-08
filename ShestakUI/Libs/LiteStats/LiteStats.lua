@@ -267,17 +267,17 @@ if clock.enabled then
 	}
 
 	-- Torghast
-	local TorghastWidgets, TorghastInfo = {
-		{nameID = 2925, levelID = 2930},	-- Fracture Chambers
-		{nameID = 2926, levelID = 2932},	-- Skoldus Hall
-		{nameID = 2924, levelID = 2934},	-- Soulforges
-		{nameID = 2927, levelID = 2936},	-- Coldheart Interstitia
-		{nameID = 2928, levelID = 2938},	-- Mort'regar
-		{nameID = 2929, levelID = 2940},	-- The Upper Reaches
-	}
-	local function CleanupLevelName(text)
-		return gsub(text, "|n", "")
-	end
+	--local TorghastWidgets, TorghastInfo = {
+	--	{nameID = 2925, levelID = 2930},	-- Fracture Chambers
+	--	{nameID = 2926, levelID = 2932},	-- Skoldus Hall
+	--	{nameID = 2924, levelID = 2934},	-- Soulforges
+	--	{nameID = 2927, levelID = 2936},	-- Coldheart Interstitia
+	--	{nameID = 2928, levelID = 2938},	-- Mort'regar
+	--	{nameID = 2929, levelID = 2940},	-- The Upper Reaches
+	--}
+	--local function CleanupLevelName(text)
+	--	return gsub(text, "|n", "")
+	--end
 
 	Inject("Clock", {
 		text = {
@@ -348,31 +348,31 @@ if clock.enabled then
 
 
 				-- Torghast
-				if not TorghastInfo then
-					TorghastInfo = C_AreaPoiInfo.GetAreaPOIInfo(1543, 6640)
-				end
-
-				local TorghastTitle
-				if TorghastInfo and C_QuestLog.IsQuestFlaggedCompleted(60136) then
-					for _, value in pairs(TorghastWidgets) do
-						local nameInfo = C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo(value.nameID)
-						if nameInfo and nameInfo.shownState == 1 then
-							if not TorghastTitle then
-								GameTooltip:AddLine(" ")
-								GameTooltip:AddLine(TorghastInfo.name, ttsubh.r, ttsubh.g, ttsubh.b)
-								TorghastTitle = true
-							end
-							local nameText = CleanupLevelName(nameInfo.text)
-							local levelInfo = C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo(value.levelID)
-							local levelText = AVAILABLE
-							if levelInfo and levelInfo.shownState == 1 then
-								levelText = CleanupLevelName(levelInfo.text)
-							end
-							GameTooltip:AddDoubleLine(nameText, levelText)
-						end
-
-					end
-				end
+				--if not TorghastInfo then
+				--	TorghastInfo = C_AreaPoiInfo.GetAreaPOIInfo(1543, 6640)
+				--end
+				--
+				--local TorghastTitle
+				--if TorghastInfo and C_QuestLog.IsQuestFlaggedCompleted(60136) then
+				--	for _, value in pairs(TorghastWidgets) do
+				--		local nameInfo = C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo(value.nameID)
+				--		if nameInfo and nameInfo.shownState == 1 then
+				--			if not TorghastTitle then
+				--				GameTooltip:AddLine(" ")
+				--				GameTooltip:AddLine(TorghastInfo.name, ttsubh.r, ttsubh.g, ttsubh.b)
+				--				TorghastTitle = true
+				--			end
+				--			local nameText = CleanupLevelName(nameInfo.text)
+				--			local levelInfo = C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo(value.levelID)
+				--			local levelText = AVAILABLE
+				--			if levelInfo and levelInfo.shownState == 1 then
+				--				levelText = CleanupLevelName(levelInfo.text)
+				--			end
+				--			GameTooltip:AddDoubleLine(nameText, levelText)
+				--		end
+				--
+				--	end
+				--end
 
 
 				-- In 9.0 seals not available
@@ -1145,8 +1145,10 @@ end
 if durability.enabled then
 	Inject("Durability", {
 		OnLoad = function(self)
-			CreateFrame("GameTooltip", "LPDURA", nil, "GameTooltipTemplate")
-			LPDURA:SetOwner(WorldFrame, "ANCHOR_NONE")
+			if T.Classic then
+				CreateFrame("GameTooltip", "LPDURA", nil, "GameTooltipTemplate")
+				LPDURA:SetOwner(WorldFrame, "ANCHOR_NONE")
+			end
 			if durability.man then DurabilityFrame.Show = DurabilityFrame.Hide end
 			RegEvents(self, "UPDATE_INVENTORY_DURABILITY MERCHANT_SHOW PLAYER_LOGIN")
 		end,
@@ -1170,11 +1172,26 @@ if durability.enabled then
 								total = GetRepairAllCost(); RepairAllItems()
 							else
 								for id = 1, 18 do
-									local cost = select(3, LPDURA:SetInventoryItem(P, id))
-									if cost ~= 0 and cost <= GetMoney() then
-										if not InRepairMode() then ShowRepairCursor() end
-										PickupInventoryItem(id)
-										total = total + cost
+									if T.Classic then
+										local cost = select(3, LPDURA:SetInventoryItem(P, id))
+										if cost ~= 0 and cost <= GetMoney() then
+											if not InRepairMode() then ShowRepairCursor() end
+											PickupInventoryItem(id)
+											total = total + cost
+										end
+									else
+										local data = C_TooltipInfo.GetInventoryItem(P, id)
+										if data then
+											local argVal = data.args and data.args[7]
+											if argVal and argVal.field == "repairCost" then
+												local cost = argVal.intVal
+												if cost ~= 0 and cost <= GetMoney() then
+													if not InRepairMode() then ShowRepairCursor() end
+													PickupInventoryItem(id)
+													total = total + cost
+												end
+											end
+										end
 									end
 								end
 							end
