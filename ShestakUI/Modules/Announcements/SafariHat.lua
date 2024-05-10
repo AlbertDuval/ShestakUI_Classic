@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.announcements.safari_hat ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ announceFrame:SetScript("OnEvent", function(_, event)
 				end
 			end
 			if maxlevel then return end
-			PlaySound(SOUNDKIT.RAID_WARNING, "master")
+			PlaySound(12867, "master")
 			RaidNotice_AddMessage(RaidWarningFrame, RESISTANCE_NONE.." "..GetSpellLink(158486).."!", ChatTypeInfo["RAID_WARNING"])
 			print("|cffff3300"..RESISTANCE_NONE.." "..GetSpellLink(158486).."|cffff3300!|r")
 		end

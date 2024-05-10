@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -30,7 +30,9 @@ local function LoadSkin()
 	DressUpFrameCancelButton:SkinButton()
 	DressUpFrameResetButton:SkinButton()
 	DressUpFrameResetButton:SetPoint("RIGHT", DressUpFrameCancelButton, "LEFT", -2, 0)
-	DressUpFrameUndressButton:SkinButton()
+	if DressUpFrameUndressButton then
+		DressUpFrameUndressButton:SkinButton()
+	end
 end
 
 table.insert(T.SkinFuncs["ShestakUI"], LoadSkin)

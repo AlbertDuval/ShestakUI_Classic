@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.plugins_swing ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -12,8 +12,8 @@ if T.Classic then
 	swingResets = {
 		[GetSpellInfo(6807)]	= true, -- Maul
 		[GetSpellInfo(2973)] 	= true, -- Raptor Strike
-		[GetSpellInfo(845)]	= true, -- Cleave
-		[GetSpellInfo(78)]	= true, -- Heroic Strike
+		[GetSpellInfo(845)]		= true, -- Cleave
+		[GetSpellInfo(78)]		= true, -- Heroic Strike
 		[GetSpellInfo(1464)]	= true, -- Slam
 	}
 end

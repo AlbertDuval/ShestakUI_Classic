@@ -1,22 +1,19 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Move ObjectiveTrackerFrame and hide background
 ----------------------------------------------------------------------------------------
-local frame = CreateFrame("Frame", "ObjectiveTrackerAnchor", UIParent)
-frame:SetPoint(unpack(C.position.quest))
-frame:SetSize(224, 150)
-
-ObjectiveTrackerFrame:ClearAllPoints()
-ObjectiveTrackerFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, 0)
-ObjectiveTrackerFrame:SetHeight(T.screenHeight / 1.6)
+local anchor = CreateFrame("Frame", "ObjectiveTrackerAnchor", UIParent)
+anchor:SetPoint(C.position.quest[1], C.position.quest[2], C.position.quest[3], C.position.quest[4], C.position.quest[5] - (C.actionbar.micromenu and 27 or 0))
+anchor:SetSize(224, 150)
 
 ObjectiveTrackerFrame.IsUserPlaced = function() return true end
+ObjectiveTrackerFrame:SetClampedToScreen(false)
 
 hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(_, _, parent)
-	if parent ~= frame then
+	if parent ~= anchor then
 		ObjectiveTrackerFrame:ClearAllPoints()
-		ObjectiveTrackerFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, -20)
+		ObjectiveTrackerFrame:SetPoint("TOPLEFT", anchor, "TOPLEFT", 20, 3)
 	end
 end)
 
@@ -28,7 +25,8 @@ local headers = {
 	QUEST_TRACKER_MODULE,
 	ACHIEVEMENT_TRACKER_MODULE,
 	WORLD_QUEST_TRACKER_MODULE,
-	PROFESSION_RECIPE_TRACKER_MODULE
+	PROFESSION_RECIPE_TRACKER_MODULE,
+	MONTHLY_ACTIVITIES_TRACKER_MODULE
 }
 
 for i = 1, #headers do
@@ -296,7 +294,9 @@ if C.automation.auto_collapse ~= "NONE" then
 	collapse:SetScript("OnEvent", function()
 		if C.automation.auto_collapse == "RAID" then
 			if IsInInstance() then
-				ObjectiveTracker_Collapse()
+				C_Timer.After(0.1, function()
+					ObjectiveTracker_Collapse()
+				end)
 			elseif ObjectiveTrackerFrame.collapsed and not InCombatLockdown() then
 				ObjectiveTracker_Expand()
 			end
@@ -313,7 +313,9 @@ if C.automation.auto_collapse ~= "NONE" then
 						end
 					end)
 				else
-					ObjectiveTracker_Collapse()
+					C_Timer.After(0.1, function()
+						ObjectiveTracker_Collapse()
+					end)
 				end
 			else
 				if not InCombatLockdown() then
@@ -329,23 +331,33 @@ if C.automation.auto_collapse ~= "NONE" then
 				end
 			end
 		elseif C.automation.auto_collapse == "RELOAD" then
-			ObjectiveTracker_Collapse()
+			C_Timer.After(0.1, function()
+				ObjectiveTracker_Collapse()
+			end)
 		end
 	end)
 end
 
 ----------------------------------------------------------------------------------------
---	Skin simple quest objective progress bar
+--	Skin quest objective progress bar
 ----------------------------------------------------------------------------------------
-local function SkinBar(_, _, line)
+local function SkinProgressBar(_, _, line)
 	local progressBar = line.ProgressBar
 	local bar = progressBar.Bar
 	local label = bar.Label
+	local icon = bar.Icon
 
 	if not progressBar.styled then
+		if bar.BarFrame then bar.BarFrame:Hide() end
+		if bar.BarFrame2 then bar.BarFrame2:Hide() end
+		if bar.BarFrame3 then bar.BarFrame3:Hide() end
+		if bar.BarGlow then bar.BarGlow:Hide() end
+		if bar.Sheen then bar.Sheen:Hide() end
+		if bar.IconBG then bar.IconBG:SetAlpha(0) end
 		if bar.BorderLeft then bar.BorderLeft:SetAlpha(0) end
 		if bar.BorderRight then bar.BorderRight:SetAlpha(0) end
 		if bar.BorderMid then bar.BorderMid:SetAlpha(0) end
+
 		bar:SetSize(200, 16)
 		bar:SetStatusBarTexture(C.media.texture)
 		bar:CreateBackdrop("Transparent")
@@ -355,59 +367,33 @@ local function SkinBar(_, _, line)
 		label:SetFont(C.media.pixel_font, C.media.pixel_font_size, C.media.pixel_font_style)
 		label:SetDrawLayer("OVERLAY")
 
-		progressBar.styled = true
-	end
-end
+		if icon then
+			icon:SetPoint("RIGHT", 26, 0)
+			icon:SetSize(20, 20)
+			icon:SetMask("")
 
-hooksecurefunc(QUEST_TRACKER_MODULE, "AddProgressBar", SkinBar)
-hooksecurefunc(CAMPAIGN_QUEST_TRACKER_MODULE, "AddProgressBar", SkinBar)
-hooksecurefunc(SCENARIO_TRACKER_MODULE, "AddProgressBar", SkinBar)
+			local border = CreateFrame("Frame", "$parentBorder", bar)
+			border:SetAllPoints(icon)
+			border:SetTemplate("Transparent")
+			border:SetBackdropColor(0, 0, 0, 0)
+			bar.newIconBg = border
 
-----------------------------------------------------------------------------------------
---	Skin quest objective progress bar with icon
-----------------------------------------------------------------------------------------
-local function SkinBarIcon(_, _, line)
-	local progressBar = line.ProgressBar
-	local bar = progressBar.Bar
-	local label = bar.Label
-	local icon = bar.Icon
+			hooksecurefunc(bar.AnimIn, "Play", function()
+				bar.AnimIn:Stop()
+			end)
+		end
 
-	if not progressBar.styled then
-		bar.BarFrame:Hide()
-		bar.BarGlow:Kill()
-		bar.Sheen:Hide()
-		bar.IconBG:Kill()
-		bar:SetSize(200, 16)
-		bar:SetStatusBarTexture(C.media.texture)
-		bar:CreateBackdrop("Transparent")
-
-		label:ClearAllPoints()
-		label:SetPoint("CENTER", 0, -1)
-		label:SetFont(C.media.pixel_font, C.media.pixel_font_size, C.media.pixel_font_style)
-
-		icon:SetPoint("RIGHT", 26, 0)
-		icon:SetSize(20, 20)
-		icon:SetMask("")
-
-		local border = CreateFrame("Frame", "$parentBorder", bar)
-		border:SetAllPoints(icon)
-		border:SetTemplate("Transparent")
-		border:SetBackdropColor(0, 0, 0, 0)
-		bar.newIconBg = border
-
-		hooksecurefunc(bar.AnimIn, "Play", function()
-			bar.AnimIn:Stop()
-		end)
-
-		BonusObjectiveTrackerProgressBar_PlayFlareAnim = T.dummy
 		progressBar.styled = true
 	end
 
-	bar.newIconBg:SetShown(icon:IsShown())
+	if bar.newIconBg then bar.newIconBg:SetShown(icon:IsShown()) end
 end
 
-hooksecurefunc(BONUS_OBJECTIVE_TRACKER_MODULE, "AddProgressBar", SkinBarIcon)
-hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddProgressBar", SkinBarIcon)
+hooksecurefunc(QUEST_TRACKER_MODULE, "AddProgressBar", SkinProgressBar)
+hooksecurefunc(CAMPAIGN_QUEST_TRACKER_MODULE, "AddProgressBar", SkinProgressBar)
+hooksecurefunc(SCENARIO_TRACKER_MODULE, "AddProgressBar", SkinProgressBar)
+hooksecurefunc(BONUS_OBJECTIVE_TRACKER_MODULE, "AddProgressBar", SkinProgressBar)
+hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddProgressBar", SkinProgressBar)
 
 ----------------------------------------------------------------------------------------
 --	Skin Timer bar
@@ -417,10 +403,12 @@ local function SkinTimer(_, _, line)
 	local bar = timerBar.Bar
 
 	if not timerBar.styled then
+		if bar.BorderLeft then bar.BorderLeft:SetAlpha(0) end
+		if bar.BorderRight then bar.BorderRight:SetAlpha(0) end
+		if bar.BorderMid then bar.BorderMid:SetAlpha(0) end
+
 		bar:SetStatusBarTexture(C.media.texture)
-		bar:SetTemplate("Transparent")
-		bar:SetBackdropColor(0, 0, 0, 0)
-		bar:DisableDrawLayer("ARTWORK")
+		bar:CreateBackdrop("Transparent")
 		timerBar.styled = true
 	end
 end
@@ -451,11 +439,12 @@ end)
 --	Kill reward animation when finished dungeon or bonus objectives
 ----------------------------------------------------------------------------------------
 ObjectiveTrackerScenarioRewardsFrame.Show = T.dummy
+BonusObjectiveTrackerProgressBar_PlayFlareAnim = T.dummy
 
-hooksecurefunc("BonusObjectiveTracker_AnimateReward", function()
-	ObjectiveTrackerBonusRewardsFrame:ClearAllPoints()
-	ObjectiveTrackerBonusRewardsFrame:SetPoint("BOTTOM", UIParent, "TOP", 0, 90)
-end)
+--BETA hooksecurefunc("BonusObjectiveTracker_AnimateReward", function()
+	-- ObjectiveTrackerBonusRewardsFrame:ClearAllPoints()
+	-- ObjectiveTrackerBonusRewardsFrame:SetPoint("BOTTOM", UIParent, "TOP", 0, 90)
+-- end)
 
 ----------------------------------------------------------------------------------------
 --	Skin ScenarioStageBlock
@@ -479,16 +468,35 @@ ChallengeBlock.backdrop:SetPoint("BOTTOMRIGHT", ChallengeBlock, -6, 3)
 ChallengeBlock.backdrop.overlay:SetVertexColor(0.12, 0.12, 0.12, 1)
 
 local bg = select(3, ChallengeBlock:GetRegions())
-bg:Hide()
+bg:SetAlpha(0)
 
-ChallengeBlock.TimerBGBack:Hide()
-ChallengeBlock.TimerBG:Hide()
+ChallengeBlock.TimerBGBack:SetAlpha(0)
+ChallengeBlock.TimerBG:SetAlpha(0)
 
 ChallengeBlock.StatusBar:SetStatusBarTexture(C.media.texture)
 ChallengeBlock.StatusBar:CreateBackdrop("Overlay")
 ChallengeBlock.StatusBar.backdrop:SetFrameLevel(ChallengeBlock.backdrop:GetFrameLevel() + 1)
 ChallengeBlock.StatusBar:SetStatusBarColor(0, 0.6, 1)
 ChallengeBlock.StatusBar:SetFrameLevel(ChallengeBlock.StatusBar:GetFrameLevel() + 3)
+
+-- Not tested TODO
+-- hooksecurefunc("Scenario_ChallengeMode_SetUpAffixes", function(self)
+	-- for _, frame in ipairs(self.Affixes) do
+		-- frame.Border:SetTexture(nil)
+		-- frame.Portrait:SetTexture(nil)
+		-- if not frame.styled then
+			-- frame.Portrait:SkinIcon()
+			-- frame.styled = true
+		-- end
+
+		-- if frame.info then
+			-- frame.Portrait:SetTexture(_G.CHALLENGE_MODE_EXTRA_AFFIX_INFO[frame.info.key].texture)
+		-- elseif frame.affixID then
+			-- local _, _, filedataid = C_ChallengeMode.GetAffixInfo(frame.affixID)
+			-- frame.Portrait:SetTexture(filedataid)
+		-- end
+	-- end
+-- end)
 
 ----------------------------------------------------------------------------------------
 --	Skin MawBuffsBlock

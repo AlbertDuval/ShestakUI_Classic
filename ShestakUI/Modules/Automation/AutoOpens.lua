@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.automation.open_items ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ frame:Register("BANKFRAME_CLOSED", function()
 	atBank = false
 end)
 
-if T.TBC or T.Wrath then
+if T.TBC or T.Wrath or T.Cata then
 	frame:Register("GUILDBANKFRAME_OPENED", function()
 		atBank = true
 	end)
@@ -65,11 +65,11 @@ end)
 frame:Register("BAG_UPDATE_DELAYED", function()
 	if atBank or atMail or atMerchant then return end
 	for bag = 0, 4 do
-		for slot = 0, GetContainerNumSlots(bag) do
+		for slot = 0, C_Container.GetContainerNumSlots(bag) do
 			local _, _, locked, _, _, lootable, _, _, _, id = GetContainerItemInfo(bag, slot)
 			if lootable and not locked and id and T.OpenItems[id] then
-				print("|cffff0000"..OPENING..": "..GetContainerItemLink(bag, slot)..".|r")
-				UseContainerItem(bag, slot)
+				print("|cffff0000"..OPENING..": "..C_Container.GetContainerItemLink(bag, slot)..".|r")
+				C_Container.UseContainerItem(bag, slot)
 				return
 			end
 		end

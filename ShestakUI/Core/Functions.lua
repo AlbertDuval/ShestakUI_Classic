@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Number value function
@@ -107,11 +107,14 @@ local function CheckRole()
 end
 local RoleUpdater = CreateFrame("Frame")
 RoleUpdater:RegisterEvent("PLAYER_ENTERING_WORLD")
-if T.Classic and not T.Wrath then
+if T.Vanilla or T.TBC then
 	RoleUpdater:RegisterEvent("CHARACTER_POINTS_CHANGED")
 	RoleUpdater:RegisterUnitEvent("UNIT_INVENTORY_CHANGED", "player", "")
 	RoleUpdater:RegisterEvent("UPDATE_BONUS_ACTIONBAR")
-elseif T.Wrath then
+	if T.SoD then
+		RoleUpdater:RegisterEvent("RUNE_UPDATED")
+	end
+elseif T.Wrath or T.Cata then
 	RoleUpdater:RegisterEvent("PLAYER_TALENT_UPDATE")
 	RoleUpdater:RegisterUnitEvent("UNIT_INVENTORY_CHANGED", "player", "")
 	RoleUpdater:RegisterEvent("UPDATE_BONUS_ACTIONBAR")
@@ -122,6 +125,18 @@ else
 	RoleUpdater:RegisterEvent("PLAYER_TALENT_UPDATE")
 end
 RoleUpdater:SetScript("OnEvent", CheckRole)
+
+T.IsHealerSpec = function()
+	local healer = false
+	local spec = GetSpecialization()
+
+	if (T.class == "EVOKER" and spec == 2) or (T.class == "DRUID" and spec == 4) or (T.class == "MONK" and spec == 2) or
+	(T.class == "PALADIN" and spec == 1) or (T.class == "PRIEST" and spec ~= 3) or (T.class == "SHAMAN" and spec == 3) then
+		healer = true
+	end
+
+	return healer
+end
 
 ----------------------------------------------------------------------------------------
 --	Player's buff check
@@ -228,4 +243,29 @@ T.IsFramePositionedLeft = function(frame)
 	end
 
 	return positionedLeft
+end
+
+T.CurrentProfile = function(reset)
+	if ShestakUIOptionsGlobal[T.realm][T.name] then
+		if ShestakUIPositionsPerChar == nil then
+			ShestakUIPositionsPerChar = ShestakUIPositions
+		end
+		if not ShestakUIPositionsPerChar then return {} end
+		local i = tostring(ShestakUIOptionsGlobal[T.realm]["Current_Profile"][T.name])
+		ShestakUIPositionsPerChar[i] = ShestakUIPositionsPerChar[i] or {}
+		if reset then
+			ShestakUIPositionsPerChar[i] = {}
+		else
+			return ShestakUIPositionsPerChar[i]
+		end
+	else
+		if not ShestakUIPositions then return {} end
+		local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+		ShestakUIPositions[i] = ShestakUIPositions[i] or {}
+		if reset then
+			ShestakUIPositions[i] = {}
+		else
+			return ShestakUIPositions[i]
+		end
+	end
 end

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.loot.auto_greed ~= true or T.level ~= MAX_PLAYER_LEVEL then return end
 
 ----------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ frame:SetScript("OnEvent", function(_, _, id)
 	if id and quality == 2 and not BoP then
 		local link = GetLootRollItemLink(id)
 		local _, _, _, ilevel = GetItemInfo(link)
-		if canDisenchant and ilevel > 270 then
+		if canDisenchant and (T.Classic or (T.Mainline and ilevel > 270)) then
 			RollOnLoot(id, 3)
 		else
 			RollOnLoot(id, 2)

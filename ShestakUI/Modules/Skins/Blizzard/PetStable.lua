@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -9,11 +9,6 @@ local function LoadSkin()
 	T.SkinFrame(frame)
 
 	PetStableFrameInset:SetTemplate("Overlay")
-
-	T.SkinRotateButton(PetStableModelRotateLeftButton)
-	T.SkinRotateButton(PetStableModelRotateRightButton)
-	PetStableModelRotateRightButton:ClearAllPoints()
-	PetStableModelRotateRightButton:SetPoint("LEFT", PetStableModelRotateLeftButton, "RIGHT", 3, 0)
 
 	T.SkinNextPrevButton(PetStablePrevPageButton, nil, "Any")
 	T.SkinNextPrevButton(PetStableNextPageButton, nil, "Any")
@@ -52,7 +47,7 @@ local function LoadSkin()
 	PetStableDiet:SetSize(20, 20)
 	PetStableDiet:SetPoint("TOPRIGHT", -9, -2)
 
-	PetStableDietTexture:SetTexture("Interface\\Icons\\ability_hunter_beasttraining")
+	PetStableDietTexture:SetTexture(132165)
 	PetStableDietTexture:SkinIcon()
 end
 

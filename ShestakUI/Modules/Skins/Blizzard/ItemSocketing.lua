@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -12,7 +12,7 @@ local function LoadSkin()
 	ItemSocketingFrameInset:StripTextures()
 	ItemSocketingScrollFrame:StripTextures()
 	ItemSocketingScrollFrame:CreateBackdrop("Overlay")
-	T.SkinScrollBar(ItemSocketingScrollFrameScrollBar)
+	T.SkinScrollBar(ItemSocketingScrollFrame.ScrollBar)
 	ItemSocketingDescription:DisableDrawLayer("BORDER")
 	ItemSocketingDescription:DisableDrawLayer("BACKGROUND")
 
@@ -40,7 +40,10 @@ local function LoadSkin()
 		Blue = {r = 0.47, g = 0.67, b = 1},
 		PunchcardRed = {r = 1, g = 0.47, b = 0.47},
 		PunchcardYellow = {r = 0.97, g = 0.82, b = 0.29},
-		PunchcardBlue = {r = 0.47, g = 0.67, b = 1}
+		PunchcardBlue = {r = 0.47, g = 0.67, b = 1},
+		Cypher = {r = 1, g = 0.8, b = 0},
+		Tinker = {r = 1, g = 0.47, b = 0.47},
+		Primordial = {r = 1, g = 0, b = 1},
 	}
 
 	hooksecurefunc("ItemSocketingFrame_Update", function()

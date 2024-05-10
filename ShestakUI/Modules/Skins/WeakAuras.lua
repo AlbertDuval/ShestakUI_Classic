@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.weak_auras ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -6,10 +6,10 @@ if C.skins.weak_auras ~= true then return end
 ----------------------------------------------------------------------------------------
 if not IsAddOnLoaded("WeakAuras") then return end
 
+local i = 0
 local function Skin_WeakAuras(frame, type)
-	if not frame.backdrop then
+	if not frame.styled then
 		if type == "icon" then
-			if frame.b then return end
 			frame.b = CreateFrame("Frame", nil, frame)
 			frame.b:CreateBackdrop("Transparent")
 			frame.b:SetInside(frame)
@@ -18,9 +18,17 @@ local function Skin_WeakAuras(frame, type)
 				self:SetAlpha(frame.icon:GetAlpha())
 			end)
 			frame.icon:SetAllPoints(frame.b)
-		else
-			frame:CreateBackdrop("Transparent")
-			frame.backdrop:SetBackdropColor(0, 0, 0, 0)
+			frame.styled = true
+		elseif type == "aurabar" then
+			if i < 50 then
+				frame.bar:CreateBackdrop("Transparent")
+				frame.bar.backdrop:SetBackdropColor(0, 0, 0, 0)
+			else
+				frame.bar:CreateBackdrop("Default")
+			end
+			i = i + 1
+
+			frame.styled = true
 		end
 	end
 
@@ -55,6 +63,8 @@ local function Skin_WeakAuras(frame, type)
 	end
 end
 
+-- TODO: FIXME
+--[[
 hooksecurefunc(WeakAuras.regionPrototype, "create", function(region)
 	if region.regionType == "icon" or region.regionType == "aurabar" then
 		Skin_WeakAuras(region, region.regionType)
@@ -66,3 +76,4 @@ hooksecurefunc(WeakAuras.regionPrototype, "modifyFinish", function(_, region)
 		Skin_WeakAuras(region, region.regionType)
 	end
 end)
+--]]

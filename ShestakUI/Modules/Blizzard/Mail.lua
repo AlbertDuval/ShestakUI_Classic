@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if IsAddOnLoaded("OpenAll") or IsAddOnLoaded("Postal") or IsAddOnLoaded("TradeSkillMaster_Mailing") then return end
 
 ----------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ function openMail(index)
 		if T.Classic then
 			MiniMapMailFrame:Hide()
 		else
-			MinimapCluster.MailFrame:Hide()
+			MinimapCluster.IndicatorFrame.MailFrame:Hide()
 		end
 		return stopOpening(L_MAIL_COMPLETE)
 	end
@@ -56,7 +56,7 @@ function openMail(index)
 		if T.Classic then
 			MiniMapMailFrame:Hide()
 		else
-			MinimapCluster.MailFrame:Hide()
+			MinimapCluster.IndicatorFrame.MailFrame:Hide()
 		end
 	end
 end

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.automation.open_items ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -602,6 +602,8 @@ T.OpenItems = {
 	[187710] = true,	-- Anniversary Gift
 	[187561] = true,	-- Winter Veil Gift
 	[187781] = true,	-- Olea Cache
+	[192093] = true,	-- Gently Shaken Gift
+	[192094] = true,	-- Winter Veil Gift
 	[190178] = true,	-- Pouch of Protogenic Provisions
 	[190610] = true,	-- Tribute of the Enlightened Elders
 	[190655] = true,	-- Cache of Sepulcher Treasures

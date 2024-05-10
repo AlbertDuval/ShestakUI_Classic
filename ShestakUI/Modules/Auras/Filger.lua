@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.filger.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -301,8 +301,8 @@ local function FindAuras(self, unit)
 
 			local data = SpellGroups[self.Id].spells[name] or SpellGroups[self.Id].spells[spid]
 			if data and (data.caster ~= 1 and (caster == data.caster or data.caster == "all") or MyUnits[caster]) and (not data.unitID or data.unitID == unit) and (not data.absID or spid == data.spellID) then
-				local isTalent = T.Mainline and data.talentID and select(10, GetTalentInfoByID(data.talentID))
-				if ((data.filter == "BUFF" and filter == "HELPFUL") or (data.filter == "DEBUFF" and filter == "HARMFUL")) and (not data.spec or data.spec == T.Spec) and (not data.talentID or isTalent) then
+				local isKnown = data.requireSpell and IsPlayerSpell(data.requireSpell)
+				if ((data.filter == "BUFF" and filter == "HELPFUL") or (data.filter == "DEBUFF" and filter == "HARMFUL")) and (not data.spec or data.spec == T.Spec) and (not data.requireSpell or isKnown) then
 					if not data.count or count >= data.count then
 						if LibClassicDurations then
 							local durationNew, expirationTimeNew = LibClassicDurations:GetAuraDurationByUnit(data.unitID, spid, caster, name)
@@ -314,7 +314,7 @@ local function FindAuras(self, unit)
 						end
 						self.actives[spid] = {data = data, name = name, icon = icon, count = count, start = expirationTime - duration, duration = duration, spid = spid, sort = data.sort}
 					end
-				elseif data.filter == "ICD" and (data.trigger == "BUFF" or data.trigger == "DEBUFF") and (not data.spec or data.spec == T.Spec) and (not data.talentID or isTalent) then
+				elseif data.filter == "ICD" and (data.trigger == "BUFF" or data.trigger == "DEBUFF") and (not data.spec or data.spec == T.Spec) and (not data.requireSpell or isKnown) then
 					if data.slotID then
 						local slotLink = GetInventoryItemLink("player", data.slotID)
 						_, _, _, _, _, _, _, _, _, icon = GetItemInfo(slotLink)
@@ -392,14 +392,15 @@ function Filger:OnEvent(event, unit, _, castID)
 					end
 				end
 				if T.Classic and HasWandEquipped() then
-					local wandSpeed = select(2, GetInventoryItemCooldown("player", 18)) or 0
+					local wandID = GetInventoryItemID("player", 18)
+					local wandSpeed = select(2, C_Container.GetItemCooldown(wandID)) or 0
 					if wandSpeed < 1.5 then wandSpeed = 1.5 end
 					if name and (duration or 0) > wandSpeed then
 						if not (T.class == "DEATHKNIGHT" and data.filter == "CD" and duration < 10) then -- Filter rune cd
 							self.actives[spid] = {data = data, name = name, icon = icon, count = nil, start = start, duration = duration, spid = spid, sort = data.sort}
 						end
 					end
-				elseif name and (duration or 0) > 1.5 then
+				elseif name and (duration or 0) > 1.5 and (T.Classic or duration < 900) then
 					if not (T.class == "DEATHKNIGHT" and data.filter == "CD" and duration < 10) then -- Filter rune cd
 						self.actives[spid] = {data = data, name = name, icon = icon, count = nil, start = start, duration = duration, spid = spid, sort = data.sort}
 					end
@@ -441,38 +442,37 @@ end
 
 for _, spell in pairs(C.filger.buff_spells_list) do
 	if spell[2] == T.class then
-		tinsert(T.CustomFilgerSpell, {"P_BUFF_ICON", {spellID = spell[1], unitID = "player", caster = "player", filter = "BUFF", absID = true}})
+		tinsert(T.CustomFilgerSpell, {"P_BUFF_ICON", {spellID = spell[1], unitID = "player", caster = "player", filter = "BUFF", absID = true, custom = true}})
 	end
 end
 
 for _, spell in pairs(C.filger.proc_spells_list) do
 	if spell[2] == T.class then
-		tinsert(T.CustomFilgerSpell, {"P_PROC_ICON", {spellID = spell[1], unitID = "player", caster = "player", filter = "BUFF", absID = true}})
+		tinsert(T.CustomFilgerSpell, {"P_PROC_ICON", {spellID = spell[1], unitID = "player", caster = "player", filter = "BUFF", absID = true, custom = true}})
 	end
 end
 
 for _, spell in pairs(C.filger.debuff_spells_list) do
 	if spell[2] == T.class then
-		tinsert(T.CustomFilgerSpell, {"T_DEBUFF_ICON", {spellID = spell[1], unitID = "target", caster = "player", filter = "DEBUFF", absID = true}})
+		tinsert(T.CustomFilgerSpell, {"T_DEBUFF_ICON", {spellID = spell[1], unitID = "target", caster = "player", filter = "DEBUFF", absID = true, custom = true}})
 	end
 end
 
 for _, spell in pairs(C.filger.aura_bar_spells_list) do
 	if spell[2] == T.class then
-		tinsert(T.CustomFilgerSpell, {"T_DE/BUFF_BAR", {spellID = spell[1], unitID = "target", caster = "player", filter = "DEBUFF", absID = true}})
+		tinsert(T.CustomFilgerSpell, {"T_DE/BUFF_BAR", {spellID = spell[1], unitID = "target", caster = "player", filter = "DEBUFF", absID = true, custom = true}})
 	end
 end
 
 for _, spell in pairs(C.filger.cd_spells_list) do
 	if spell[2] == T.class then
-		tinsert(T.CustomFilgerSpell, {"COOLDOWN", {spellID = spell[1], filter = "CD", absID = true}})
+		tinsert(T.CustomFilgerSpell, {"COOLDOWN", {spellID = spell[1], filter = "CD", absID = true, custom = true}})
 	end
 end
 
-local ignoreTable = {}
 for _, spell in pairs(C.filger.ignore_spells_list) do
 	if spell[2] == T.class then
-		ignoreTable[GetSpellInfo(spell[1])] = true
+		T.FilgerIgnoreSpell[GetSpellInfo(spell[1])] = true
 	end
 end
 
@@ -505,20 +505,17 @@ if C["filger_spells"] and C["filger_spells"][T.class] then
 					name = GetItemInfo(slotLink)
 				end
 			end
-			if name and not ignoreTable[name] or data[j].slotID then
-				local id = data[j].absID and data[j].spellID or GetSpellInfo(data[j].spellID) or data[j].slotID
-				data[j].sort = j
-				group.spells[id] = data[j]
+			if name or data[j].slotID then
+				if T.FilgerIgnoreSpell[name] and not data[j].custom then
+					table.insert(jdx, j)
+				else
+					local id = data[j].absID and data[j].spellID or GetSpellInfo(data[j].spellID) or data[j].slotID
+					data[j].sort = j
+					group.spells[id] = data[j]
+				end
 			end
 			if not name and not data[j].slotID then
-				if T.Classic then
-					print("|cffff0000WARNING: spell/slot ID ["..(data[j].spellID or data[j].slotID or "UNKNOWN").."] no longer exists! Report this to EsreverWoW.|r")
-				else
-					print("|cffff0000WARNING: spell/slot ID ["..(data[j].spellID or data[j].slotID or "UNKNOWN").."] no longer exists! Report this to Shestak.|r")
-				end
-				table.insert(jdx, j)
-			end
-			if ignoreTable[name] then
+				print("|cffff0000ShestakUI: spell/slot ID ["..(data[j].spellID or data[j].slotID or "UNKNOWN").."] no longer exists!|r")
 				table.insert(jdx, j)
 			end
 		end
@@ -531,11 +528,7 @@ if C["filger_spells"] and C["filger_spells"][T.class] then
 		table.insert(SpellGroups, i, group)
 
 		if #data == 0 then
-			if T.Classic then
-				print("|cffff0000WARNING: section ["..data.Name.."] is empty! Report this to EsreverWoW.|r")
-			else
-				print("|cffff0000WARNING: section ["..data.Name.."] is empty! Report this to Shestak.|r")
-			end
+			print("|cffff0000ShestakUI: section ["..data.Name.."] is empty!|r")
 			table.insert(idx, i)
 		end
 	end

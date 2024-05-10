@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -36,16 +36,16 @@ local function LoadSkin()
 			self:SetDesaturated(true, true)
 		end
 
-		hooksecurefunc(AddonList.ScrollBox, "Update", function(self)
-			for i = 1, self.ScrollTarget:GetNumChildren() do
-				local child = select(i, self.ScrollTarget:GetChildren())
-				if not child.styled then
-					T.SkinCheckBox(child.Enabled)
-					child.LoadAddonButton:SkinButton()
-					hooksecurefunc(child.Enabled:GetCheckedTexture(), "SetDesaturated", forceSaturation)
+		hooksecurefunc("AddonList_InitButton", function(child)
+			if not child.styled then
+				T.SkinCheckBox(child.Enabled)
+				child.LoadAddonButton:SkinButton()
+				hooksecurefunc(child.Enabled:GetCheckedTexture(), "SetDesaturated", forceSaturation)
 
-					child.styled = true
-				end
+				T.ReplaceIconString(child.Title)
+				hooksecurefunc(child.Title, "SetText", T.ReplaceIconString)
+
+				child.styled = true
 			end
 		end)
 	end

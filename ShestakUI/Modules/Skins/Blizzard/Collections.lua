@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Collections skin
@@ -72,8 +72,6 @@ local function LoadSkin()
 
 	T.SkinEditBox(MountJournalSearchBox, nil, 18)
 	T.SkinScrollBar(MountJournal.ScrollBar)
-	T.SkinRotateButton(MountJournal.MountDisplay.ModelScene.RotateLeftButton)
-	T.SkinRotateButton(MountJournal.MountDisplay.ModelScene.RotateRightButton)
 
 	MountJournal.ScrollBar:SetPoint("TOPLEFT", MountJournal.ScrollBox, "TOPRIGHT", 1, 35)
 	MountJournal.ScrollBar:SetPoint("BOTTOMLEFT", MountJournal.ScrollBox, "BOTTOMRIGHT", 1, 0)
@@ -480,9 +478,7 @@ local function LoadSkin()
 	end)
 
 	-- Wardrobe
-	WardrobeFrame:StripTextures()
-	WardrobeFrame:SetTemplate("Transparent")
-	T.SkinCloseButton(WardrobeFrameCloseButton)
+	T.SkinFrame(WardrobeFrame)
 	T.SkinDropDownBox(WardrobeOutfitDropDown)
 	WardrobeOutfitDropDown:SetSize(221, 34)
 	WardrobeOutfitDropDown.SaveButton:SkinButton()
@@ -499,6 +495,7 @@ local function LoadSkin()
 	T.SkinCloseButton(WardrobeCollectionFrame.FilterButton.ResetButton)
 	WardrobeCollectionFrame.FilterButton.ResetButton:ClearAllPoints()
 	WardrobeCollectionFrame.FilterButton.ResetButton:SetPoint("CENTER", WardrobeCollectionFrame.FilterButton, "TOPRIGHT", 0, 0)
+	WardrobeCollectionFrame.FilterButton:SetWidth(90)
 
 	for i = 1, #WardrobeTransmogFrame.SlotButtons do
 		local slot = WardrobeTransmogFrame.SlotButtons[i]

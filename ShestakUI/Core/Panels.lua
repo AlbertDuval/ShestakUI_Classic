@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Bottom bars anchor
@@ -61,9 +61,7 @@ else
 	PetBarAnchor:CreatePanel("Invisible", (C.actionbar.button_size + C.actionbar.button_space), (C.actionbar.button_size * 10) + (C.actionbar.button_space * 9), unpack(C.position.right_bars))
 end
 PetBarAnchor:SetFrameStrata("LOW")
-if T.Vanilla or T.TBC then
-	RegisterStateDriver(PetBarAnchor, "visibility", "[pet,nooverridebar,nopossessbar] show; hide")
-elseif T.Wrath then
+if T.Classic then
 	RegisterStateDriver(PetBarAnchor, "visibility", "[pet,nooverridebar,novehicleui,nopossessbar] show; hide")
 else
 	RegisterStateDriver(PetBarAnchor, "visibility", "[pet,novehicleui,nopossessbar,nopetbattle] show; hide")
@@ -98,6 +96,9 @@ StanceAnchor:RegisterEvent("PLAYER_LOGIN")
 StanceAnchor:RegisterEvent("PLAYER_ENTERING_WORLD")
 StanceAnchor:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 StanceAnchor:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
+if T.Wrath or T.Cata or T.Mainline then
+	StanceAnchor:RegisterUnitEvent("PLAYER_SPECIALIZATION_CHANGED", "player", "")
+end
 StanceAnchor:SetScript("OnEvent", function()
 	local forms = GetNumShapeshiftForms()
 	if forms > 0 and not InCombatLockdown() then
@@ -108,7 +109,10 @@ StanceAnchor:SetScript("OnEvent", function()
 		end
 	end
 	if T.Mainline then
-		RegisterStateDriver(StanceAnchor, "visibility", GetNumShapeshiftForms() == 0 and "hide" or "show")
+		if not StanceAnchor.hook then
+			RegisterStateDriver(StanceAnchor, "visibility", GetNumShapeshiftForms() == 0 and "hide" or "show")
+			StanceAnchor.hook = true
+		end
 	end
 end)
 
@@ -139,7 +143,7 @@ if C.chat.background == true then
 	end
 elseif C.stats.bottom_line then
 	local leftpanel = CreateFrame("Frame", "LeftPanel", UIParent)
-	leftpanel:CreatePanel("ClassColor", 1, C.chat.height - 2, "BOTTOMLEFT", BottomPanel, "LEFT", 0, 0)
+	leftpanel:CreatePanel("ClassColor", 1, C.chat.height - 1, "BOTTOMLEFT", BottomPanel, "LEFT", 0, 0)
 end
 
 ----------------------------------------------------------------------------------------

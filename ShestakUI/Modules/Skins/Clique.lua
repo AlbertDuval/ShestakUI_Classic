@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true or C.skins.clique ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -8,6 +8,7 @@ local function LoadSkin()
 	if not IsAddOnLoaded("Clique") then return end
 	CliqueConfig:StripTextures()
 	CliqueConfig:SetTemplate("Transparent")
+	CliqueConfigPortrait:SetAlpha(0)
 
 	CliqueConfigPage1Column1:StripTextures()
 	CliqueConfigPage1Column2:StripTextures()
@@ -34,6 +35,13 @@ local function LoadSkin()
 	CliqueConfigPage2ButtonCancel:SkinButton(true)
 	CliqueDialogButtonBinding:SkinButton()
 	CliqueDialogButtonAccept:SkinButton()
+
+	if T.client == "ruRU" then
+		CliqueConfigPage1ButtonSpell:SetWidth(130)
+		CliqueConfigPage1ButtonSpellText:SetWidth(CliqueConfigPage1ButtonSpell:GetWidth())
+		CliqueConfigPage1ButtonSpellText:SetHeight(CliqueConfigPage1ButtonSpell:GetHeight())
+		CliqueConfigPage1ButtonOther:SetWidth(110)
+	end
 
 	CliqueSpellTab:GetRegions():SetSize(0.1, 0.1)
 	CliqueSpellTab:GetNormalTexture():SetTexCoord(0.1, 0.9, 0.1, 0.9)

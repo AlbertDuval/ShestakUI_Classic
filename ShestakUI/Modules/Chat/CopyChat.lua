@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.chat.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ local function CreatCopyFrame()
 
 	editBox = CreateFrame("EditBox", "CopyBox", frame)
 	editBox:SetMultiLine(true)
-	editBox:SetMaxLetters(99999)
+	editBox:SetMaxLetters(0)
 	editBox:SetAutoFocus(false)
 	editBox:SetFontObject(ChatFontNormal)
 	editBox:SetWidth(500)
@@ -46,11 +46,11 @@ local function CreatCopyFrame()
 		end
 	end)
 
-	local scrollArea = CreateFrame("ScrollFrame", "CopyScroll", frame, "UIPanelScrollFrameTemplate")
+	local scrollArea = CreateFrame("ScrollFrame", "CopyScroll", frame, "ScrollFrameTemplate")
 	scrollArea:SetPoint("TOPLEFT", frame, "TOPLEFT", 8, -30)
 	scrollArea:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -27, 8)
 	scrollArea:SetScrollChild(editBox)
-	T.SkinScrollBar(CopyScrollScrollBar)
+	T.SkinScrollBar(CopyScroll.ScrollBar)
 
 	local close = CreateFrame("Button", "CopyCloseButton", frame, "UIPanelCloseButton")
 	T.SkinCloseButton(close)
@@ -69,6 +69,10 @@ local function MessageIsProtected(message)
 	return message and (message ~= gsub(message, "(:?|?)|K(.-)|k", canChangeMessage))
 end
 
+local scrollDown = function()
+	CopyScroll:SetVerticalScroll(CopyScroll:GetVerticalScrollRange() or 0)
+end
+
 local function Copy(cf)
 	if not isf then CreatCopyFrame() end
 	local text = ""
@@ -83,17 +87,13 @@ local function Copy(cf)
 	text = text:gsub("|T[^\\]+\\[^\\]+\\[Uu][Ii]%-[Rr][Aa][Ii][Dd][Tt][Aa][Rr][Gg][Ee][Tt][Ii][Nn][Gg][Ii][Cc][Oo][Nn]_(%d)[^|]+|t", "{rt%1}")
 	text = text:gsub("|T13700([1-8])[^|]+|t", "{rt%1}")
 	text = text:gsub("|T[^|]+|t", "")
+	text = text:gsub("|A[^|]+|a", "")
 	if frame:IsShown() then frame:Hide() return end
-	frame:Show()
-	editBox:SetText(text)
 
-	editBox:SetScript("OnTextChanged", function(_, userInput)
-		if userInput then return end
-		local _, max = CopyScrollScrollBar:GetMinMaxValues()
-		for _ = 1, max do
-			ScrollFrameTemplate_OnMouseWheel(CopyScroll, -1)
-		end
-	end)
+	editBox:SetText(text)
+	frame:Show()
+
+	C_Timer.After(0, scrollDown)
 end
 
 for i = 1, NUM_CHAT_WINDOWS do

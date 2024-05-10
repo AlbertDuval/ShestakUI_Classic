@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -79,6 +79,10 @@ local function LoadSkin()
 		end
 	end
 
+	if T.Classic then
+		ChatConfigFrame.ToggleChatButton:SkinButton()
+	end
+
 	local checkboxes = {
 		"CombatConfigColorsHighlightingLine",
 		"CombatConfigColorsHighlightingAbility",
@@ -117,39 +121,43 @@ local function LoadSkin()
 			f.InnerBorder:SetAlpha(0)
 			f.SwatchBg:SetAlpha(0)
 		end
+
 		f:CreateBackdrop("Overlay")
 		f:SetFrameLevel(f:GetFrameLevel() + 2)
-		if T.Classic then
-			f.backdrop:SetOutside(f.Color, 0, 0)
-		else
-			f.backdrop:SetOutside(f.Color, 2, 2)
-		end
-	end
+		f.backdrop:SetOutside(f.Color, 2, 2)
 
-	if T.Classic then
-		hooksecurefunc("ChatConfig_CreateBoxes", function(frame, boxTable, boxTemplate)
-			if frame.styled then return end
-
-			local boxNameString = frame:GetName().."Box"
-
-			if boxTemplate == "ChatConfigTextBoxTemplateWithButton" then
-				for index in ipairs(boxTable) do
-					local boxName = boxNameString..index
-					local box = _G[boxName]
-
-					box:StripTextures()
-					local bg = CreateFrame("Frame", nil, box)
-					bg:SetPoint("TOPLEFT", 2, -1)
-					bg:SetPoint("BOTTOMRIGHT", -2, 1)
-					bg:SetTemplate("Overlay")
-
-					bg:SetFrameLevel(bg:GetFrameLevel() - 1)
-
-					_G[boxName.."Button"]:SkinButton()
-				end
+		local function ReskinCombatColourSwatch(f)
+			local SwatchBg = _G[f:GetName().."SwatchBg"]
+			if SwatchBg then
+				SwatchBg:SetAlpha(0)
 			end
 
-			frame.styled = true
+			f:CreateBackdrop("Overlay")
+			f:SetFrameLevel(f:GetFrameLevel() + 2)
+			f.backdrop:SetInside(f, 1, 1)
+		end
+
+		hooksecurefunc("ChatConfig_UpdateCheckboxes", function(frame)
+			if not FCF_GetCurrentChatFrame() then return end
+
+			if frame == ChatConfigTextToSpeechChannelSettingsLeft then -- init after
+				local nameString = frame:GetName().."CheckBox"
+				for index in ipairs(frame.checkBoxTable) do
+					local checkBoxName = nameString..index
+					local checkbox = _G[checkBoxName]
+					if checkbox and not checkbox.IsSkinned then
+						checkbox:StripTextures()
+
+						local bg = CreateFrame("Frame", nil, checkbox)
+						bg:SetPoint("TOPLEFT", 2, -1)
+						bg:SetPoint("BOTTOMRIGHT", -2, 1)
+						bg:SetTemplate("Overlay")
+
+						T.SkinCheckBox(_G[checkBoxName.."Check"])
+						checkbox.IsSkinned = true
+					end
+				end
+			end
 		end)
 	end
 
@@ -158,11 +166,12 @@ local function LoadSkin()
 
 		local checkBoxNameString = frame:GetName().."CheckBox"
 
-		if checkBoxTemplate == "ChatConfigCheckBoxTemplate" or checkBoxTemplate == "ChatConfigCheckBoxSmallTemplate" then
+		if checkBoxTemplate == "ChatConfigCheckBoxTemplate" then
 			for index in ipairs(checkBoxTable) do
 				local checkBoxName = checkBoxNameString..index
 				local checkbox = _G[checkBoxName]
 
+				checkbox:StripTextures()
 				local bg = CreateFrame("Frame", nil, checkbox)
 				bg:SetPoint("TOPLEFT", 2, -1)
 				bg:SetPoint("BOTTOMRIGHT", -2, 1)
@@ -191,7 +200,25 @@ local function LoadSkin()
 		frame.styled = true
 	end)
 
-	hooksecurefunc("ChatConfig_CreateColorSwatches", function(frame, swatchTable)
+	hooksecurefunc("ChatConfig_CreateTieredCheckboxes", function(frame, checkBoxTable)
+		if frame.IsSkinned then return end
+
+		local nameString = frame:GetName().."CheckBox"
+		for index, value in ipairs(checkBoxTable) do
+			local checkBoxName = nameString..index
+			T.SkinCheckBox(_G[checkBoxName])
+
+			if value.subTypes then
+				for i in ipairs(value.subTypes) do
+					T.SkinCheckBox(_G[checkBoxName.."_"..i])
+				end
+			end
+		end
+
+		frame.IsSkinned = true
+	end)
+
+	hooksecurefunc("ChatConfig_CreateColorSwatches", function(frame, swatchTable) -- combat log only (in Mainline)
 		if frame.styled then return end
 
 		local nameString = frame:GetName().."Swatch"
@@ -200,13 +227,7 @@ local function LoadSkin()
 			local swatchName = nameString..index
 			local swatch = _G[swatchName]
 
-			if swatch.SetBackdrop then
-				if T.Classic then
-					swatch:SetBackdrop(nil)
-				end
-			else
-				swatch.NineSlice:SetAlpha(0)
-			end
+			swatch:StripTextures()
 
 			local bg = CreateFrame("Frame", nil, swatch)
 			bg:SetPoint("TOPLEFT", 0, 0)
@@ -220,7 +241,11 @@ local function LoadSkin()
 			bg2:SetPoint("BOTTOMRIGHT", -1, 1)
 			bg2:CreateBorder(true, true)
 
-			ReskinColourSwatch(_G[swatchName.."ColorSwatch"])
+			if T.Classic then
+				ReskinColourSwatch(_G[swatchName.."ColorSwatch"])
+			else
+				ReskinCombatColourSwatch(_G[swatchName.."ColorSwatch"])
+			end
 		end
 
 		frame.styled = true
@@ -257,13 +282,9 @@ local function LoadSkin()
 			else
 				tab:SetPoint("LEFT", _G["CombatConfigTab"..i-1], "RIGHT", 1, 0)
 			end
-			if T.Classic then
-				_G["CombatConfigTab"..i.."Text"]:SetPoint("BOTTOM", 0, 7)
-			else
-				local text = tab.Text
-				if text then
-					text:SetWidth(text:GetWidth() + 10)
-				end
+			local text = tab.Text
+			if text then
+				text:SetWidth(text:GetWidth() + 10)
 			end
 		end
 		if T.Mainline then
@@ -281,6 +302,9 @@ local function LoadSkin()
 	_G["ChatConfigMoveFilterDownButton"]:SetPoint("TOPLEFT", _G["ChatConfigMoveFilterUpButton"], "TOPRIGHT", 1, 0)
 	_G["ChatConfigFrameDefaultButton"]:SetPoint("TOP", _G["ChatConfigCategoryFrame"], "BOTTOM", 0, -4)
 	ChatConfigFrameRedockButton:SetPoint("LEFT", ChatConfigFrameDefaultButton, "RIGHT", 3, 0)
+	if T.Classic then
+		ChatConfigFrame.ToggleChatButton:SetPoint("LEFT", ChatConfigFrameRedockButton, "RIGHT", 3, 0)
+	end
 	_G["ChatConfigFrameOkayButton"]:SetPoint("TOPRIGHT", _G["ChatConfigBackgroundFrame"], "BOTTOMRIGHT", 0, -4)
 	_G["CombatLogDefaultButton"]:SetPoint("TOPLEFT", _G["ChatConfigCategoryFrame"], "BOTTOMLEFT", 0, -4)
 	_G["CombatConfigSettingsSaveButton"]:SetPoint("TOPLEFT", _G["CombatConfigSettingsNameEditBox"], "TOPRIGHT", 5, 2)
@@ -288,15 +312,7 @@ local function LoadSkin()
 	_G["ChatConfigCombatSettingsFiltersCopyFilterButton"]:SetPoint("RIGHT", _G["ChatConfigCombatSettingsFiltersDeleteButton"], "LEFT", -3, 0)
 	_G["ChatConfigCombatSettingsFiltersAddFilterButton"]:SetPoint("RIGHT", _G["ChatConfigCombatSettingsFiltersCopyFilterButton"], "LEFT", -3, 0)
 
-	if ChatConfigFrame.ToggleChatButton then
-		ChatConfigFrame.ToggleChatButton:SkinButton()
-		ChatConfigFrame.ToggleChatButton:ClearAllPoints()
-		ChatConfigFrame.ToggleChatButton:SetPoint("LEFT", _G["ChatConfigFrameRedockButton"], "RIGHT", 3, 0)
-
-		if TextToSpeechCharacterSpecificButton then
-			T.SkinCheckBox(TextToSpeechCharacterSpecificButton, 25)
-		end
-	end
+	T.SkinCheckBox(TextToSpeechCharacterSpecificButton, 25)
 
 	hooksecurefunc(ChatConfigFrameChatTabManager, "UpdateWidth", function(self)
 		for tab in self.tabPool:EnumerateActive() do

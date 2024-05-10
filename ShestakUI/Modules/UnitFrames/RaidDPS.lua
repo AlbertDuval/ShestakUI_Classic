@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ local function Shared(self, unit)
 	if suffix == "pet" or (suffix == "target" and unit ~= "tank") then
 		self:Tag(self.Info, "[GetNameColor][NameArena]")
 	else
-		if T.Mainline and unit == "party" and C.raidframe.icons_role ~= true then
+		if (T.Wrath or T.Cata or T.Mainline) and unit == "party" and C.raidframe.icons_role ~= true then
 			self:Tag(self.Info, "[LFD] [GetNameColor][NameShort]")
 		else
 			self:Tag(self.Info, "[GetNameColor][NameShort]")
@@ -171,7 +171,7 @@ local function Shared(self, unit)
 	end
 
 	-- LFD role icons
-	if T.Mainline and C.raidframe.icons_role == true and not (suffix == "pet" or suffix == "target") then
+	if (T.Wrath or T.Cata or T.Mainline) and C.raidframe.icons_role == true and not (suffix == "pet" or suffix == "target") then
 		self.GroupRoleIndicator = self.Health:CreateTexture(nil, "OVERLAY")
 		self.GroupRoleIndicator:SetSize(12, 12)
 		self.GroupRoleIndicator:SetPoint("TOPRIGHT", self.Health, 2, 5)
@@ -258,10 +258,6 @@ local function Shared(self, unit)
 			self.HealPrediction = healBar
 		else
 			T.CreateHealthPrediction(self)
-
-			if T.Classic then
-				self.HealthPrediction.frequentUpdates = true
-			end
 		end
 	end
 
@@ -456,7 +452,7 @@ if C.raidframe.layout == "AUTO" then
 		C.raidframe.layout = "HEAL"
 	else
 		local function CheckSpec(self)
-			if (T.class == "DRUID" and GetSpecialization() == 4) or (T.class == "MONK" and GetSpecialization() == 2) or (T.class == "PALADIN" and GetSpecialization() == 1) or (T.class == "PRIEST" and GetSpecialization() ~= 3) or (T.class == "SHAMAN" and GetSpecialization() == 3) then
+			if T.IsHealerSpec() then
 				-- Disable DPS
 				for _, party in pairs({oUF_PartyDPS, oUF_PartyTargetDPS, oUF_PartyPetDPS}) do
 					party:SetAttribute("showSolo", false)

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Movement function(by Allez)
@@ -40,10 +40,16 @@ T.MoverFrames = {
 	T_DE_BUFF_BAR_Anchor,
 	SplitBarLeft,
 	SplitBarRight,
-	Bar7Holder,
-	Bar8Holder,
 	UIWidgetPowerBarAnchor
 }
+
+if C.actionbar.bar7_enable then
+	tinsert(T.MoverFrames, Bar7Holder)
+end
+
+if C.actionbar.bar8_enable then
+	tinsert(T.MoverFrames, Bar8Holder)
+end
 
 local unitFrames = {
 	oUF_Player,
@@ -84,7 +90,9 @@ if C.actionbar.editor then
 	tinsert(T.MoverFrames, Bar3Holder)
 	tinsert(T.MoverFrames, Bar4Holder)
 	tinsert(T.MoverFrames, Bar5Holder)
-	tinsert(T.MoverFrames, Bar6Holder)
+	if T.Mainline then
+		tinsert(T.MoverFrames, Bar6Holder)
+	end
 	tremove(T.MoverFrames, 5)	-- RightActionBarAnchor
 	tremove(T.MoverFrames, 4)	-- ActionBarAnchor
 end
@@ -95,6 +103,7 @@ local placed = {
 	"Butsu",
 	"UIAltPowerBar",
 	"LootHistoryFrame",
+	"GroupLootHistoryFrame",
 	"stArchaeologyFrame",
 	"StuffingFrameBags",
 	"StuffingFrameBank",
@@ -102,14 +111,38 @@ local placed = {
 	"UIWidgetBelowAnchor"
 }
 
+local function MergeOldPositions()	-- TODO delete after while
+	if ShestakUIOptionsGlobal[T.realm][T.name] then
+		if not ShestakUIPositionsPerChar then
+			ShestakUIPositionsPerChar = ShestakUIPositions
+		end
+		if not ShestakUIPositionsPerChar.merged then
+			local backup = ShestakUIPositions
+			ShestakUIPositionsPerChar = {}
+			ShestakUIPositionsPerChar["1"] = backup
+			ShestakUIPositionsPerChar.merged = true
+			ShestakUIPositionsPerChar["1"]["1"] = nil -- T.CurrentProfile calls early and create empty table so remove this
+		end
+	else
+		if not ShestakUIPositions.merged then
+			local backup = ShestakUIPositions
+			ShestakUIPositions = {}
+			ShestakUIPositions["1"] = backup
+			ShestakUIPositions.merged = true
+			ShestakUIPositions["1"]["1"] = nil
+		end
+	end
+end
+
 local SaveDefaultPosition = function(mover)
 	local ap, p, rp, x, y = mover.frame:GetPoint()
-	ShestakUIPositions.Default = ShestakUIPositions.Default or {}
-	if not ShestakUIPositions.Default[mover.frame:GetName()] then
+	local positionTable = T.CurrentProfile()
+	positionTable.Default = positionTable.Default or {}
+	if not positionTable.Default[mover.frame:GetName()] then
 		if not p then
 			p = UIParent
 		end
-		ShestakUIPositions.Default[mover.frame:GetName()] = {ap, p:GetName(), rp, x, y}
+		positionTable.Default[mover.frame:GetName()] = {ap, p:GetName(), rp, x, y}
 	end
 end
 
@@ -117,7 +150,8 @@ local SetPosition = function(mover)
 	local x, y, ap = T.CalculateMoverPoints(mover)
 	mover.frame:ClearAllPoints()
 	mover.frame:SetPoint(ap, "UIParent", ap, x, y)
-	ShestakUIPositions[mover.frame:GetName()] = {ap, "UIParent", ap, x, y}
+	local positionTable = T.CurrentProfile()
+	positionTable[mover.frame:GetName()] = {ap, "UIParent", ap, x, y}
 end
 
 -- Controls
@@ -177,7 +211,8 @@ local function CreateArrow(moveX, moveY, callback)
 		if not relativeTo then
 			relativeTo = UIParent
 		end
-		ShestakUIPositions[frame.frame:GetName()] = {point, relativeTo:GetName(), relativePoint, xOfs, yOfs}
+		local positionTable = T.CurrentProfile()
+		positionTable[frame.frame:GetName()] = {point, relativeTo:GetName(), relativePoint, xOfs, yOfs}
 		frame:SetAllPoints(frame.frame)
 		controls.x:SetText(T.Round(xOfs))
 		controls.y:SetText(T.Round(yOfs))
@@ -275,14 +310,15 @@ end
 
 local RestoreDefaults = function(self, button)
 	if button == "RightButton" then
-		local data = ShestakUIPositions.Default and ShestakUIPositions.Default[self.frame:GetName()]
+		local positionTable = T.CurrentProfile()
+		local data = positionTable.Default and positionTable.Default[self.frame:GetName()]
 		if data then
 			self.frame:ClearAllPoints()
 			self.frame:SetPoint(unpack(data))
 			self:ClearAllPoints()
 			self:SetAllPoints(self.frame)
-			ShestakUIPositions.Default[self.frame:GetName()] = nil
-			ShestakUIPositions[self.frame:GetName()] = nil
+			positionTable.Default[self.frame:GetName()] = nil
+			positionTable[self.frame:GetName()] = nil
 		end
 	elseif button == "MiddleButton" then
 		self:Hide()
@@ -301,7 +337,8 @@ local UpdatePosition = function(moveX, moveY)
 	if not relativeTo then
 		relativeTo = UIParent
 	end
-	ShestakUIPositions[frame.frame:GetName()] = {point, relativeTo:GetName(), relativePoint, xOfs, yOfs}
+	local positionTable = T.CurrentProfile()
+	positionTable[frame.frame:GetName()] = {point, relativeTo:GetName(), relativePoint, xOfs, yOfs}
 	frame:SetAllPoints(frame.frame)
 	controls.x:SetText(T.Round(xOfs))
 	controls.y:SetText(T.Round(yOfs))
@@ -415,7 +452,7 @@ end
 local InitMove = function(msg)
 	if InCombatLockdown() then print("|cffffff00"..ERR_NOT_IN_COMBAT.."|r") return end
 	if msg and (msg == "reset" or msg == "куыуе") then
-		ShestakUIPositions = {}
+		T.CurrentProfile(true)
 		for _, v in pairs(placed) do
 			if _G[v] then
 				_G[v]:SetUserPlaced(false)
@@ -458,8 +495,10 @@ local RestoreUI = function(self)
 		end)
 		return
 	end
-	if ShestakUIPositions then
-		for frame_name, point in pairs(ShestakUIPositions) do
+	MergeOldPositions()	-- TODO delete after while
+	local positionTable = T.CurrentProfile()
+	if positionTable then
+		for frame_name, point in pairs(positionTable) do
 			if _G[frame_name] then
 				_G[frame_name]:ClearAllPoints()
 				_G[frame_name]:SetPoint(unpack(point))
@@ -486,9 +525,10 @@ StaticPopupDialogs.RESET_UF = {
 	button1 = ACCEPT,
 	button2 = CANCEL,
 	OnAccept = function() if InCombatLockdown() then print("|cffffff00"..ERR_NOT_IN_COMBAT.."|r") else
+		local positionTable = T.CurrentProfile()
 		for _, frame in pairs(unitFrames) do
 			if frame:GetName() then
-				ShestakUIPositions[frame:GetName()] = nil
+				positionTable[frame:GetName()] = nil
 			end
 		end
 		ReloadUI()
@@ -508,7 +548,7 @@ StaticPopupDialogs.MOVEUI_RESET = {
 	button1 = ACCEPT,
 	button2 = CANCEL,
 	OnAccept = function() if InCombatLockdown() then print("|cffffff00"..ERR_NOT_IN_COMBAT.."|r") else
-		ShestakUIPositions = {}
+		T.CurrentProfile(true)
 		for _, v in pairs(placed) do
 			if _G[v] then
 				_G[v]:SetUserPlaced(false)
@@ -522,3 +562,12 @@ StaticPopupDialogs.MOVEUI_RESET = {
 	hideOnEscape = true,
 	preferredIndex = 5,
 }
+
+-- Replace EditMode with our moving system
+if T.Mainline then
+	GameMenuButtonEditMode:SetScript("OnClick", function()
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
+		SlashCmdList.MOVING()
+		HideUIPanel(GameMenuFrame)
+	end)
+end

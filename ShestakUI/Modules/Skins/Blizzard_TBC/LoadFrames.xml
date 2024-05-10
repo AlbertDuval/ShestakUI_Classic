@@ -1,7 +1,0 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Include file="..\Blizzard_Vanilla\LoadFrames.xml"/>
-
-	<Script file="Arena.lua"/>
-	<Script file="Battlefield.lua"/>
-	<Script file="ItemSocketing.lua"/>
-</Ui>

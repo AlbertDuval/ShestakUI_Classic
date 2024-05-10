@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if T.client ~= "frFR" then return end
 
 ----------------------------------------------------------------------------------------
@@ -31,7 +31,6 @@ L_ANNOUNCE_FP_USE = "%s a utilisé : %s."
 L_ANNOUNCE_INTERRUPTED = INTERRUPTED
 
 -- Tooltip
-L_TOOLTIP_NO_TALENT = "Aucun talent"
 L_TOOLTIP_LOADING = "Chargement..."
 L_TOOLTIP_ACH_STATUS = "Votre statut : "
 L_TOOLTIP_ACH_COMPLETE = "Votre statut : Terminé"
@@ -51,6 +50,7 @@ L_MISC_UI_OUTDATED_CLASSIC = "Une version plus récente de ShestakUI est disponi
 L_MISC_HEADER_MARK = "Icône de raid au survol de la souris"
 L_MISC_BINDER_OPEN = "Assignations des boutons de la souris"
 L_MISC_SCROLL = "Parchemin"
+L_MISC_HEADER_QUEST = "Auto quest button" -- Needs review
 
 -- Raid Utility
 L_RAID_UTIL_DISBAND = "Dissoudre le raid"
@@ -185,7 +185,7 @@ L_POPUP_ARMORY = "Armurerie"
 
 -- Welcome message
 L_WELCOME_LINE_1 = "Bienvenue sur ShestakUI "
-L_WELCOME_LINE_2_1 = "Tapez /cfg pour configurer l'interface, ou visitez https://github.com/Shestak/ShestakUI"
+L_WELCOME_LINE_2_1 = "Tapez /cfg pour configurer l'interface, ou visitez https://github.com/Wetxius/ShestakUI_Help/wiki/English"
 L_WELCOME_LINE_2_2 = "pour plus d'informations"
 L_WELCOME_LINE_1_CLASSIC = "Bienvenue sur ShestakUI (Classic) "
 L_WELCOME_LINE_2_1_CLASSIC = "Tapez /cfg pour configurer l'interface, ou visitez https://github.com/EsreverWoW/ShestakUI_Classic"

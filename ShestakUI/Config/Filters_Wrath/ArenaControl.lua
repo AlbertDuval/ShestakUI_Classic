@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.show_arena ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ local function SpellName(id)
 	if name then
 		return name
 	else
-		print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to EsreverWoW.|r")
+		print("|cffff0000ShestakUI: spell ID ["..tostring(id).."] no longer exists!|r")
 		return "Empty"
 	end
 end
@@ -64,6 +64,7 @@ T.ArenaControl = {
 	[SpellName(6770)] = 5,		-- Sap
 	-- Shaman
 	[SpellName(58861)] = 5,		-- Bash (Spirit Wolf)
+	[SpellName(53019)] = 5,		-- Earth's Grasp
 	[SpellName(51514)] = 5,		-- Hex
 	[SpellName(39796)] = 5,		-- Stoneclaw Totem
 	-- Warlock
@@ -75,7 +76,7 @@ T.ArenaControl = {
 	-- Warrior
 	[SpellName(7922)] = 5,		-- Charge Stun
 	[SpellName(12809)] = 5,		-- Concussion Blow
-	[SpellName(20253)] = 5,		-- Intercept Stun
+	[SpellName(20253)] = 5,		-- Intercept
 	[SpellName(5246)] = 5,		-- Intimidating Shout
 	[SpellName(46968)] = 5,		-- Shockwave
 	-- Racial
@@ -84,7 +85,7 @@ T.ArenaControl = {
 	-- Silences
 	[SpellName(47476)] = 4,		-- Strangulate
 	[SpellName(34490)] = 4,		-- Silencing Shot
-	[SpellName(18469)] = 4,		-- Counterspell - Silenced
+	[SpellName(18469)] = 4,		-- Silenced - Improved Counterspell
 	[SpellName(63529)] = 4,		-- Silenced - Shield of the Templar
 	[SpellName(15487)] = 4,		-- Silence
 	[SpellName(1330)] = 4,		-- Garrote - Silence
@@ -95,7 +96,7 @@ T.ArenaControl = {
 	-- [SpellName(25046)] = 4,		-- Arcane Torrent (Energy)
 	-- [SpellName(50613)] = 4,		-- Arcane Torrent (Runic Power)
 	-- [SpellName(44835)] = 4,		-- Maim Interrupt (incorrect spellID)
-	[SpellName(32747)] = 4,		-- Deadly Throw Interrupt
+	[SpellName(32747)] = 4,		-- Interrupt
 
 	-- Roots
 	[SpellName(53534)] = 3,		-- Chains of Ice
@@ -106,6 +107,7 @@ T.ArenaControl = {
 	[SpellName(33395)] = 3,		-- Freeze (Water Elemental)
 	[SpellName(122)] = 3,		-- Frost Nova
 	[SpellName(12494)] = 3,		-- Frostbite
+	[SpellName(55080)] = 3,		-- Shattered Barrier
 	[SpellName(58373)] = 3,		-- Glyph of Hamstring
 	[SpellName(23694)] = 3,		-- Improved Hamstring
 
@@ -148,12 +150,12 @@ T.ArenaControl = {
 	[SpellName(12043)] = 1,		-- Presence of Mind
 	-- Paladin
 	[SpellName(31884)] = 1,		-- Avenging Wrath
+	[SpellName(20216)] = 1,		-- Divine Favor
+	[SpellName(31842)] = 1,		-- Divine Illumination
 	[SpellName(1044)] = 1,		-- Hand of Freedom
 	[SpellName(1022)] = 1,		-- Hand of Protection
 	[SpellName(6940)] = 1,		-- Hand of Sacrifice
 	[SpellName(1038)] = 1,		-- Hand of Salvation
-	[SpellName(20216)] = 1,		-- Divine Favor
-	[SpellName(31842)] = 1,		-- Divine Illumination
 	-- Priest
 	[SpellName(64843)] = 1,		-- Divine Hymn
 	[SpellName(6346)] = 1,		-- Fear Ward
@@ -168,7 +170,7 @@ T.ArenaControl = {
 	[SpellName(51713)] = 1,		-- Shadow Dance
 	[SpellName(57933)] = 1,		-- Tricks of the Trade
 	-- Shaman
-	[SpellName(8178)] = 1,		-- Grounding Totem
+	[SpellName(8178)] = 1,		-- Grounding Totem Effect
 	[SpellName(16190)] = 1,		-- Mana Tide Totem
 	[SpellName(55198)] = 1,		-- Tidal Force
 	-- Warlock

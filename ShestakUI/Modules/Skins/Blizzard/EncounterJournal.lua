@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	EncounterJournal skin
@@ -66,23 +66,34 @@ local function LoadSkin()
 		end
 	end)
 
+	local monthlyActivities = EncounterJournalMonthlyActivitiesFrame
+	if monthlyActivities then
+		EncounterJournalMonthlyActivitiesFrame:StripTextures()
+		EncounterJournalMonthlyActivitiesFrame.FilterList:StripTextures()
+		EncounterJournalMonthlyActivitiesFrame.FilterList:SetTemplate("Overlay")
+		T.SkinScrollBar(EncounterJournalMonthlyActivitiesFrame.ScrollBar)
+	end
+
 	local mainTabs = {
+		EncounterJournalMonthlyActivitiesTab,
 		EncounterJournalSuggestTab,
 		EncounterJournalDungeonTab,
 		EncounterJournalRaidTab,
-		EncounterJournalLootJournalTab
+		EncounterJournalLootJournalTab,
 	}
 
 	for _, tab in pairs(mainTabs) do
 		T.SkinTab(tab)
 	end
 
-	EncounterJournalSuggestTab:SetPoint("TOPLEFT", EncounterJournal, "BOTTOMLEFT", 11, 0)
+	mainTabs[1]:ClearAllPoints()
+	mainTabs[1]:SetPoint("TOPLEFT", EncounterJournal, "BOTTOMLEFT", 11, 0)
 
 	T.SkinEditBox(EncounterJournalSearchBox)
 	T.SkinCloseButton(EncounterJournalCloseButton)
 	T.SkinDropDownBox(EncounterJournalInstanceSelectTierDropDown)
 
+	EncounterJournalInstanceSelectBG:SetAlpha(0)
 	EncounterJournalInstanceSelect.bg:Kill()
 	EncounterJournalEncounterFrameInfoBG:Kill()
 	EncounterJournal.encounter.info.leftShadow:Kill()
@@ -116,8 +127,15 @@ local function LoadSkin()
 		tab.backdrop:SetPoint("BOTTOMRIGHT", 0, 2)
 		tab:SetNormalTexture(0)
 		tab:SetPushedTexture(0)
-		tab:SetDisabledTexture(0)
-		tab:SetHighlightTexture(0)
+		tab:SetDisabledTexture(C.media.blank)
+
+		local hl = tab:GetHighlightTexture()
+		hl:SetColorTexture(1, 1, 1, 0.2)
+		hl:SetInside(tab.backdrop)
+
+		local d = tab:GetDisabledTexture()
+		d:SetVertexColor(0.8, 0, 0, 0.1)
+		d:SetInside(tab.backdrop)
 	end
 
 	EncounterJournalEncounterFrameInfoOverviewTab:SetPoint("TOPLEFT", EncounterJournalEncounterFrameInfo, "TOPRIGHT", 8, -40)
@@ -126,9 +144,9 @@ local function LoadSkin()
 	T.SkinScrollBar(EncounterJournalInstanceSelect.ScrollBar)
 	T.SkinScrollBar(EncounterJournalEncounterFrameInfo.LootContainer.ScrollBar)
 	T.SkinScrollBar(EncounterJournalEncounterFrameInstanceFrame.LoreScrollBar)
-	T.SkinScrollBar(EncounterJournalEncounterFrameInfoDetailsScrollFrameScrollBar)
 	T.SkinScrollBar(EncounterJournalEncounterFrameInfo.BossesScrollBar)
-	T.SkinScrollBar(EncounterJournalEncounterFrameInfoOverviewScrollFrameScrollBar)
+	T.SkinScrollBar(EncounterJournalEncounterFrameInfoDetailsScrollFrame.ScrollBar)
+	T.SkinScrollBar(EncounterJournalEncounterFrameInfoOverviewScrollFrame.ScrollBar)
 
 	for i = 1, AJ_MAX_NUM_SUGGESTIONS do
 		local suggestion = EncounterJournal.suggestFrame["Suggestion"..i]
@@ -203,6 +221,9 @@ local function LoadSkin()
 		for _, child in next, {frame.ScrollTarget:GetChildren()} do
 			if not child.isSkinned then
 				child:SkinButton()
+				local hl = child:GetHighlightTexture()
+				hl:SetColorTexture(1, 1, 1, 0.2)
+				hl:SetInside(child)
 				child.isSkinned = true
 			end
 		end
@@ -263,23 +284,47 @@ local function LoadSkin()
 		end
 	end)
 
-	local function SkinOverviewInfo(self, _, index)
-		local header = self.overviews[index]
-		if not header.isSkinned then
-
-			header.descriptionBG:SetAlpha(0)
-			header.descriptionBGBottom:SetAlpha(0)
-			for i = 4, 18 do
-				select(i, header.button:GetRegions()):SetTexture("")
+	local SkinOverviewInfo
+	do -- this prevents a taint trying to force a color lock by setting it to T.dummy
+		local LockColors = {}
+		local function LockValue(button, r, g, b)
+			if r ~= 1 or g ~= 1 or b ~= 0 then
+				button:SetTextColor(1, 1, 0)
 			end
+		end
 
-			header.button:SkinButton()
-			header.button.title:SetTextColor(1, 1, 0)
-			header.button.title.SetTextColor = T.dummy
-			header.button.expandedIcon:SetTextColor(1, 1, 1)
-			header.button.expandedIcon.SetTextColor = T.dummy
+		local function LockWhite(button, r, g, b)
+			if r ~= 1 or g ~= 1 or b ~= 1 then
+				button:SetTextColor(1, 1, 1)
+			end
+		end
 
-			header.isSkinned = true
+		local function LockColor(button, valuecolor)
+			if LockColors[button] then return end
+
+			hooksecurefunc(button, 'SetTextColor', (valuecolor and LockValue) or LockWhite)
+
+			LockColors[button] = true
+		end
+
+		SkinOverviewInfo = function(frame, _, index)
+			local header = frame.overviews[index]
+			if not header.isSkinned then
+				for i = 4, 18 do
+					select(i, header.button:GetRegions()):SetTexture()
+				end
+
+				header.button:SkinButton()
+
+				LockColor(header.button.title, true)
+				LockColor(header.button.expandedIcon)
+
+				header.descriptionBG:SetAlpha(0)
+				header.descriptionBGBottom:SetAlpha(0)
+				header.description:SetTextColor(1, 1, 1)
+
+				header.isSkinned = true
+			end
 		end
 	end
 	hooksecurefunc("EncounterJournal_SetUpOverview", SkinOverviewInfo)
@@ -316,23 +361,11 @@ local function LoadSkin()
 				header.button.title.SetTextColor = T.dummy
 				header.button.expandedIcon:SetTextColor(1, 1, 1)
 				header.button.expandedIcon.SetTextColor = T.dummy
-				header.button:SkinButton(true)
-				header.button.bg = CreateFrame("Frame", nil, header.button)
-				header.button.bg:SetTemplate("Default")
-				header.button.bg:SetFrameLevel(header.button.bg:GetFrameLevel() - 1)
-				header.button.abilityIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-				if header.button.abilityIcon:IsShown() then
-					header.button.bg:Show()
-				else
-					header.button.bg:Hide()
-				end
-				header.isSkinned = true
-			end
 
-			if header.button.abilityIcon:IsShown() then
-				header.button.bg:Show()
-			else
-				header.button.bg:Hide()
+				header.button:SkinButton()
+				header.button.abilityIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+
+				header.isSkinned = true
 			end
 
 			index = index + 1
@@ -395,32 +428,35 @@ local function LoadSkin()
 
 	local itemSetsFrame = EncounterJournal.LootJournalItems.ItemSetsFrame
 	itemSetsFrame.ClassButton:SkinButton(true)
-	T.SkinScrollBar(itemSetsFrame.scrollBar)
+	T.SkinScrollBar(itemSetsFrame.ScrollBar)
 
-	hooksecurefunc(itemSetsFrame, "ConfigureItemButton", function(_, button)
-		if not button.styled then
-			button.Border:SetAlpha(0)
-			button:CreateBackdrop("Overlay")
-			button.backdrop:SetPoint("TOPLEFT", button.Border, 5, -5)
-			button.backdrop:SetPoint("BOTTOMRIGHT", button.Border, -4, 3)
-			button.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-			button.styled = true
-		end
+	hooksecurefunc(itemSetsFrame.ScrollBox, "Update", function(self)
+		self:ForEachFrame(function(bar)
+			if not bar.styled then
+				bar.ItemLevel:SetTextColor(1, 1, 1)
+				bar.Background:Hide()
+				bar:CreateBackdrop("Overlay")
+				bar.backdrop:SetPoint("TOPLEFT", 0, 2)
+				bar.backdrop:SetPoint("BOTTOMRIGHT", -2, -2)
 
-		local quality = select(3, GetItemInfo(button.itemID))
-		local color = ITEM_QUALITY_COLORS[quality or 1]
-		button.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+				bar.styled = true
+			end
+
+			local itemButtons = bar.ItemButtons
+			for i = 1, #itemButtons do
+				local button = itemButtons[i]
+				if not button.styled then
+					button:CreateBackdrop("Overlay")
+					button.backdrop:SetPoint("TOPLEFT", button.Border, 5, -5)
+					button.backdrop:SetPoint("BOTTOMRIGHT", button.Border, -4, 3)
+					button.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+					T.SkinIconBorder(button.Border, button.backdrop)
+					button.Border:SetAtlas(button.Border:GetAtlas()) -- force to update border as it call before we can skin
+					button.styled = true
+				end
+			end
+		end)
 	end)
-
-	local button = itemSetsFrame.buttons
-	for i = 1, #button do
-		local button = button[i]
-		button:CreateBackdrop("Overlay")
-		button.backdrop:SetPoint("TOPLEFT", 2, 2)
-		button.backdrop:SetPoint("BOTTOMRIGHT", 0, 0)
-		button.Background:Hide()
-		button.ItemLevel:SetTextColor(1, 1, 1)
-	end
 
 	T.SkinScrollBar(EncounterJournal.LootJournal.ScrollBar)
 
@@ -437,7 +473,7 @@ local function LoadSkin()
 				btn.backdrop:SetPoint("TOPLEFT", 2, -2)
 				btn.backdrop:SetPoint("BOTTOMRIGHT", 2, 2)
 
-				btn.IsSkinned = true
+				btn.isSkinned = true
 			end
 		end
 	end)

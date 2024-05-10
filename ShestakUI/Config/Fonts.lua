@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	ShestakUI fonts configuration file
@@ -112,6 +112,7 @@ C["font"] = {
 	["tooltip_header_font_size"] = 13,
 	["tooltip_font_size"] = 11,
 	["bubble_font_size"] = 14,
+	["quest_tracker_font_mult"] = 1,
 }
 
 C["normal_font"] = {
@@ -208,7 +209,22 @@ C["normal_font"] = {
 ----------------------------------------------------------------------------------------
 --	Pixel font replacement
 ----------------------------------------------------------------------------------------
-if (ShestakUIOptions and ShestakUIOptions["font"] and ShestakUIOptions["font"]["global_font"] == true) or (ShestakUIOptionsPerChar and ShestakUIOptionsPerChar["font"] and ShestakUIOptionsPerChar["font"]["global_font"] == true) then
+local disablePixel
+if ShestakUIOptionsGlobal then
+	if ShestakUIOptionsGlobal[T.realm] and ShestakUIOptionsGlobal[T.realm][T.name] and ShestakUIOptionsGlobal[T.realm]["Current_Profile"] then
+		local i = tostring(ShestakUIOptionsGlobal[T.realm]["Current_Profile"][T.name])
+		if ShestakUIOptionsPerChar and ShestakUIOptionsPerChar[i] and ShestakUIOptionsPerChar[i]["font"] and ShestakUIOptionsPerChar[i]["font"]["global_font"] then
+			disablePixel = true
+		end
+	else
+		local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+		if ShestakUIOptions and ShestakUIOptions[i] and ShestakUIOptions[i]["font"] and ShestakUIOptions[i]["font"]["global_font"] then
+			disablePixel = true
+		end
+	end
+end
+
+if disablePixel then
 	C["media"].pixel_font = C.media.normal_font
 	C["media"].pixel_font_size = 11
 	C["media"].pixel_font_style = "OUTLINE"

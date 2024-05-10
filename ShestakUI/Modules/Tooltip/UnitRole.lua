@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.tooltip.enable ~= true or C.tooltip.unit_role ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ local function GetLFDRole(unit)
 end
 
 local function OnTooltipSetUnit()
-	if self ~= GameTooltip or self:IsForbidden() then return end
+	if T.Mainline and (self ~= GameTooltip or self:IsForbidden()) then return end
 	local _, instanceType = IsInInstance()
 	if instanceType == "scenario" then return end
 	local _, unit = GameTooltip:GetUnit()

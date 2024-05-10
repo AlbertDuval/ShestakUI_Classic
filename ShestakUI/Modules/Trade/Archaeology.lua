@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.trade.archaeology ~= true or IsAddOnLoaded("stArchaeologist") then return end
 
 ----------------------------------------------------------------------------------------
@@ -9,7 +9,7 @@ stArch["archSkill"] = {}	-- Archaeology skill level
 stArch["progressBars"] = {}	-- Status bars for artifacts
 stArch["artifactInfo"] = {}	-- Information to update bars
 
-local numRaces = 20
+local numRaces = (T.Classic and GetNumArchaeologyRaces) and GetNumArchaeologyRaces() or 20
 local Loaded = false
 
 function stArch:OnLoad(self)
@@ -23,7 +23,7 @@ function stArch:OnLoad(self)
 	stArch["title"]["text"] = stArch["title"]:CreateFontString()
 	stArch["title"]["text"]:SetPoint("CENTER", stArch["title"], "CENTER", 0, 0)
 	stArch["title"]["text"]:SetJustifyH("CENTER")
-	stArch["title"]["text"]:SetJustifyV("CENTER")
+	stArch["title"]["text"]:SetJustifyV("MIDDLE")
 	stArch["title"]["text"]:SetFont(C.media.pixel_font, C.media.pixel_font_size, C.media.pixel_font_style)
 	stArch["title"]["text"]:SetText(PROFESSIONS_ARCHAEOLOGY)
 
@@ -296,8 +296,8 @@ function stArch:updateArtifact(index)
 		artifact["canSolve"] = CanSolveArtifact()
 
 		for i = 0, 4 do
-			for j = 1, GetContainerNumSlots(i) do
-				local slotID = GetContainerItemID(i, j)
+			for j = 1, C_Container.GetContainerNumSlots(i) do
+				local slotID = C_Container.GetContainerItemID(i, j)
 				if slotID == artifact["keyID"] then
 					local _, count = GetContainerItemInfo(i, j)
 					if artifact["numKeystones"] < artifact["numKeysockets"] then
@@ -463,7 +463,7 @@ function stArch:updateFramePosition(self)
 end
 
 local stArchFrame = CreateFrame("Frame", "stArchaeologyFrame", UIParent)
-stArchFrame:RegisterEvent("RESEARCH_ARTIFACT_HISTORY_READY")
+--BETA stArchFrame:RegisterEvent("RESEARCH_ARTIFACT_HISTORY_READY")
 stArchFrame:RegisterEvent("RESEARCH_ARTIFACT_COMPLETE")
 stArchFrame:RegisterEvent("RESEARCH_ARTIFACT_DIG_SITE_UPDATED")
 stArchFrame:RegisterEvent("CURRENCY_DISPLAY_UPDATE")

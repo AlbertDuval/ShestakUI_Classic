@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.actionbar.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -28,33 +28,21 @@ vehicle:SetFrameStrata("HIGH")
 vehicle:Hide()
 
 local function MainMenuBarVehicleLeaveButtonUpdateHook()
-	if T.Vanilla or T.TBC then
+	if CanExitVehicle() then
 		if UnitOnTaxi("player") then
-			vehicle:Show()
 			vehicle:SetScript("OnClick", function(self)
 				TaxiRequestEarlyLanding()
 				self:LockHighlight()
 			end)
 		else
-			vehicle:Hide()
+			vehicle:SetScript("OnClick", function()
+				VehicleExit()
+			end)
 		end
+		vehicle:Show()
 	else
-		if CanExitVehicle() then
-			if UnitOnTaxi("player") then
-				vehicle:SetScript("OnClick", function(self)
-					TaxiRequestEarlyLanding()
-					self:LockHighlight()
-				end)
-			else
-				vehicle:SetScript("OnClick", function()
-					VehicleExit()
-				end)
-			end
-			vehicle:Show()
-		else
-			vehicle:UnlockHighlight()
-			vehicle:Hide()
-		end
+		vehicle:UnlockHighlight()
+		vehicle:Hide()
 	end
 end
 
@@ -64,7 +52,7 @@ else
 	hooksecurefunc(MainMenuBarVehicleLeaveButton, "Update", MainMenuBarVehicleLeaveButtonUpdateHook)
 end
 
-if T.Wrath then
+if T.Wrath or T.Cata then
 	vehicle:RegisterEvent("PLAYER_ENTERING_WORLD")
 	vehicle:RegisterEvent("UPDATE_BONUS_ACTIONBAR")
 	vehicle:RegisterEvent("UPDATE_MULTI_CAST_ACTIONBAR")
@@ -97,7 +85,7 @@ local function PossessBarUpdateHook()
 	end
 end
 
-if T.Wrath then
+if T.Wrath or T.Cata then
 	hooksecurefunc("PossessBar_UpdateState", PossessBarUpdateHook)
 elseif T.Mainline then
 	hooksecurefunc(PossessActionBar, "UpdateState", PossessBarUpdateHook)
@@ -110,14 +98,12 @@ vehicle:SetScript("OnEnter", function(self)
 		GameTooltip:SetText(TAXI_CANCEL, 1, 1, 1)
 		GameTooltip:AddLine(TAXI_CANCEL_DESCRIPTION, 1, 0.8, 0, true)
 		GameTooltip:Show()
-	elseif T.Mainline or T.Wrath then
-		if T.Mainline and IsPossessBarVisible() then
-			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-			GameTooltip_SetTitle(GameTooltip, CANCEL)
-		else
-			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-			GameTooltip_SetTitle(GameTooltip, LEAVE_VEHICLE)
-		end
+	elseif IsPossessBarVisible() then
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip_SetTitle(GameTooltip, CANCEL)
+	else
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip_SetTitle(GameTooltip, LEAVE_VEHICLE)
 	end
 end)
 vehicle:SetScript("OnLeave", function() GameTooltip:Hide() end)

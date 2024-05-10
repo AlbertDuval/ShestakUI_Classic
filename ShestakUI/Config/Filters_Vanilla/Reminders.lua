@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	The best way to add or delete spell is to go at www.wowhead.com, search for a spell.
@@ -10,7 +10,7 @@ local function SpellName(id)
 	if name then
 		return {name, icon}
 	else
-		print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to EsreverWoW.|r")
+		print("|cffff0000ShestakUI: spell ID ["..tostring(id).."] no longer exists!|r")
 		return {"Empty", ""}
 	end
 end
@@ -110,6 +110,7 @@ if C.reminder.raid_buffs_enable == true or C.announcements.flask_food == true th
 			Physical = {
 				SpellName(25782),	-- Greater Blessing of Might
 				SpellName(19740),	-- Blessing of Might
+				SpellName(425600),	-- Horn of Lordaeron [Season of Discovery]
 			},
 			Threat = {
 				SpellName(25895),	-- Greater Blessing of Salvation
@@ -139,6 +140,7 @@ if C.reminder.raid_buffs_enable == true or C.announcements.flask_food == true th
 		Kings = {
 			SpellName(25898),	-- Greater Blessing of Kings
 			SpellName(20217),	-- Blessing of Kings
+			SpellName(409583),	-- Aspect of the Lion [Season of Discovery]
 		},
 		Mark = {
 			SpellName(21849),	-- Gift of the Wild
@@ -183,7 +185,7 @@ if C.reminder.raid_buffs_enable == true or C.announcements.flask_food == true th
 		local faction = UnitFactionGroup("player")
 		if not faction or faction == "Neutral" then faction = "Alliance" end
 
-		T.ReminderBuffs.Spell4Buff = faction == "Alliance" and T.ReminderBuffs["Kings"] or T.ReminderBuffs["Horde"]["Threat"]
+		T.ReminderBuffs.Spell4Buff = faction == "Alliance" and T.ReminderBuffs["Kings"] or (T.SoD and T.ReminderBuffs["Kings"] or T.ReminderBuffs["Horde"]["Threat"])
 		T.ReminderBuffs.Spell5Buff = T.ReminderBuffs["AP"]
 		T.ReminderBuffs.Spell6Buff = T.ReminderBuffs[faction]["Physical"]
 	end
@@ -242,6 +244,7 @@ if C.reminder.solo_buffs_enable == true then
 					SpellName(13163),	-- Aspect of the Monkey
 					SpellName(13159),	-- Aspect of the Pack
 					SpellName(20043),	-- Aspect of the Wild
+					SpellName(409580),	-- Aspect of the Lion [Season of Discovery]
 				},
 				["combat"] = true,
 				["instance"] = true,
@@ -263,6 +266,7 @@ if C.reminder.solo_buffs_enable == true then
 					SpellName(168),		-- Frost Armor
 					SpellName(6117),	-- Mage Armor
 					SpellName(7302),	-- Ice Armor
+					SpellName(428741),	-- Molten Armor [Season of Discovery]
 				},
 				["combat"] = true,
 				["instance"] = true,
@@ -281,6 +285,7 @@ if C.reminder.solo_buffs_enable == true then
 			[1] = {	-- Righteous Fury group
 				["spells"] = {
 					SpellName(25780),	-- Righteous Fury
+					-- SpellName(407627),	-- Righteous Fury [Season of Discovery]
 				},
 				["role"] = "Tank",
 				["combat"] = true,
@@ -336,6 +341,7 @@ if C.reminder.solo_buffs_enable == true then
 					SpellName(31892),		-- Seal of Blood
 					SpellName(348700),		-- Seal of the Martyr
 					SpellName(348704),		-- Seal of Corruption
+					SpellName(407798),		-- Seal of Martyrdom [Season of Discovery]
 				},
 				["combat"] = true,
 				["instance"] = true,
@@ -394,10 +400,22 @@ if C.reminder.solo_buffs_enable == true then
 			[1] = {	-- Main Hand Weapon Enchant group
 				["spells"] = {
 					SpellName(8679),	-- Instant Poison
+					SpellName(8686),	-- Instant Poison II
+					SpellName(8688),	-- Instant Poison III
+					SpellName(11338),	-- Instant Poison IV
+					SpellName(11339),	-- Instant Poison V
+					SpellName(11340),	-- Instant Poison VI
 					SpellName(2823),	-- Deadly Poison
+					SpellName(2824),	-- Deadly Poison II
+					SpellName(11355),	-- Deadly Poison III
+					SpellName(11356),	-- Deadly Poison IV
+					SpellName(25351),	-- Deadly Poison V
 					SpellName(3408),	-- Crippling Poison
 					SpellName(5761),	-- Mind-numbing Poison
 					SpellName(13219),	-- Wound Poison
+					SpellName(439465),	-- Atrophic Poison [Season of Discovery]
+					SpellName(439464),	-- Numbing Poison [Season of Discovery]
+					SpellName(439462),	-- Sebacious Poison [Season of Discovery]
 				},
 				["mainhand"] = true,
 				["combat"] = true,
@@ -408,10 +426,22 @@ if C.reminder.solo_buffs_enable == true then
 			[2] = {	-- Off-Hand Weapon Enchant group
 				["spells"] = {
 					SpellName(8679),	-- Instant Poison
+					SpellName(8686),	-- Instant Poison II
+					SpellName(8688),	-- Instant Poison III
+					SpellName(11338),	-- Instant Poison IV
+					SpellName(11339),	-- Instant Poison V
+					SpellName(11340),	-- Instant Poison VI
 					SpellName(2823),	-- Deadly Poison
+					SpellName(2824),	-- Deadly Poison II
+					SpellName(11355),	-- Deadly Poison III
+					SpellName(11356),	-- Deadly Poison IV
+					SpellName(25351),	-- Deadly Poison V
 					SpellName(3408),	-- Crippling Poison
 					SpellName(5761),	-- Mind-numbing Poison
 					SpellName(13219),	-- Wound Poison
+					SpellName(439465),	-- Atrophic Poison [Season of Discovery]
+					SpellName(439464),	-- Numbing Poison [Season of Discovery]
+					SpellName(439462),	-- Sebacious Poison [Season of Discovery]
 				},
 				["offhand"] = true,
 				["combat"] = true,
@@ -421,12 +451,24 @@ if C.reminder.solo_buffs_enable == true then
 			},
 		},
 		SHAMAN = {
-			[1] = {	-- Main Hand Weapon Enchant group
+			[1] = {	-- Shields group
+				["spells"] = {
+					SpellName(408510),	-- Water Shield [Season of Discovery]
+					SpellName(324),		-- Lightning Shield
+					SpellName(974),		-- Earth Shield [Season of Discovery]
+				},
+				["combat"] = true,
+				["instance"] = true,
+				["pvp"] = true,
+				-- ["level"] = 8,
+			},
+			[2] = {	-- Main Hand Weapon Enchant group
 				["spells"] = {
 					SpellName(8232),	-- Windfury Weapon
 					SpellName(8017),	-- Rockbiter Weapon
 					SpellName(8024),	-- Flametongue Weapon
 					SpellName(8033),	-- Frostbrand Weapon
+					SpellName(430585),	-- Increased Mana Regen and Spell Hit (Blackfathom Mana Oil) [Season of Discovery]
 					SpellName(25123),	-- Brilliant Mana Oil
 					SpellName(25122),	-- Brilliant Wizard Oil
 					SpellName(28898),	-- Blessed Wizard Oil
@@ -437,7 +479,7 @@ if C.reminder.solo_buffs_enable == true then
 				["instance"] = true,
 				["pvp"] = true,
 			},
-			[2] = {	-- Off-Hand Weapon Enchant group
+			[3] = {	-- Off-Hand Weapon Enchant group
 				["spells"] = {
 					SpellName(8232),	-- Windfury Weapon
 					SpellName(8017),	-- Rockbiter Weapon
@@ -460,11 +502,20 @@ if C.reminder.solo_buffs_enable == true then
 				["instance"] = true,
 				["pvp"] = true,
 			},
+			[2] = {	-- Grimoire of Synergy [Season of Discovery] group
+				["spells"] = {
+					SpellName(426301),	-- Grimoire of Synergy
+				},
+				["combat"] = true,
+				["instance"] = true,
+				["pvp"] = true,
+			},
 		},
 		WARRIOR = {
 			[1] = {	-- Battle Shout group
 				["spells"] = {
 					SpellName(6673),	-- Battle Shout
+					SpellName(403215),	-- Commanding Shout [Season of Discovery]
 				},
 				["combat"] = true,
 				["instance"] = true,
@@ -476,6 +527,7 @@ if C.reminder.solo_buffs_enable == true then
 					SpellName(2457),		-- Battle Stance
 					SpellName(2458),		-- Berserker Stance
 					SpellName(71),			-- Defensive Stance
+					SpellName(412513),		-- Gladiator Stance [Season of Discovery]
 				},
 				["combat"] = true,
 				["instance"] = true,

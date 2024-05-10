@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Garrison, OrderHall and BFA Mission skin
@@ -929,7 +929,7 @@ local function LoadSkin()
 	T.SkinEditBox(Follower.SearchBox)
 	Follower.SearchBox:SetPoint("TOPLEFT", 2, 25)
 	Follower.SearchBox:SetSize(301, 20)
-	T.SkinScrollBar(OrderHallMissionFrameFollowers.ScrollBar )
+	T.SkinScrollBar(OrderHallMissionFrameFollowers.ScrollBar)
 	Follower.MaterialFrame:StripTextures()
 	T.SkinCloseButton(OrderHallMissionFrame.MissionTab.MissionPage.CloseButton)
 	OrderHallMissionFrame.MissionTab.MissionPage.StartMissionButton:SkinButton()

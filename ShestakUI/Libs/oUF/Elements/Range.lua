@@ -5,7 +5,7 @@ local _FRAMES = {}
 local OnRangeFrame
 
 local UnitInRange, UnitIsConnected = UnitInRange, UnitIsConnected
-local LibRangeCheck = oUF:IsClassic() and LibStub("LibRangeCheck-2.0-ShestakUI")
+local LibRangeCheck = oUF:IsClassic() and LibStub("LibRangeCheck-3.0-ShestakUI")
 
 local function Update(self, event)
 	local element = self.Range
@@ -23,17 +23,13 @@ local function Update(self, event)
 	local inRange, checkedRange
 	local connected = UnitIsConnected(unit)
 	if(connected) then
-		if(oUF:IsClassic()) then
+		if(LibRangeCheck) then
 			-- GetRange(unit, checkVisible, noItems)
 			_, inRange = LibRangeCheck:GetRange(unit, true, true)
-			-- 40yd Vial of the Sunwell Fallback
-			inRange = inRange or IsItemInRange(34471, unit)
-			-- 28yd Follow Fallback
-			inRange = inRange or CheckInteractDistance(unit, 4)
 		else
 			inRange, checkedRange = UnitInRange(unit)
 		end
-		if((not oUF:IsClassic() and checkedRange and not inRange) or (not inRange)) then
+		if((oUF:IsMainline() and checkedRange and not inRange) or (not inRange)) then
 			self:SetAlpha(element.outsideAlpha)
 		else
 			self:SetAlpha(element.insideAlpha)

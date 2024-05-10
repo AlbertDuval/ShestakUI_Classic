@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -70,8 +70,6 @@ local function LoadSkin()
 	bg:SetPoint("BOTTOMRIGHT", -8, 3)
 
 	CalendarContextMenu.NineSlice:SetTemplate("Transparent")
-	-- CalendarContextMenu.SetBackdropColor = T.dummy
-	-- CalendarContextMenu.SetBackdropBorderColor = T.dummy
 	CalendarInviteStatusContextMenu.NineSlice:SetTemplate("Transparent")
 
 	-- Boost frame levels
@@ -131,12 +129,7 @@ local function LoadSkin()
 	-- Texture Picker Frame
 	CalendarTexturePickerFrame:SetTemplate("Transparent")
 
-	if T.Mainline then
-		T.SkinScrollBar(CalendarTexturePickerFrame.ScrollBar)
-		--BETA T.SkinScrollBar(CalendarViewEventInviteListScrollFrame.ScrollBar)
-		-- T.SkinScrollBar(CalendarCreateEventDescriptionScrollFrame.ScrollBar)
-	end
-
+	T.SkinScrollBar(CalendarTexturePickerFrame.ScrollBar)
 	CalendarTexturePickerAcceptButton:SkinButton(true)
 	CalendarTexturePickerCancelButton:SkinButton(true)
 	CalendarCreateEventRaidInviteButton:SkinButton(true)
@@ -170,10 +163,6 @@ local function LoadSkin()
 	T.SkinCloseButton(CalendarViewEventCloseButton)
 
 	CalendarEventPickerFrame:SetTemplate("Transparent")
-
-	if T.Mainline then
-		-- T.SkinScrollBar(CalendarEventPicker.ScrollBar)
-	end
 
 	CalendarEventPickerCloseButton:SkinButton(true)
 

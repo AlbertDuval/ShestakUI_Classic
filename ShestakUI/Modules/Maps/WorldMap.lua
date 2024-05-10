@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Font replacement
@@ -20,11 +20,16 @@ WorldMapFrame:SetClampedToScreen(true)
 ----------------------------------------------------------------------------------------
 --	Count of quests
 ----------------------------------------------------------------------------------------
+local maxQuest = T.Vanilla and 20 or T.Classic and 25 or 35
 local numQuest = CreateFrame("Frame", nil, QuestMapFrame)
 numQuest.text = numQuest:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-numQuest.text:SetPoint("TOP", QuestMapFrame, "TOP", 0, -21)
+if C.skins.blizzard_frames then
+	numQuest.text:SetPoint("TOP", QuestMapFrame, "TOP", 0, -21)
+else
+	numQuest.text:SetPoint("TOP", QuestMapFrame, "TOP", 0, -17)
+end
 numQuest.text:SetJustifyH("LEFT")
-numQuest.text:SetText(select(2, C_QuestLog.GetNumQuestLogEntries()).."/"..C_QuestLog.GetMaxNumQuestsCanAccept())
+numQuest.text:SetText(select(2, C_QuestLog.GetNumQuestLogEntries()).."/"..maxQuest)
 
 ----------------------------------------------------------------------------------------
 --	Creating coordinate
@@ -90,7 +95,7 @@ WorldMapFrame:HookScript("OnUpdate", function()
 			coords.MouseText:SetText(L_MAP_CURSOR.."|cffff0000"..L_MAP_BOUNDS.."|r")
 		end
 
-		numQuest.text:SetText(select(2, C_QuestLog.GetNumQuestLogEntries()).."/"..C_QuestLog.GetMaxNumQuestsCanAccept())
+		numQuest.text:SetText(select(2, C_QuestLog.GetNumQuestLogEntries()).."/"..maxQuest)
 
 		int = 0
 	end

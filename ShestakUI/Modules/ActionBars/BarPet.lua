@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.actionbar.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -53,9 +53,7 @@ bar:SetScript("OnEvent", function(self, event)
 			button:Show()
 			self:SetAttribute("addchild", button)
 		end
-		if T.Vanilla or T.TBC then
-			RegisterStateDriver(self, "visibility", "[pet,nooverridebar,nopossessbar] show; hide")
-		elseif T.Wrath then
+		if T.Classic then
 			RegisterStateDriver(self, "visibility", "[pet,nooverridebar,novehicleui,nopossessbar] show; hide")
 		else
 			RegisterStateDriver(self, "visibility", "[pet,novehicleui,nopossessbar,nopetbattle] show; hide")
@@ -73,6 +71,30 @@ bar:SetScript("OnEvent", function(self, event)
 			PetActionBar_UpdateCooldowns()
 		else
 			PetActionBar:UpdateCooldowns()
+		end
+	end
+end)
+
+hooksecurefunc(PetActionButton10, "SetPoint", function(_, _, anchor)
+	if InCombatLockdown() then return end
+	if anchor and anchor == PetActionBar then
+		for i = 1, 10 do
+			local button = _G["PetActionButton"..i]
+			button:ClearAllPoints()
+			if i == 1 then
+				if C.actionbar.petbar_horizontal == true then
+					button:SetPoint("BOTTOMLEFT", 0, 0)
+				else
+					button:SetPoint("TOPLEFT", 0, 0)
+				end
+			else
+				local previous = _G["PetActionButton"..i-1]
+				if C.actionbar.petbar_horizontal == true then
+					button:SetPoint("LEFT", previous, "RIGHT", C.actionbar.button_space, 0)
+				else
+					button:SetPoint("TOP", previous, "BOTTOM", 0, -C.actionbar.button_space)
+				end
+			end
 		end
 	end
 end)

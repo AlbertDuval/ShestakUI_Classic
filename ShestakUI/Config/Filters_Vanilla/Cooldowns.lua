@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	The best way to add or delete spell is to go at www.wowhead.com, search for a spell.
@@ -17,9 +17,18 @@ if C.raidcooldown.enable == true then
 		-- Healing
 		{740, 300},		-- Tranquility (300sec base / -150sec from 8pc T1)
 		{724, 600},		-- Lightwell
+		{409324, 120},	-- Ancestral Guidance [Season of Discovery]
 		-- Defense
+		{428713, 60},	-- Barkskin [Season of Discovery]
+		{408024, 180},	-- Survival Instincts [Season of Discovery]
 		{1022, 300},	-- Blessing of Protection (300sec base / -120sec from talents)
+		{498, 300},		-- Divine Protection
+		{407804, 120},	-- Divine Sacrifice [Season of Discovery]
 		{633, 3600},	-- Lay on Hands (3600sec base / -1200sec from talents / -720sec from 4pc T3)
+		{425294, 120},	-- Dispersion [Season of Discovery]
+		{402004, 180},	-- Pain Suppression [Season of Discovery]
+		{425207, 180},	-- Power Word: Barrier [Season of Discovery]
+		{426195, 180},	-- Vengeance [Season of Discovery]
 		{871, 1800},	-- Shield Wall
 		{12975, 600},	-- Last Stand
 		-- Taunts
@@ -50,7 +59,9 @@ end
 if C.enemycooldown.enable == true then
 	T.enemy_spells = {
 		-- Interrupts and Silences
+		{410176, 10},	-- Skull Bash [Season of Discovery]
 		{2139, 30},		-- Counterspell (24sec base / -2sec from ZG neck)
+		{425609, 10},	-- Rebuke [Season of Discovery]
 		{15487, 45},	-- Silence
 		{1766, 10},		-- Kick (10sec base / -0.5sec from ZG neck)
 		{8042, 5},		-- Earth Shock (6sec base / -1sec from talents)
@@ -61,7 +72,7 @@ if C.enemycooldown.enable == true then
 		{19503, 30},	-- Scatter Shot
 		{19386, 120},	-- Wyvern Sting
 		{11113, 45},	-- Blast Wave
-		{853, 45},		-- Hammer of Justice (60sec base / -10sec from 4pc PvP / -15sec from talents / -0.5sec from ZG neck)
+		{853, 45},		-- Hammer of Justice (60sec base / -10sec from 4pc PvP / -15sec from talents)
 		{20066, 60},	-- Repentance
 		{6789, 120},	-- Death Coil (120sec base / -18sec from 5pc ZG Set)
 		{8122, 26},		-- Psychic Scream (30sec base / -4sec from talents)
@@ -70,6 +81,8 @@ if C.enemycooldown.enable == true then
 		{12809, 45},	-- Concussion Blow
 		-- Defense abilities
 		{22812, 60},	-- Barkskin
+		{428713, 60},	-- Barkskin [Season of Discovery]
+		{408024, 180},	-- Survival Instincts [Season of Discovery]
 		{19263, 300},	-- Deterrence
 		{11958, 300},	-- Ice Block
 		{1044, 14},		-- Blessing of Freedom (20sec base / -6sec from talents)
@@ -77,15 +90,22 @@ if C.enemycooldown.enable == true then
 		{498, 300},		-- Divine Protection
 		{642, 300},		-- Divine Shield
 		{6346, 30},		-- Fear Ward
+		{402004, 180},	-- Pain Suppression [Season of Discovery]
+		{425207, 180},	-- Power Word: Barrier [Season of Discovery]
+		{426490, 180},	-- Rallying Cry [Season of Discovery]
 		{5277, 210},	-- Evasion (300sec base / -90sec from talents / -60sec from 3pc AQ Set)
+		{424919, 20},	-- Main Gauche [Season of Discovery]
 		{1856, 210},	-- Vanish (300sec base / -90sec from talents / -30sec from 3pc T1)
-		-- {8178, 13},	-- Grounding Totem (15sec base / -2sec from talents)
+		-- {8178, 13},	-- Grounding Totem Effect (15sec base / -2sec from talents)
+		{425463, 20},	-- Demonic Grace [Season of Discovery]
 		{18499, 30},	-- Berserker Rage
+		{12328, 180},	-- Death Wish
 		{20600, 180},	-- Perception
 		{20594, 180},	-- Stoneform
 		{7744, 120},	-- Will of the Forsaken
 		-- Heals
 		-- Disarms
+		{409495, 60},	-- Chimera Shot - Scorpid [Season of Discovery]
 		-- {14251, 6},		-- Riposte
 		{676, 60},		-- Disarm
 		-- Mana Regeneration
@@ -113,7 +133,20 @@ if C.enemycooldown.enable == true then
 end
 
 if C.pulsecooldown.enable == true then
+	local function SpellName(id)
+		local name = GetSpellInfo(id)
+		if name then
+			return name
+		else
+			print("|cffff0000ShestakUI: Pulse cooldown spell ID ["..tostring(id).."] no longer exists!|r")
+			return "Empty"
+		end
+	end
+
 	T.pulse_ignored_spells = {
-		-- GetSpellInfo(spellID),	-- Spell name
+		-- SpellName(spellID),	-- Spell name
 	}
+	for _, spell in pairs(C.pulsecooldown.spells_list) do
+		T.pulse_ignored_spells[SpellName(spell)] = true
+	end
 end

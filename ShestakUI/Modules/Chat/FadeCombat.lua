@@ -1,4 +1,4 @@
-﻿local T, C, L, _ = unpack(select(2, ...))
+﻿local T, C, L = unpack(ShestakUI)
 if C.chat.enable ~= true or C.chat.hide_combat ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -125,9 +125,11 @@ end
 local function checkAgain(self)
 	C_Timer.After(1, function()
 		local f = GetMouseFocus()
-		local name = GetMouseFocus():GetName()
-		if f and name and not name:match("HCIC") then
-			hcic:ChatOnLeave(self)
+		if f then
+			local name = GetMouseFocus():GetName()
+			if name and not name:match("HCIC") then
+				hcic:ChatOnLeave(self)
+			end
 		end
 	end)
 end

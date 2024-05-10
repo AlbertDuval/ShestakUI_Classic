@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -59,28 +59,50 @@ local function LoadSkin()
 		end
 	end
 
+	local function replaceTextColor(text, r)
+		if r ~= 1 then
+			text:SetTextColor(1, 1, 1)
+		end
+	end
+
 	_G.QuestFont:SetTextColor(1, 1, 1)
 	_G.QuestFont:SetShadowOffset(1, -1)
 
 	GossipFrame:CreateBackdrop("Transparent")
 	GossipFrame.backdrop:SetAllPoints()
+	if T.Classic then
+		GossipFrame.backdrop:SetPoint("TOPLEFT", 10, -12)
+		GossipFrame.backdrop:SetPoint("BOTTOMRIGHT", -32, 66)
+	end
 	GossipFrame:DisableDrawLayer("BACKGROUND")
 
-	T.SkinCloseButton(GossipFrameCloseButton, GossipFrame.backdrop)
+	if T.Classic then
+		T.SkinCloseButton(GossipFrame.CloseButton, GossipFrame.backdrop)
+	else
+		T.SkinCloseButton(GossipFrameCloseButton, GossipFrame.backdrop)
+	end
 
 	T.SkinScrollBar(GossipFrame.GreetingPanel.ScrollBar)
 
-	GossipFrame.FriendshipStatusBar:StripTextures()
-	GossipFrame.FriendshipStatusBar:SetStatusBarTexture(C.media.texture)
-	GossipFrame.FriendshipStatusBar:CreateBackdrop("Overlay")
-	GossipFrame.FriendshipStatusBar.icon:SetPoint("TOPLEFT", -30, 7)
+	if T.Mainline then
+		GossipFrame.FriendshipStatusBar:StripTextures()
+		GossipFrame.FriendshipStatusBar:SetStatusBarTexture(C.media.texture)
+		GossipFrame.FriendshipStatusBar:CreateBackdrop("Overlay")
+		GossipFrame.FriendshipStatusBar.icon:SetPoint("TOPLEFT", -30, 7)
+	end
 
 	-- Extreme hackage, blizzard makes button text on quest frame use hex color codes for some reason
 	hooksecurefunc(GossipFrame.GreetingPanel.ScrollBox, "Update", function(frame)
 		for _, button in next, {frame.ScrollTarget:GetChildren()} do
 			if not button.IsSkinned then
-				local buttonText = select(3, button:GetRegions())
-				if buttonText and buttonText:IsObjectType("FontString") then
+				local buttonText = button.GreetingText or button.GetFontString and button:GetFontString()
+				if buttonText then
+					buttonText:SetTextColor(1, 1, 1)
+					hooksecurefunc(buttonText, "SetTextColor", replaceTextColor)
+				end
+
+				local buttonText = button.GetFontString and button:GetFontString()
+				if buttonText then
 					ReplaceGossipText(button, button:GetText())
 					hooksecurefunc(button, "SetText", ReplaceGossipText)
 					hooksecurefunc(button, "SetFormattedText", ReplaceGossipFormat)

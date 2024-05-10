@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -43,7 +43,10 @@ local function LoadSkin()
 	}
 
 	for i = 1, #KillTextures do
-		KillTextures[i]:Kill()
+		local frame = KillTextures[i]
+		if frame then
+			frame:Kill()
+		end
 	end
 
 	local buttons = {
@@ -94,11 +97,10 @@ local function LoadSkin()
 	end)
 
 	local scrollbars = {
-		-- LFGListApplicationViewerScrollFrameScrollBar,
 		LFDQueueFrameSpecific.ScrollBar,
-		LFDQueueFrameRandomScrollFrameScrollBar,
-		RaidFinderQueueFrameScrollFrameScrollBar,
-		-- LFGListEntryCreationSearchScrollFrameScrollBar,
+		LFDQueueFrameRandomScrollFrame.ScrollBar,
+		RaidFinderQueueFrameScrollFrame.ScrollBar,
+		LFGListFrame.EntryCreation.ActivityFinder.Dialog.ScrollBar
 	}
 
 	for i = 1, #scrollbars do
@@ -118,7 +120,7 @@ local function LoadSkin()
 		button.backdrop:SetAllPoints()
 		button:StyleButton()
 
-		button.bg:SetTexture(0)
+		button.bg:SetTexture("")
 
 		button.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 		button.icon:SetPoint("LEFT", button, "LEFT", 10, 0)
@@ -165,7 +167,7 @@ local function LoadSkin()
 				if r ~= 0.65882 and g ~= 0.65882 and b ~= 0.65882 then
 					self:GetParent().border.backdrop:SetBackdropBorderColor(r, g, b)
 				end
-				self:SetTexture(0)
+				self:SetTexture("")
 			end)
 
 			hooksecurefunc(item.IconBorder, "Hide", function(self)
@@ -177,7 +179,7 @@ local function LoadSkin()
 
 			item.NameFrame:Hide()
 
-			item.shortageBorder:SetTexture(0)
+			item.shortageBorder:SetTexture(nil)
 
 			item.roleIcon1:SetParent(item.border)
 			item.roleIcon2:SetParent(item.border)
@@ -255,15 +257,32 @@ local function LoadSkin()
 
 	LFGListFrame.CategorySelection.FindGroupButton:SkinButton()
 	LFGListFrame.CategorySelection.StartGroupButton:SkinButton()
+	LFGListFrame.SearchPanel.BackToGroupButton:SkinButton()
 	LFGListFrame.SearchPanel.BackButton:SkinButton()
 	LFGListFrame.SearchPanel.SignUpButton:SkinButton()
-	LFGListFrame.SearchPanel.ScrollBox.StartGroupButton:SkinButton()
 	LFGListFrame.SearchPanel.RefreshButton:SkinButton()
 	LFGListFrame.SearchPanel.RefreshButton:SetSize(24, 24)
 	LFGListFrame.SearchPanel.RefreshButton.Icon:SetPoint("CENTER")
 	LFGListFrame.SearchPanel.FilterButton:SkinButton()
 	LFGListFrame.SearchPanel.FilterButton:SetPoint("LEFT", LFGListFrame.SearchPanel.SearchBox, "RIGHT", 5, 0)
-	T.SkinScrollBar(LFGListFrame.SearchPanel.ScrollBar)
+
+	local function skinCreateButton(button)
+		local child = button:GetChildren()
+		if not child.styled and child:IsObjectType("Button") then
+			child:SkinButton()
+			child.styled = true
+		end
+	end
+
+	local delayStyled -- otherwise it taints while listing (from NDui)
+	hooksecurefunc(LFGListFrame.SearchPanel.ScrollBox, "Update", function(self)
+		if not delayStyled then
+			self.StartGroupButton:SkinButton()
+			T.SkinScrollBar(LFGListFrame.SearchPanel.ScrollBar)
+			delayStyled = true
+		end
+		self:ForEachFrame(skinCreateButton)
+	end)
 
 	hooksecurefunc("LFGListApplicationViewer_UpdateApplicant", function(button)
 		if not button.DeclineButton.isSkinned then
@@ -320,10 +339,6 @@ local function LoadSkin()
 	T.SkinCloseButton(PVEFrameCloseButton)
 	T.SkinCloseButton(LFGDungeonReadyStatusCloseButton, nil, "-")
 	T.SkinCloseButton(LFGDungeonReadyDialogCloseButton, LFGDungeonReadyDialog, "-")
-
-	LFDQueueFrameRandomScrollFrameScrollBackground:SetTexture(0)
-	LFDQueueFrameRandomScrollFrameScrollBackgroundTopLeft:SetTexture(0)
-	LFDQueueFrameRandomScrollFrameScrollBackgroundBottomRight:SetTexture(0)
 
 	LFGInvitePopup:StripTextures()
 	LFGInvitePopup:SetTemplate("Transparent")
@@ -435,17 +450,17 @@ local function LoadSkin()
 	LFGListFrame.ApplicationViewer.RefreshButton:ClearAllPoints()
 	LFGListFrame.ApplicationViewer.RefreshButton:SetPoint("BOTTOMRIGHT", LFGListFrame.ApplicationViewer.Inset, "TOPRIGHT", 16, 4)
 
+	LFGListFrame.ApplicationViewer.BrowseGroupsButton:SkinButton(true)
+	LFGListFrame.ApplicationViewer.BrowseGroupsButton:ClearAllPoints()
+	LFGListFrame.ApplicationViewer.BrowseGroupsButton:SetPoint("BOTTOMLEFT", -1, 2)
+
 	LFGListFrame.ApplicationViewer.RemoveEntryButton:SkinButton(true)
-	LFGListFrame.ApplicationViewer.RemoveEntryButton:ClearAllPoints()
-	LFGListFrame.ApplicationViewer.RemoveEntryButton:SetPoint("BOTTOMLEFT", -1, 2)
 	LFGListFrame.ApplicationViewer.RemoveEntryButton:SetWidth(80)
 
 	LFGListFrame.ApplicationViewer.EditButton:SkinButton(true)
 	LFGListFrame.ApplicationViewer.EditButton:ClearAllPoints()
 	LFGListFrame.ApplicationViewer.EditButton:SetPoint("BOTTOMRIGHT", -6, 2)
 	LFGListFrame.ApplicationViewer.EditButton:SetWidth(80)
-
-	LFGListFrame.ApplicationViewer.BrowseGroupsButton:SkinButton(true)
 
 	LFGListFrame.ApplicationViewer.ScrollBar:ClearAllPoints()
 	LFGListFrame.ApplicationViewer.ScrollBar:SetPoint("TOPLEFT", LFGListFrame.ApplicationViewer.Inset, "TOPRIGHT", 0, -14)
@@ -455,67 +470,6 @@ local function LoadSkin()
 	LFGListFrame.ApplicationViewer.InfoBackground:SkinIcon()
 	LFGListFrame.ApplicationViewer.InfoBackground:SetPoint("TOPLEFT", 1, -27)
 	LFGListFrame.ApplicationViewer.InfoBackground:SetSize(324, 90)
-
-	if IsAddOnLoaded("PremadeGroupsFilter") then
-		T.SkinCheckBox(UsePFGButton)
-		PremadeGroupsFilterDialog:StripTextures()
-		PremadeGroupsFilterDialog:CreateBackdrop("Transparent")
-		PremadeGroupsFilterDialog.backdrop:SetPoint("TOPLEFT", 3, 0)
-		PremadeGroupsFilterDialog.backdrop:SetPoint("BOTTOMRIGHT", 0, -1)
-		PremadeGroupsFilterDialog.ResetButton:SkinButton()
-		PremadeGroupsFilterDialog.RefreshButton:SkinButton()
-		T.SkinCloseButton(PremadeGroupsFilterDialog.CloseButton)
-
-		T.SkinCloseButton(PremadeGroupsFilterDialog.MaxMinButtonFrame.MinimizeButton, nil, "-")
-		PremadeGroupsFilterDialog.MaxMinButtonFrame.MinimizeButton:SetHitRectInsets(0, 0, 0, 0)
-		PremadeGroupsFilterDialog.MaxMinButtonFrame.MinimizeButton:ClearAllPoints()
-		PremadeGroupsFilterDialog.MaxMinButtonFrame.MinimizeButton:SetPoint("TOPRIGHT", PremadeGroupsFilterDialog.CloseButton, "TOPLEFT", -3, 0)
-		T.SkinCloseButton(PremadeGroupsFilterDialog.MaxMinButtonFrame.MaximizeButton, nil, "+")
-		PremadeGroupsFilterDialog.MaxMinButtonFrame.MaximizeButton:SetHitRectInsets(0, 0, 0, 0)
-		PremadeGroupsFilterDialog.MaxMinButtonFrame.MaximizeButton:ClearAllPoints()
-		PremadeGroupsFilterDialog.MaxMinButtonFrame.MaximizeButton:SetPoint("TOPRIGHT", PremadeGroupsFilterDialog.CloseButton, "TOPLEFT", -3, 0)
-
-		T.SkinDropDownBox(PremadeGroupsFilterDialog.Difficulty.DropDown)
-		T.SkinEditBox(PremadeGroupsFilterDialog.Expression)
-		PremadeGroupsFilterDialog.Difficulty.DropDown:SetPoint("TOPRIGHT", PremadeGroupsFilterDialog.Difficulty, "TOPRIGHT", 5, 1)
-
-		local checkButtons = {
-			PremadeGroupsFilterDialog.Difficulty.Act,
-			PremadeGroupsFilterDialog.MPRating.Act,
-			PremadeGroupsFilterDialog.PVPRating.Act,
-			PremadeGroupsFilterDialog.Defeated.Act,
-			PremadeGroupsFilterDialog.Members.Act,
-			PremadeGroupsFilterDialog.Tanks.Act,
-			PremadeGroupsFilterDialog.Heals.Act,
-			PremadeGroupsFilterDialog.Dps.Act
-		}
-
-		for _, button in pairs(checkButtons) do
-			button:SetSize(27, 27)
-			T.SkinCheckBox(button)
-		end
-
-		local editBoxes = {
-			PremadeGroupsFilterDialog.MPRating.Min,
-			PremadeGroupsFilterDialog.MPRating.Max,
-			PremadeGroupsFilterDialog.Defeated.Min,
-			PremadeGroupsFilterDialog.Defeated.Max,
-			PremadeGroupsFilterDialog.PVPRating.Min,
-			PremadeGroupsFilterDialog.PVPRating.Max,
-			PremadeGroupsFilterDialog.Members.Min,
-			PremadeGroupsFilterDialog.Members.Max,
-			PremadeGroupsFilterDialog.Tanks.Min,
-			PremadeGroupsFilterDialog.Tanks.Max,
-			PremadeGroupsFilterDialog.Heals.Min,
-			PremadeGroupsFilterDialog.Heals.Max,
-			PremadeGroupsFilterDialog.Dps.Min,
-			PremadeGroupsFilterDialog.Dps.Max
-		}
-
-		for _, box in pairs(editBoxes) do
-			T.SkinEditBox(box, nil, 17)
-		end
-	end
 end
 
 tinsert(T.SkinFuncs["ShestakUI"], LoadSkin)
@@ -538,21 +492,23 @@ local function LoadSecondarySkin()
 	end)
 
 	local function HandleAffixIcons(self)
-		for _, frame in ipairs(self.Affixes) do
-			frame.Border:SetTexture(0)
-			frame.Portrait:SetTexture(0)
+		if self.Affixes then
+			for _, frame in ipairs(self.Affixes) do
+				frame.Border:SetTexture(nil)
+				frame.Portrait:SetTexture(nil)
 
-			if frame.info then
-				frame.Portrait:SetTexture(CHALLENGE_MODE_EXTRA_AFFIX_INFO[frame.info.key].texture)
-			elseif frame.affixID then
-				local _, _, filedataid = C_ChallengeMode.GetAffixInfo(frame.affixID)
-				frame.Portrait:SetTexture(filedataid)
-			end
-			frame.Portrait:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-			if not frame.backdrop then
-				frame:CreateBackdrop("Default")
-				frame.backdrop:SetPoint("TOPLEFT", frame.Portrait, "TOPLEFT", -2, 2)
-				frame.backdrop:SetPoint("BOTTOMRIGHT", frame.Portrait, "BOTTOMRIGHT", 2, -2)
+				if frame.info then
+					frame.Portrait:SetTexture(CHALLENGE_MODE_EXTRA_AFFIX_INFO[frame.info.key].texture)
+				elseif frame.affixID then
+					local _, _, filedataid = C_ChallengeMode.GetAffixInfo(frame.affixID)
+					frame.Portrait:SetTexture(filedataid)
+				end
+				frame.Portrait:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+				if not frame.backdrop then
+					frame:CreateBackdrop("Default")
+					frame.backdrop:SetPoint("TOPLEFT", frame.Portrait, "TOPLEFT", -2, 2)
+					frame.backdrop:SetPoint("BOTTOMRIGHT", frame.Portrait, "BOTTOMRIGHT", 2, -2)
+				end
 			end
 		end
 	end
@@ -598,3 +554,99 @@ local function LoadSecondarySkin()
 end
 
 T.SkinFuncs["Blizzard_ChallengesUI"] = LoadSecondarySkin
+
+if IsAddOnLoaded("PremadeGroupsFilter") then
+	PremadeGroupsFilterDialog:StripTextures()
+	PremadeGroupsFilterDialog:CreateBackdrop("Transparent")
+	PremadeGroupsFilterDialog.backdrop:SetPoint("TOPLEFT", 3, 0)
+	PremadeGroupsFilterDialog.backdrop:SetPoint("BOTTOMRIGHT", 0, -1)
+	PremadeGroupsFilterDialog.ResetButton:SkinButton()
+	PremadeGroupsFilterDialog.RefreshButton:SkinButton()
+	T.SkinCloseButton(PremadeGroupsFilterDialog.CloseButton)
+
+	PremadeGroupsFilterDialog.ResetButton:SetPoint("BOTTOMLEFT", PremadeGroupsFilterDialog, "BOTTOMLEFT", 8, 4)
+
+	T.SkinCloseButton(PremadeGroupsFilterDialog.MaxMinButtonFrame.MinimizeButton, nil, "-")
+	PremadeGroupsFilterDialog.MaxMinButtonFrame.MinimizeButton:SetHitRectInsets(0, 0, 0, 0)
+	PremadeGroupsFilterDialog.MaxMinButtonFrame.MinimizeButton:ClearAllPoints()
+	PremadeGroupsFilterDialog.MaxMinButtonFrame.MinimizeButton:SetPoint("TOPRIGHT", PremadeGroupsFilterDialog.CloseButton, "TOPLEFT", -3, 0)
+	T.SkinCloseButton(PremadeGroupsFilterDialog.MaxMinButtonFrame.MaximizeButton, nil, "+")
+	PremadeGroupsFilterDialog.MaxMinButtonFrame.MaximizeButton:SetHitRectInsets(0, 0, 0, 0)
+	PremadeGroupsFilterDialog.MaxMinButtonFrame.MaximizeButton:ClearAllPoints()
+	PremadeGroupsFilterDialog.MaxMinButtonFrame.MaximizeButton:SetPoint("TOPRIGHT", PremadeGroupsFilterDialog.CloseButton, "TOPLEFT", -3, 0)
+
+	local DungeonPanel = _G.PremadeGroupsFilterDungeonPanel
+	if not DungeonPanel then return end
+
+	local ArenaPanel = _G.PremadeGroupsFilterArenaPanel
+	local RBGPanel = _G.PremadeGroupsFilterRBGPanel
+	local RaidPanel = _G.PremadeGroupsFilterRaidPanel
+	local RolePanel = _G.PremadeGroupsFilterRolePanel
+	local MiniPanel = _G.PremadeGroupsFilterMiniPanel
+	local PGFDialog = _G.PremadeGroupsFilterDialog
+
+	local names = {"Difficulty", "MPRating", "Members", "Tanks", "Heals", "DPS", "Partyfit", "BLFit", "BRFit", "Defeated", "MatchingId", "PvPRating"}
+
+	local function handleGroup(panel)
+		for _, name in pairs(names) do
+			local frame = panel.Group[name]
+			if frame then
+				local check = frame.Act
+				if check then
+					check:SetSize(27, 27)
+					check:SetPoint("TOPLEFT", 5, -1)
+					T.SkinCheckBox(check)
+				end
+				local input = frame.Min
+				if input then
+					T.SkinEditBox(input)
+					T.SkinEditBox(frame.Max)
+
+				end
+				if frame.DropDown then
+					T.SkinDropDownBox(frame.DropDown)
+				end
+			end
+		end
+
+		T.SkinEditBox(panel.Advanced.Expression)
+		if panel.Advanced.Expression.EditBox then
+			panel.Advanced.Expression.EditBox:SetFont(C.media.normal_font, 12, "")
+		end
+	end
+
+	handleGroup(RaidPanel)
+	handleGroup(DungeonPanel)
+	handleGroup(ArenaPanel)
+	handleGroup(RBGPanel)
+	handleGroup(RolePanel)
+
+	T.SkinEditBox(MiniPanel.Advanced.Expression)
+	T.SkinEditBox(MiniPanel.Sorting.Expression)
+	MiniPanel.Advanced.Expression.EditBox:SetFont(C.media.normal_font, 12, "")
+	MiniPanel.Sorting.Expression:SetFont(C.media.normal_font, 12, "")
+
+	for i = 1, 8 do
+		local dungeon = PremadeGroupsFilterDungeonPanel.Dungeons["Dungeon" .. i]
+		local check = dungeon and dungeon.Act
+		if check then
+			check:SetSize(27, 27)
+			check:SetPoint("TOPLEFT", 5, -1)
+			T.SkinCheckBox(check)
+		end
+	end
+
+	local popup = PremadeGroupsFilterStaticPopup
+	if popup then
+		popup:StripTextures()
+		popup:SetTemplate("Transparent")
+		T.SkinEditBox(popup.EditBox, nil, 18)
+		popup.Button1:SkinButton()
+		popup.Button2:SkinButton()
+	end
+
+	local button = UsePFGButton or UsePGFButton
+	if button then
+		T.SkinCheckBox(button)
+	end
+end

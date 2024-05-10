@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true and C.nameplate.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ end
 oUF.Tags.Events["DiffColor"] = "UNIT_LEVEL"
 
 oUF.Tags.Methods["PetNameColor"] = function()
-	if T.Classic and T.class == "HUNTER" and C.unitframe.bar_color_happiness then
+	if T.Classic and not T.Cata and T.class == "HUNTER" and C.unitframe.bar_color_happiness then
 		local mood = GetPetHappiness()
 		if mood then
 			local r, g, b = unpack(T.oUF_colors.happiness[mood])
@@ -51,7 +51,7 @@ oUF.Tags.Methods["PetNameColor"] = function()
 		return string.format("|cff%02x%02x%02x", T.color.r * 255, T.color.g * 255, T.color.b * 255)
 	end
 end
-if T.Classic then
+if T.Classic and not T.Cata then
 	oUF.Tags.Events["PetNameColor"] = "UNIT_POWER_UPDATE UNIT_HAPPINESS"
 else
 	oUF.Tags.Events["PetNameColor"] = "UNIT_POWER_UPDATE"
@@ -101,8 +101,11 @@ oUF.Tags.Events["NameLong"] = "UNIT_NAME_UPDATE"
 
 oUF.Tags.Methods["NameLongAbbrev"] = function(unit)
 	local name = UnitName(unit)
-	local newname = (string.len(name) > 18) and string.gsub(name, "%s?(.[\128-\191]*)%S+%s", "%1. ") or name
-	return T.UTF(newname, 18, false)
+	if string.len(name) > 18 then
+		name = string.gsub(name, "-", "")
+		name = string.gsub(name, "%s?(.[\128-\191]*)%S+%s", "%1. ")
+	end
+	return T.UTF(name, 18, false)
 end
 oUF.Tags.Events["NameLongAbbrev"] = "UNIT_NAME_UPDATE"
 

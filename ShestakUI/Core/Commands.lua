@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Slash commands
@@ -18,7 +18,7 @@ SLASH_TICKET1 = "/gm"
 SLASH_TICKET2 = "/гм"
 SLASH_TICKET3 = "/пь"
 
-if T.Mainline then
+if T.Cata or T.Mainline then
 	SlashCmdList.JOURNAL = function() ToggleEncounterJournal() end
 	SLASH_JOURNAL1 = "/ej"
 	SLASH_JOURNAL2 = "/уо"
@@ -156,7 +156,7 @@ SLASH_PARTYTORAID4 = "/сщтмуке"
 ----------------------------------------------------------------------------------------
 --	Instance teleport
 ----------------------------------------------------------------------------------------
-if T.Mainline then
+if T.Wrath or T.Cata or T.Mainline then
 	SlashCmdList.INSTTELEPORT = function()
 		local inInstance = IsInInstance()
 		if inInstance then
@@ -172,7 +172,15 @@ end
 ----------------------------------------------------------------------------------------
 --	Spec switching(by Monolit)
 ----------------------------------------------------------------------------------------
-if T.Mainline then
+if T.SoD or T.Wrath or T.Cata then
+	SlashCmdList.SPEC = function()
+		local spec = GetActiveTalentGroup()
+		if spec == 1 then SetActiveTalentGroup(2) elseif spec == 2 then SetActiveTalentGroup(1) end
+	end
+	SLASH_SPEC1 = "/ss"
+	SLASH_SPEC2 = "/spec"
+	SLASH_SPEC3 = "/ыы"
+elseif T.Mainline then
 	SlashCmdList.SPEC = function(spec)
 		local canUse, failureReason = C_SpecializationInfo.CanPlayerUseTalentSpecUI()
 		if canUse then
@@ -182,16 +190,6 @@ if T.Mainline then
 		else
 			print("|cffffff00"..failureReason.."|r")
 		end
-	end
-	SLASH_SPEC1 = "/ss"
-	SLASH_SPEC2 = "/spec"
-	SLASH_SPEC3 = "/ыы"
-end
-
-if T.Wrath then
-	SlashCmdList.SPEC = function()
-		local spec = GetActiveTalentGroup()
-		if spec == 1 then SetActiveTalentGroup(2) elseif spec == 2 then SetActiveTalentGroup(1) end
 	end
 	SLASH_SPEC1 = "/ss"
 	SLASH_SPEC2 = "/spec"
@@ -322,7 +320,19 @@ SLASH_CLEAR_CHAT2 = "/сдуфк"
 ----------------------------------------------------------------------------------------
 --	Test Blizzard Alerts
 ----------------------------------------------------------------------------------------
-if T.Mainline then
+if T.Wrath or T.Cata then
+	SlashCmdList.TEST_ACHIEVEMENT = function()
+		PlaySound(SOUNDKIT.LFG_REWARDS)
+		if not AchievementFrame then
+			AchievementFrame_LoadUI()
+		end
+		AchievementAlertSystem:AddAlert(112)
+		MoneyWonAlertSystem:AddAlert(81500)
+		NewRecipeLearnedAlertSystem:AddAlert(204)
+	end
+	SLASH_TEST_ACHIEVEMENT1 = "/tach"
+	SLASH_TEST_ACHIEVEMENT2 = "/ефср"
+elseif T.Mainline then
 	SlashCmdList.TEST_ACHIEVEMENT = function()
 		PlaySound(SOUNDKIT.LFG_REWARDS)
 		if not AchievementFrame then
@@ -342,25 +352,12 @@ if T.Mainline then
 		-- LootUpgradeAlertSystem:AddAlert("|cffa335ee|Hitem:158712::::::::60:66::16:4:6534:6513:1533:4786::::|h[Rezan's Gleaming Eye]|h|r", 1, 1, 1, nil, nil, false)
 		MoneyWonAlertSystem:AddAlert(81500)
 		EntitlementDeliveredAlertSystem:AddAlert("", "Interface\\Icons\\Ability_pvp_gladiatormedallion", TRINKET0SLOT, 214)
-		RafRewardDeliveredAlertSystem:AddAlert("", "Interface\\Icons\\Ability_pvp_gladiatormedallion", TRINKET0SLOT, 214)
+		RafRewardDeliveredAlertSystem:AddAlert("", "Interface\\Icons\\Ability_pvp_gladiatormedallion", TRINKET0SLOT, 214, nil, 2)
 		-- DigsiteCompleteAlertSystem:AddAlert("Human")
 		NewRecipeLearnedAlertSystem:AddAlert(204)
 		NewRuneforgePowerAlertSystem:AddAlert(204)
+		NewCosmeticAlertFrameSystem:AddAlert(204)
 		-- BonusRollFrame_StartBonusRoll(242969, 'test', 20, 515, 15, 14)
-	end
-	SLASH_TEST_ACHIEVEMENT1 = "/tach"
-	SLASH_TEST_ACHIEVEMENT2 = "/ефср"
-end
-
-if T.Wrath then
-	SlashCmdList.TEST_ACHIEVEMENT = function()
-		PlaySound(SOUNDKIT.LFG_REWARDS)
-		if not AchievementFrame then
-			AchievementFrame_LoadUI()
-		end
-		AchievementAlertSystem:AddAlert(112)
-		MoneyWonAlertSystem:AddAlert(81500)
-		NewRecipeLearnedAlertSystem:AddAlert(204)
 	end
 	SLASH_TEST_ACHIEVEMENT1 = "/tach"
 	SLASH_TEST_ACHIEVEMENT2 = "/ефср"

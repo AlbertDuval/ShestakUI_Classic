@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Force readycheck warning
@@ -49,7 +49,11 @@ StaticPopupDialogs.CONFIRM_SUMMON.hideOnEscape = nil
 StaticPopupDialogs.ADDON_ACTION_FORBIDDEN.button1 = nil
 StaticPopupDialogs.TOO_MANY_LUA_ERRORS.button1 = nil
 PetBattleQueueReadyFrame.hideOnEscape = nil
-if T.Mainline then
+if T.Classic then
+	PVPReadyDialog.hideButton:Hide()
+	PVPReadyDialog.enterButton:ClearAllPoints()
+	PVPReadyDialog.enterButton:SetPoint("BOTTOM", PVPReadyDialog, "BOTTOM", 0, 16)
+else
 	PVPReadyDialog.leaveButton:Hide()
 	PVPReadyDialog.enterButton:ClearAllPoints()
 	PVPReadyDialog.enterButton:SetPoint("BOTTOM", PVPReadyDialog, "BOTTOM", 0, 25)
@@ -94,19 +98,20 @@ end
 --	Auto select current event boss from LFD tool(EventBossAutoSelect by Nathanyel)
 ----------------------------------------------------------------------------------------
 if T.Mainline then
-	local firstLFD
-	LFDParentFrame:HookScript("OnShow", function()
-		if not firstLFD then
-			firstLFD = 1
-			for i = 1, GetNumRandomDungeons() do
-				local id = GetLFGRandomDungeonInfo(i)
-				local isHoliday = select(15, GetLFGDungeonInfo(id))
-				if isHoliday and not GetLFGDungeonRewards(id) then
-					LFDQueueFrame_SetType(id)
-				end
-			end
-		end
-	end)
+	-- It cause taint SetEntryTitle()
+	-- local firstLFD
+	-- LFDParentFrame:HookScript("OnShow", function()
+		-- if not firstLFD then
+			-- firstLFD = 1
+			-- for i = 1, GetNumRandomDungeons() do
+				-- local id = GetLFGRandomDungeonInfo(i)
+				-- local isHoliday = select(15, GetLFGDungeonInfo(id))
+				-- if isHoliday and not GetLFGDungeonRewards(id) then
+					-- LFDQueueFrame_SetType(id)
+				-- end
+			-- end
+		-- end
+	-- end)
 end
 
 ----------------------------------------------------------------------------------------
@@ -120,8 +125,8 @@ if T.Classic then
 	strip:SetFrameLevel(DressUpModelFrame:GetFrameLevel() + 2)
 end
 strip:RegisterForClicks("AnyUp")
-strip:SetScript("OnClick", function(self, button)
-	local actor = T.Classic and self.model or T.Mainline and DressUpFrame.ModelScene:GetPlayerActor()
+strip:SetScript("OnClick", function(_, button)
+	local actor = T.Classic and DressUpFrame.DressUpModel or T.Mainline and DressUpFrame.ModelScene:GetPlayerActor()
 	if not actor then return end
 	if button == "RightButton" then
 		actor:UndressSlot(19)
@@ -155,81 +160,17 @@ end
 if T.Mainline then
 	if C.general.hide_banner == true then
 		BossBanner.PlayBanner = function() end
+		BossBanner:UnregisterAllEvents()
 	end
-end
-
-----------------------------------------------------------------------------------------
---	Hide button for oUF_RaidDPS
-----------------------------------------------------------------------------------------
-if C.misc.hide_raid_button == true then
-	local show = false
-	SlashCmdList.HideRaidMODE = function()
-		if show == false then
-			if oUF_RaidDPS1 then
-				for i = 1, C.raidframe.raid_groups do
-					_G["oUF_RaidDPS"..i]:SetAlpha(0)
-				end
-				if oUF_MainTank then
-					oUF_MainTank:SetAlpha(0)
-				end
-			end
-			show = true
-		else
-			if oUF_RaidDPS1 then
-				for i = 1, C.raidframe.raid_groups do
-					_G["oUF_RaidDPS"..i]:SetAlpha(1)
-				end
-				if oUF_MainTank then
-					oUF_MainTank:SetAlpha(1)
-				end
-			end
-			show = false
-		end
-
-	end
-	SLASH_HIDERAIDMODE1 = "/hideraid"
-
-	local HideRaid = CreateFrame("Button", "HideRaidMode", UIParent)
-	HideRaid:SetTemplate("ClassColor")
-	HideRaid:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0)
-	HideRaid:SetSize(19, 19)
-	HideRaid:SetAlpha(0)
-	HideRaid:Hide()
-
-	HideRaid.t = HideRaid:CreateTexture(nil, "OVERLAY")
-	HideRaid.t:SetTexture("Interface\\Icons\\inv_misc_spyglass_03")
-	HideRaid.t:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-	HideRaid.t:SetPoint("TOPLEFT", HideRaid, 2, -2)
-	HideRaid.t:SetPoint("BOTTOMRIGHT", HideRaid, -2, 2)
-
-	HideRaid:SetScript("OnClick", function()
-		if oUF_RaidDPS1 and oUF_RaidDPS1:IsShown() then
-			SlashCmdList.HideRaidMODE()
-		end
-	end)
-
-	HideRaid:SetScript("OnEnter", function()
-		if oUF_RaidDPS1 and oUF_RaidDPS1:IsShown() then
-			HideRaid:FadeIn()
-		end
-	end)
-
-	HideRaid:SetScript("OnLeave", function()
-		HideRaid:FadeOut()
-	end)
-
-	HideRaid:RegisterEvent("PLAYER_LOGIN")
-	HideRaid:SetScript("OnEvent", function(self)
-		if C.unitframe.enable == true and C.raidframe.layout == "DPS" then
-			self:Show()
-		end
-	end)
 end
 
 ----------------------------------------------------------------------------------------
 --	Easy delete good items
 ----------------------------------------------------------------------------------------
-hooksecurefunc(StaticPopupDialogs["DELETE_GOOD_ITEM"], "OnShow", function(s) s.editBox:SetText(DELETE_ITEM_CONFIRM_STRING) s.editBox:SetAutoFocus(false) s.editBox:ClearFocus() end)
+local deleteDialog = StaticPopupDialogs["DELETE_GOOD_ITEM"]
+if deleteDialog.OnShow then
+	hooksecurefunc(deleteDialog, "OnShow", function(s) s.editBox:SetText(DELETE_ITEM_CONFIRM_STRING) s.editBox:SetAutoFocus(false) s.editBox:ClearFocus() end)
+end
 
 ----------------------------------------------------------------------------------------
 --	Change UIErrorsFrame strata

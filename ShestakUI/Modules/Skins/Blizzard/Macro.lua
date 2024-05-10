@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -50,10 +50,6 @@ local function LoadSkin()
 	MacroFrameTextBackground.backdrop:SetPoint("TOPLEFT", 4, -3)
 	MacroFrameTextBackground.backdrop:SetPoint("BOTTOMRIGHT", -23, 0)
 
-	if T.Classic and not T.Wrath then
-		MacroButtonScrollFrame:CreateBackdrop("Overlay")
-	end
-
 	T.SkinCloseButton(MacroFrameCloseButton, MacroFrame.backdrop)
 
 	-- Reposition buttons
@@ -62,11 +58,11 @@ local function LoadSkin()
 	MacroDeleteButton:ClearAllPoints()
 	MacroDeleteButton:SetPoint("BOTTOMLEFT", MacroFrame.backdrop, "BOTTOMLEFT", 9, 4)
 	MacroNewButton:ClearAllPoints()
-	MacroNewButton:SetPoint("RIGHT", MacroExitButton, "LEFT", -3, 0)
+	MacroNewButton:SetPoint("RIGHT", MacroExitButton, "LEFT", -4, 0)
 
 	-- Regular scroll bar
 	T.SkinScrollBar(MacroFrame.MacroSelector.ScrollBar)
-	T.SkinScrollBar(MacroFrameScrollFrameScrollBar)
+	T.SkinScrollBar(MacroFrameScrollFrame.ScrollBar)
 
 	-- Big icon
 	MacroFrameSelectedMacroButton:StripTextures()

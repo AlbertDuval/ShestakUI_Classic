@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.raidframe.plugins_aura_watch ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ local function SpellName(id)
 	if name then
 		return name
 	else
-		print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to EsreverWoW.|r")
+		print("|cffff0000ShestakUI: spell ID ["..tostring(id).."] no longer exists!|r")
 		return "Empty"
 	end
 end
@@ -104,80 +104,164 @@ T.RaidDebuffs = {
 -- Molten Core (40)
 	-- Trash
 	-- Lucifron
+		[SpellName(19703)] = 3,		-- Lucifron's Curse
 	-- Magmadar
+		[SpellName(19408)] = 3,		-- Panic
 	-- Gehennas
+		[SpellName(20277)] = 4,		-- Fist of Ragnaros
+		[SpellName(19716)] = 3,		-- Gehennas' Curse
+		[SpellName(19717)] = 5,		-- Rain of Fire
 	-- Garr
 	-- Shazzrah
+		[SpellName(19713)] = 3,		-- Shazzrah's Curse
 	-- Baron Geddon
+		[SpellName(19659)] = 3,		-- Ignite Mana
+		[SpellName(19695)] = 3,		-- Inferno
+		[SpellName(20475)] = 3,		-- Living Bomb
 	-- Golemagg
+		[SpellName(13880)] = 3,		-- Magma Splash
 	-- Sulfuron
+		[SpellName(19780)] = 3,		-- Hand of Ragnaros
 	-- Majordomo
 	-- Ragnaros
 
--- Onyxia's Lair (40)
-	-- Onyxia
+	-- Onyxia's Lair (40)
+		-- Onyxia
+			[SpellName(18431)] = 3,		-- Bellowing Roar
 
 -- Blackwing Lair (40)
 	-- Trash
+		[SpellName(22274)] = 3,		-- Greater Polymorph
 	-- Razorgore
+		-- [SpellName(23023)] = 3,		-- Conflagration
+		[SpellName(24375)] = 3,		-- War Stomp
 	-- Vaelastrasz
+		[SpellName(18173)] = 4,		-- Burning Adrenaline
+		-- [SpellName(23461)] = 3,		-- Flame Breath
 	-- Broodlord
+		[SpellName(24573)] = 3,		-- Mortal Strike
 	-- Firemaw
+		[SpellName(23341)] = 3,		-- Flame Buffet
+		-- [SpellName(22682)] = 3,		-- Shadow Flame
 	-- Ebonroc
+		-- [SpellName(22682)] = 3,		-- Shadow Flame
+		[SpellName(23340)] = 3,		-- Shadow of Ebonroc
 	-- Flamegor
+		-- [SpellName(22682)] = 3,		-- Shadow Flame
 	-- Chromaggus
+		[SpellName(23154)] = 3,		-- Brood Affliction: Black
+		[SpellName(23153)] = 3,		-- Brood Affliction: Blue
+		[SpellName(23170)] = 5,		-- Brood Affliction: Bronze
+		[SpellName(23169)] = 3,		-- Brood Affliction: Green
+		[SpellName(23155)] = 3,		-- Brood Affliction: Red
+		[SpellName(23313)] = 4,		-- Corrosive Acid
+		-- [SpellName(23189)] = 4,		-- Frost Burn
+		-- [SpellName(23315)] = 4,		-- Ignite Flesh
+		-- [SpellName(23312)] = 4,		-- Time Lapse
 	-- Nefarian
+		[SpellName(22686)] = 3,		-- Bellowing Roar
+		[SpellName(23414)] = 4,		-- Paralyze
+		-- [SpellName(22682)] = 3,		-- Shadow Flame
+		[SpellName(23364)] = 4,		-- Tail Lash
+		[SpellName(22687)] = 5,		-- Veil of Shadow
+		[SpellName(23603)] = 3,		-- Wild Polymorph
 
 -- Zul'Gurub (20)
 	-- Trash
 	-- Jeklik
+		[SpellName(22884)] = 3,		-- Psychic Scream
+		[SpellName(23952)] = 3,		-- Shadow Word: Pain
+		[SpellName(23918)] = 3,		-- Sonic Burst
 	-- Venoxis
+		[SpellName(23860)] = 4,		-- Holy Fire
+		-- [SpellName(23865)] = 3,		-- Parasitic Serpent
+		[SpellName(23861)] = 3,		-- Poison Cloud
 	-- Mar'li
+		[SpellName(24111)] = 4,		-- Corrosive Poison
+		[SpellName(24300)] = 3,		-- Drain Life
 	-- Bloodlord
+		-- Mandokir
+			[SpellName(16856)] = 3,		-- Mortal Strike
+			[SpellName(24314)] = 3,		-- Threatening Gaze
+		-- Ohgan
+			[SpellName(24317)] = 3,		-- Sunder Armor
 	-- Gahz'ranka
 	-- Thekal
+		[SpellName(21060)] = 3,		-- Blind
+		[SpellName(12540)] = 3,		-- Gouge
 	-- Arlokk
+		[SpellName(24210)] = 4,		-- Mark of Arlokk
+		[SpellName(24212)] = 3,		-- Shadow Word: Pain
 	-- Jin'do
+		[SpellName(24261)] = 5,		-- Brain Wash
+		[SpellName(24306)] = 3,		-- Delusions of Jin'do
+		[SpellName(17172)] = 4,		-- Hex
 	-- Hakkar
+		[SpellName(17172)] = 4,		-- Aspect of Arlokk
+		[SpellName(24687)] = 3,		-- Aspect of Jeklik
+		[SpellName(24686)] = 4,		-- Aspect of Mar'li
+		[SpellName(24688)] = 3,		-- Aspect of Venoxis
+		[SpellName(24327)] = 5,		-- Cause Insanity
+		-- [SpellName(24328)] = 3,		-- Corrupted Blood
+	-- Edge of Madness
+		-- Gri'lek
+			[SpellName(6524)] = 3,		-- Ground Tremor
+		-- Hazza'rah
+			[SpellName(24664)] = 3,		-- Sleep
+		-- Renataki
+			[SpellName(24698)] = 3,		-- Gouge
+		-- Wushoolay
 
 -- Ruins of Ahn'Qiraj (20)
 	-- Trash
 	-- Kurinnaxx
+		[SpellName(25646)] = 3,		-- Mortal Wound
+		[SpellName(25656)] = 4,		-- Sand Trap
 	-- Rajaxx
+		[SpellName(25471)] = 4,		-- Attack Order
+		[SpellName(25471)] = 3,		-- Disarm
 	-- Moam
 	-- Buru
+		[SpellName(20512)] = 3,		-- Creeping Plague
+		[SpellName(96)] = 4,		-- Dismember
 	-- Ayamiss
+		[SpellName(25852)] = 3,		-- Lash
+		[SpellName(25725)] = 4,		-- Paralyze
+		-- [SpellName(25748)] = 3,		-- Poison Stinger
 	-- Ossirian
+		[SpellName(25195)] = 3,		-- Curse of Tongues
+		[SpellName(25189)] = 4,		-- Enveloping Winds
 
 -- Temple of Ahn'Qiraj (40)
 	-- Trash
 	-- Skeram
+		[SpellName(785)] = 3,		-- True Fulfillment
 	-- Royalty
+		[SpellName(26580)] = 3,		-- Fear
+		[SpellName(19128)] = 5,		-- Knockdown
+		[SpellName(3242)] = 5,		-- Ravage
+		[SpellName(25989)] = 3,		-- Toxin
+		[SpellName(25786)] = 4,		-- Toxic Vapors
+		[SpellName(25812)] = 3,		-- Toxic Volley
 	-- Sartura
+		[SpellName(25174)] = 3,		-- Sundering Cleave
 	-- Fankriss
+		[SpellName(720)] = 3,		-- Entangle
+		[SpellName(25646)] = 3,		-- Mortal Wound
 	-- Viscidus
+		[SpellName(25991)] = 3,		-- Poison Bolt Volley
 	-- Huhuran
+		-- [SpellName(26050)] = 3,		-- Acid Spit
+		[SpellName(26053)] = 3,		-- Noxious Poison
+		[SpellName(26180)] = 3,		-- Wyvern Sting
 	-- Twin Emperors
+		[SpellName(26607)] = 3,		-- Blizzard
+		[SpellName(26613)] = 3,		-- Unbalancing Strike
 	-- Ouro
+		[SpellName(26102)] = 3,		-- Sand Blast
+		[SpellName(26093)] = 3,		-- Quake
 	-- C'Thun
-
--- Naxxramas (40)
-	-- Trash
-	-- Anub'Rekhan
-	-- Faerlina
-	-- Maexxna
-	-- Patchwerk
-	-- Grobbulus
-	-- Gluth
-	-- Thaddius
-	-- Noth
-	-- Heigan
-	-- Loatheb
-	-- Razuvious
-	-- Gothik
-	-- Four Horsemen
-	-- Sapphiron
-	-- Kel'Thuzad
+		[SpellName(26476)] = 3,		-- Digestive Acid
 
 -----------------------------------------------------------------
 -- Classic Dungeons
@@ -702,7 +786,7 @@ T.RaidDebuffs = {
 		[SpellName(54022)] = 3,		-- Locust Swarm
 	-- Faerlina
 		[SpellName(28796)] = 3,		-- Poison Bolt Volley
-		[SpellName(39024)] = 5,		-- Rain of Fire
+		[SpellName(28794)] = 5,		-- Rain of Fire
 		[SpellName(54093)] = 4,		-- Silence
 	-- Maexxna
 		[SpellName(28776)] = 3,		-- Necrotic Poison
@@ -752,7 +836,7 @@ T.RaidDebuffs = {
 		[SpellName(28522)] = 4,		-- Icebolt
 		[SpellName(28542)] = 3,		-- Life Drain
 	-- Kel'Thuzad
-		[SpellName(28410)] = 3,		-- Chains of Kel'Thuzad
+		[SpellName(28410)] = 5,		-- Chains of Kel'Thuzad
 		[SpellName(27819)] = 3,		-- Detonate Mana
 		[SpellName(27808)] = 4,		-- Frost Blast
 
@@ -1134,6 +1218,7 @@ if C.raidframe.plugins_pvp_debuffs == true then
 		[SpellName(61780)] = 3,		-- Polymorph: Turkey
 		[SpellName(28271)] = 3,		-- Polymorph: Turtle
 		[SpellName(59634)] = 3,		-- Polymorph - Penguin
+		[SpellName(55080)] = 2,		-- Shattered Barrier
 		[SpellName(18469)] = 3,		-- Silenced - Improved Counterspell
 		-- Paladin
 		[SpellName(853)] = 3,		-- Hammer of Justice
@@ -1150,15 +1235,16 @@ if C.raidframe.plugins_pvp_debuffs == true then
 		-- Rogue
 		[SpellName(2094)] = 3,		-- Blind
 		[SpellName(1833)] = 3,		-- Cheap Shot
-		[SpellName(32747)] = 3,		-- Deadly Throw Interrupt
 		[SpellName(51722)] = 3,		-- Dismantle
 		[SpellName(1330)] = 3,		-- Garrote - Silence
 		[SpellName(1776)] = 3,		-- Gouge
+		[SpellName(32747)] = 3,		-- Interrupt
 		[SpellName(408)] = 3,		-- Kidney Shot
 		[SpellName(6770)] = 3,		-- Sap
 		[SpellName(18425)] = 3,		-- Silenced - Improved Kick
 		-- Shaman
 		[SpellName(58861)] = 3,		-- Bash (Spirit Wolf)
+		[SpellName(53019)] = 3,		-- Earth's Grasp
 		[SpellName(51514)] = 3,		-- Hex
 		[SpellName(39796)] = 3,		-- Stoneclaw Totem
 		-- Warlock
@@ -1166,7 +1252,7 @@ if C.raidframe.plugins_pvp_debuffs == true then
 		[SpellName(60995)] = 3,		-- Demon Charge (Metamorphosis)
 		[SpellName(5782)] = 3,		-- Fear
 		[SpellName(5484)] = 3,		-- Howl of Terror
-		[SpellName(30153)] = 3,		-- Intercept Stun (Felguard)
+		[SpellName(30153)] = 3,		-- Intercept (Felguard)
 		[SpellName(6358)] = 3,		-- Seduction (Succubus)
 		[SpellName(30283)] = 3,		-- Shadowfury
 		[SpellName(24259)] = 3,		-- Spell Lock (Felhunter)
@@ -1177,7 +1263,7 @@ if C.raidframe.plugins_pvp_debuffs == true then
 		[SpellName(58373)] = 2,		-- Glyph of Hamstring
 		[SpellName(23694)] = 2,		-- Improved Hamstring
 		[SpellName(5246)] = 3,		-- Intimidating Shout
-		[SpellName(20253)] = 3,		-- Intercept Stun
+		[SpellName(20253)] = 3,		-- Intercept
 		[SpellName(46968)] = 3,		-- Shockwave
 		[SpellName(18498)] = 3,		-- Silenced - Gag Order
 		-- Racial

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	ShestakUI personal configuration file
@@ -91,7 +91,6 @@ if T.name == "Oz" and T.realm == "Pozzo dell'Eternità" then
 	C["threat"].width = 125
 	C["threat"].bar_rows = 2
 	C["tooltip"].item_icon = true
-	C["tooltip"].talents = true
 	C["tooltip"].achievements = false
 	C["tooltip"].title = true
 	C["tooltip"].spell_id = true
@@ -151,7 +150,6 @@ if Sw2rT1 then
 	C["general"].hide_talking_head = true
 	C["misc"].shift_marking = false
 	C["misc"].raid_tools = false
-	C["misc"].hide_raid_button = true
 	C["trade"].disenchanting = true
 	C["announcements"].pull_countdown = false
 	C["automation"].accept_invite = true
@@ -204,6 +202,7 @@ if IsWetxius then
 	C["aura"].cast_by = true
 	C["actionbar"].toggle_mode = false
 	C["actionbar"].bottombars = 3
+	C["actionbar"].stancebar_mouseover_alpha = 0.3
 	C["tooltip"].hide_combat = true
 	C["tooltip"].rank = false
 	C["tooltip"].spell_id = true
@@ -262,27 +261,30 @@ if IsWetxius then
 	C["font"].stats_font = C.media.normal_font
 	C["font"].stats_font_style = "OUTLINE"
 	C["font"].stats_font_size = 12
-	-- C["position"].raid_cooldown = {"TOPLEFT", UIParent, "TOPLEFT", 300, -14}
 	C["position"].bag = {"BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -21, 20}
 	C["position"].bank = {"BOTTOMLEFT", UIParent, "BOTTOMLEFT", 21, 20}
-	C["position"].auto_button = {"BOTTOMLEFT", "oUF_Player" or ChatFrame1, "TOPRIGHT", 33, 83}
 	C["position"].unitframes.arena = {"BOTTOMRIGHT", UIParent, "RIGHT", -55, -70}
 	C["position"].stance_bar = {"TOPRIGHT", "ActionBarAnchor", "TOPLEFT", -3, 0}
+
+	local anchor = _G["oUF_Player"] or ChatFrame1
+	C["position"].auto_button = {"BOTTOMLEFT", anchor, "TOPRIGHT", 33, 83}
 
 	local frame = CreateFrame("Frame")
 	frame:RegisterEvent("PLAYER_LOGIN")
 	frame:SetScript("OnEvent", function()
-		xCT3:SetPoint("CENTER", 0, 305)
-		xCT3:SetWidth(400)
 		C["combattext"].heal_treshold = UnitHealthMax("player")/100
+		if xCT3 then
+			xCT3:SetPoint("CENTER", 0, 305)
+			xCT3:SetWidth(400)
+		end
 		if PTR_IssueReporter then
 			PTR_IssueReporter:SetAlpha(0)
 			PTR_IssueReporter:SetScale(0.001)
 		end
+		SetCVar("lootUnderMouse", 1)
 	end)
 
 	T.CustomFilgerSpell = {
-		{"P_PROC_ICON", {spellID = 328908, unitID = "player", caster = "player", filter = "BUFF"}}, -- Combat Meditation {Kyrian)
 		{"P_PROC_ICON", {spellID = 26573, filter = "ICD", trigger = "NONE", totem = true}}, 		-- Consecration
 	}
 end

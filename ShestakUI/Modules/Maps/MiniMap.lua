@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.minimap.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ frame:SetScript("OnEvent", function(self, event)
 	MinimapBackdrop:SetSize(MinimapAnchor:GetWidth(), MinimapAnchor:GetWidth())
 
 	-- Instance Difficulty icon
-	if T.Wrath then
+	if T.Wrath or T.Cata then
 		MiniMapInstanceDifficulty:SetParent(Minimap)
 		MiniMapInstanceDifficulty:ClearAllPoints()
 		MiniMapInstanceDifficulty:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", 3, 2)
@@ -73,21 +73,75 @@ frame:SetScript("OnEvent", function(self, event)
 		QueueStatusButton:SetPoint("TOP", Minimap, "TOP", 1, -1)
 		QueueStatusButton:SetParent(Minimap)
 		QueueStatusButton:SetScale(0.5)
+
+		hooksecurefunc(QueueStatusButton, "SetPoint", function(self, _, anchor)
+			if anchor ~= Minimap then
+				self:ClearAllPoints()
+				self:SetPoint("TOP", Minimap, "TOP", 1, -1)
+			end
+		end)
+
+		hooksecurefunc(QueueStatusButton, "SetScale", function(self, scale)
+			if scale ~= 0.5 then
+				self:SetScale(0.5)
+			end
+		end)
 	end
 
 	-- Invites icon
-	if T.Wrath then
+	if T.Wrath or T.Cata then
 		GameTimeCalendarInvitesTexture:ClearAllPoints()
 		GameTimeCalendarInvitesTexture:SetParent(Minimap)
 		GameTimeCalendarInvitesTexture:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", 0, 0)
 	elseif T.Mainline then
-		GameTimeCalendarInvitesTexture:ClearAllPoints()
-		GameTimeCalendarInvitesTexture:SetParent(Minimap)
-		GameTimeCalendarInvitesTexture:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -1, -4)
+		local InviteTexture = GameTimeCalendarInvitesTexture
+		InviteTexture:ClearAllPoints()
+		InviteTexture:SetParent(Minimap)
+		InviteTexture:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -1, -4)
+		GameTimeFrame:Hide()
+
+		-- Create button to show invite tooltip and allow open calendar
+		local button = CreateFrame("Button", nil, Minimap)
+		button:SetAllPoints(InviteTexture)
+		if not GameTimeCalendarInvitesTexture:IsShown() then
+			button:Hide()
+		end
+
+		button:SetScript("OnEnter", function()
+			if InCombatLockdown() then return end
+			if InviteTexture:IsShown() then
+				GameTooltip:SetOwner(button, "ANCHOR_LEFT")
+				GameTooltip:AddLine(GAMETIME_TOOLTIP_CALENDAR_INVITES)
+				GameTooltip:AddLine(" ")
+				GameTooltip:AddLine(GAMETIME_TOOLTIP_TOGGLE_CALENDAR)
+				GameTooltip:Show()
+			end
+		end)
+
+		button:SetScript("OnLeave", function()
+			GameTooltip:Hide()
+		end)
+
+		button:SetScript("OnClick", function()
+			if InCombatLockdown() then return end
+			if InviteTexture:IsShown() then
+				ToggleCalendar()
+			end
+		end)
+
+		hooksecurefunc(InviteTexture, "Show", function()
+			button:Show()
+		end)
+
+		hooksecurefunc(InviteTexture, "Hide", function()
+			button:Hide()
+		end)
 	end
 
 	-- Hide Game Time
-	GameTimeFrame:Hide() -- BETA Need another solution to keep showing calendar invites
+	if T.Vanilla or T.TBC then
+		GameTimeFrame:Hide()
+	end
 
 	-- Move Mail icon
 	if T.Classic then
@@ -97,10 +151,26 @@ frame:SetScript("OnEvent", function(self, event)
 		MiniMapMailIcon:SetTexture("Interface\\AddOns\\ShestakUI\\Media\\Textures\\Mail.tga")
 		MiniMapMailIcon:SetSize(16, 16)
 	else
-		MinimapCluster.MailFrame:ClearAllPoints()
-		MinimapCluster.MailFrame:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMRIGHT", 4, -1)
+		local MailFrame = MinimapCluster.IndicatorFrame.MailFrame
+		hooksecurefunc(MailFrame, "SetPoint", function(self, _, anchor)
+			if anchor ~= Minimap then
+				self:ClearAllPoints()
+				self:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMRIGHT", 4, -1)
+			end
+		end)
 		MiniMapMailIcon:SetTexture("Interface\\AddOns\\ShestakUI\\Media\\Textures\\Mail.tga")
 		MiniMapMailIcon:SetSize(16, 16)
+	end
+
+	-- Move crafting order icon
+	if T.Mainline then
+		local Crafting = MinimapCluster.IndicatorFrame.CraftingOrderFrame
+		hooksecurefunc(Crafting, "SetPoint", function(self, _, anchor)
+			if anchor ~= Minimap then
+				self:ClearAllPoints()
+				self:SetPoint("BOTTOM", Minimap, "BOTTOM", 0, 4)
+			end
+		end)
 	end
 
 	-- Move LFG Eye icon
@@ -111,7 +181,7 @@ frame:SetScript("OnEvent", function(self, event)
 		MiniMapLFGFrame:SetPoint("TOP", Minimap, "TOP", 1, 6)
 		MiniMapLFGFrame:SetScale(0.8)
 		MiniMapLFGFrame:SetHighlightTexture(0)
-		if T.Wrath then
+		if T.Wrath or T.Cata then
 			MiniMapLFGFrameBorder:Hide()
 		else
 			MiniMapLFGBorder:Hide()
@@ -160,6 +230,10 @@ if T.Classic then
 	MiniMapWorldMapButton.Show = T.dummy
 end
 
+if T.Mainline then
+	AddonCompartmentFrame:Kill()
+end
+
 -- Garrison icon
 if T.Mainline then
 	if C.minimap.garrison_icon == true then
@@ -198,7 +272,7 @@ if StreamingIcon then
 end
 
 -- GhostFrame
-if T.Mainline then
+if T.Cata or T.Mainline then
 	GhostFrame:StripTextures()
 	GhostFrame:SetTemplate("Overlay")
 	GhostFrame:StyleButton()
@@ -463,6 +537,7 @@ if T.Vanilla then
 	if C.minimap.tracking_icon then
 		MiniMapTrackingFrame:ClearAllPoints()
 		MiniMapTrackingFrame:SetPoint("BOTTOMLEFT", MinimapAnchor, "BOTTOMLEFT", -1, -5)
+		MiniMapTrackingFrame.SetPoint = T.dummy
 		MiniMapTrackingBorder:Hide()
 		MiniMapTrackingFrame:SetFrameStrata("HIGH")
 		MiniMapTrackingIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
@@ -477,11 +552,11 @@ if T.Vanilla then
 		MiniMapTrackingBorder:Hide()
 		MiniMapTrackingIcon:Hide()
 	end
-elseif T.TBC or T.Wrath then
+elseif T.TBC or T.Wrath or T.Cata then
 	if C.minimap.tracking_icon then
 		MiniMapTrackingBackground:Hide()
 		MiniMapTracking:ClearAllPoints()
-		if T.Wrath then
+		if T.Wrath or T.Cata then
 			MiniMapTracking:SetPoint("BOTTOMLEFT", MinimapAnchor, "BOTTOMLEFT", -1, -5)
 			MiniMapTrackingButtonBorder:Hide()
 		else
@@ -501,10 +576,14 @@ elseif T.TBC or T.Wrath then
 else
 	if C.minimap.tracking_icon then
 		MinimapCluster.Tracking.Background:Hide()
-		MinimapCluster.Tracking:ClearAllPoints()
-		MinimapCluster.Tracking:SetPoint("BOTTOMLEFT", MinimapAnchor, "BOTTOMLEFT", 5, 6)
+		MinimapCluster.Tracking.Button:ClearAllPoints()
+		MinimapCluster.Tracking.Button:SetPoint("BOTTOMLEFT", MinimapAnchor, "BOTTOMLEFT", 5, 6)
 		MinimapCluster.Tracking.Button:SetHighlightTexture(0)
 		MinimapCluster.Tracking.Button:SetSize(16, 16)
+
+		MinimapCluster.Tracking.Button:SetScript("OnMouseDown", function(self, button)
+			Minimap:GetScript("OnMouseUp")(self, "MiddleButton")
+		end)
 
 		MinimapCluster.Tracking:CreateBackdrop("ClassColor")
 		MinimapCluster.Tracking.backdrop:SetPoint("TOPLEFT", MinimapCluster.Tracking.Button, -2, 2)
@@ -542,22 +621,25 @@ end
 if C.minimap.on_top then
 	MinimapAnchor:ClearAllPoints()
 	MinimapAnchor:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -21, -21)
-	BuffsAnchor:ClearAllPoints()
-	BuffsAnchor:SetPoint("TOPRIGHT", MinimapAnchor, "TOPLEFT", -25, 0)
+	if BuffsAnchor then
+		BuffsAnchor:ClearAllPoints()
+		BuffsAnchor:SetPoint("TOPRIGHT", MinimapAnchor, "TOPLEFT", -25, 0)
+	end
 
 	LPSTAT_CONFIG.Location.tip_frame = MinimapAnchor
-	LPSTAT_CONFIG.Location.tip_anchor = "BOTTOMRIGHT"
+	LPSTAT_CONFIG.Location.tip_anchor = "TOPRIGHT"
 	LPSTAT_CONFIG.Location.tip_x = 0
-	LPSTAT_CONFIG.Location.tip_y = -50
+	LPSTAT_CONFIG.Location.tip_y = 0
 
 	local frame = CreateFrame("Frame")
 	frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 	frame:SetScript("OnEvent", function()
 		frame:UnregisterEvent("PLAYER_ENTERING_WORLD")
+		local positionTable = T.CurrentProfile()
 
 		if LP_Coords then
 			LP_Coords:ClearAllPoints()
-			LP_Coords:SetPoint("BOTTOMRIGHT", MinimapAnchor, "TOPRIGHT", 0, 5)
+			LP_Coords:SetPoint("BOTTOMRIGHT", MinimapAnchor, "TOPRIGHT", 4, 5)
 		end
 
 		if TeleportMenu then
@@ -565,17 +647,17 @@ if C.minimap.on_top then
 			TeleportMenu:SetPoint("TOPLEFT", MinimapAnchor, "BOTTOMLEFT", 0, -13)
 		end
 
-		if RaidBuffsAnchor and not ShestakUIPositions[RaidBuffsAnchor:GetName()] then
+		if RaidBuffsAnchor and not positionTable[RaidBuffsAnchor:GetName()] then
 			RaidBuffsAnchor:ClearAllPoints()
 			RaidBuffsAnchor:SetPoint("TOPLEFT", MinimapAnchor, "BOTTOMLEFT", 0, -3)
 		end
 
-		if VehicleAnchor and not ShestakUIPositions[VehicleAnchor:GetName()] then
+		if VehicleAnchor and not positionTable[VehicleAnchor:GetName()] then
 			VehicleAnchor:ClearAllPoints()
 			VehicleAnchor:SetPoint("TOP", Minimap, "BOTTOM", 0, -27)
 		end
 
-		if TooltipAnchor and not ShestakUIPositions[TooltipAnchor:GetName()] then
+		if TooltipAnchor and not positionTable[TooltipAnchor:GetName()] then
 			TooltipAnchor:ClearAllPoints()
 			TooltipAnchor:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -21, 20)
 		end
@@ -590,17 +672,17 @@ if C.minimap.on_top then
 			stArchaeologyFrame:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 2, -5)
 		end
 
-		if AutoButtonAnchor and not ShestakUIPositions[AutoButtonAnchor:GetName()] then
+		if AutoButtonAnchor and not positionTable[AutoButtonAnchor:GetName()] then
 			AutoButtonAnchor:ClearAllPoints()
 			AutoButtonAnchor:SetPoint("TOPLEFT", Minimap, "BOTTOMLEFT", -2, -27)
 		end
 
-		if AutoButtonAnchor and not ShestakUIPositions[AutoButtonAnchor:GetName()] then
+		if AutoButtonAnchor and not positionTable[AutoButtonAnchor:GetName()] then
 			AutoButtonAnchor:ClearAllPoints()
 			AutoButtonAnchor:SetPoint("TOPLEFT", Minimap, "BOTTOMLEFT", -2, -27)
 		end
 
-		if StuffingFrameBags and not ShestakUIPositions[StuffingFrameBags:GetName()] then
+		if StuffingFrameBags and not positionTable[StuffingFrameBags:GetName()] then
 			StuffingFrameBags:ClearAllPoints()
 			StuffingFrameBags:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -21, 20)
 		end

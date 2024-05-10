@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.tooltip.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -45,15 +45,7 @@ local backdrop = {
 
 for _, tt in pairs(tooltips) do
 	if not IsAddOnLoaded("Aurora") then
-		if tt.SetBackdrop then
-			tt:SetBackdrop(nil)
-			tt.SetBackdrop = T.dummy
-			if tt.BackdropFrame then
-				tt.BackdropFrame:SetBackdrop(nil)
-			end
-		else
-			tt.NineSlice:SetAlpha(0)
-		end
+		tt.NineSlice:SetAlpha(0)
 		local bg = CreateFrame("Frame", nil, tt)
 		bg:SetPoint("TOPLEFT")
 		bg:SetPoint("BOTTOMRIGHT")
@@ -148,7 +140,11 @@ local targetedList = {}
 local ClassColors = {}
 local token
 for class, color in next, RAID_CLASS_COLORS do
-	ClassColors[class] = ("|cff%.2x%.2x%.2x"):format(color.r * 255, color.g * 255, color.b * 255)
+	if T.Vanilla and class == "SHAMAN" then
+		ClassColors[class] = ("|cff%.2x%.2x%.2x"):format(0 * 255, 0.44 * 255, 0.87 * 255)
+	else
+		ClassColors[class] = ("|cff%.2x%.2x%.2x"):format(color.r * 255, color.g * 255, color.b * 255)
+	end
 end
 
 local function AddTargetedBy()
@@ -186,6 +182,9 @@ local function GetColor(unit)
 		local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
 		if color then
 			r, g, b = color.r, color.g, color.b
+			if T.Vanilla and class == "SHAMAN" and not CUSTOM_CLASS_COLORS then
+				r, g, b = 0, 0.44, 0.87
+			end
 		else
 			r, g, b = 1, 1, 1
 		end
@@ -212,6 +211,11 @@ local function GameTooltipDefault(tooltip, parent)
 		tooltip:SetPoint("BOTTOMRIGHT", TooltipAnchor, "BOTTOMRIGHT", 0, 0)
 		tooltip.default = 1
 	end
+	if not C.tooltip.shift_modifer then
+		if InCombatLockdown() and C.tooltip.hide_combat and not IsShiftKeyDown() then
+			tooltip:Hide()
+		end
+	end
 end
 hooksecurefunc("GameTooltip_SetDefaultAnchor", GameTooltipDefault)
 
@@ -225,24 +229,6 @@ if C.tooltip.shift_modifer == true then
 			end
 		end
 	end)
-else
-	if C.tooltip.cursor == true then
-		hooksecurefunc("GameTooltip_SetDefaultAnchor", function(self, parent)
-			if InCombatLockdown() and C.tooltip.hide_combat and not IsShiftKeyDown() then
-				self:Hide()
-			else
-				self:SetOwner(parent, "ANCHOR_CURSOR_RIGHT", 20, 20)
-			end
-		end)
-	else
-		hooksecurefunc("GameTooltip_SetDefaultAnchor", function(self)
-			if InCombatLockdown() and C.tooltip.hide_combat and not IsShiftKeyDown() then
-				self:Hide()
-			else
-				self:SetPoint("BOTTOMRIGHT", TooltipAnchor, "BOTTOMRIGHT", 0, 0)
-			end
-		end)
-	end
 end
 
 if C.tooltip.health_value == true then
@@ -315,7 +301,7 @@ local OnTooltipSetUnit = function(self)
 			self:AppendText((" %s"):format("|cffFF0000"..L_CHAT_DND.."|r"))
 		end
 
-		if isPlayer and englishRace == "Pandaren" and faction ~= nil and faction ~= playerFaction then
+		if isPlayer and (englishRace == "Pandaren" or englishRace == "Dracthyr") and faction ~= nil and faction ~= playerFaction then
 			local hex = "cffff3333"
 			if faction == "Alliance" then
 				hex = "cff69ccf0"
@@ -331,9 +317,7 @@ local OnTooltipSetUnit = function(self)
 			else
 				_G["GameTooltipTextLeft2"]:SetTextColor(0, 1, 1)
 			end
-			if not T.Vanilla and C.tooltip.rank then
-				self:AddLine(RANK..": |cffffffff"..guildRank.."|r")
-			end
+			self:AddLine(RANK..": |cffffffff"..guildRank.."|r")
 		end
 
 		local n = guildName and 3 or 2
@@ -353,10 +337,6 @@ local OnTooltipSetUnit = function(self)
 				line:SetText()
 				break
 			end
-		end
-
-		if T.Vanilla and guildName and C.tooltip.rank then -- Rank line needs to come later for Classic 1.13.*/1.14.* clients
-			self:AddLine(RANK..": |cffffffff"..guildRank.."|r")
 		end
 	else
 		for i = 2, lines do
@@ -530,6 +510,25 @@ else
 			end
 		end
 	end)
+
+	-- Custom tooltip from MultiItemRef.lua
+	if _G["ItemRefTooltipMoneyFrame1"] then
+		_G["ItemRefTooltipMoneyFrame1PrefixText"]:SetFontObject("GameTooltipText")
+		_G["ItemRefTooltipMoneyFrame1SuffixText"]:SetFontObject("GameTooltipText")
+		_G["ItemRefTooltipMoneyFrame1GoldButton"]:SetNormalFontObject("GameTooltipText")
+		_G["ItemRefTooltipMoneyFrame1SilverButton"]:SetNormalFontObject("GameTooltipText")
+		_G["ItemRefTooltipMoneyFrame1CopperButton"]:SetNormalFontObject("GameTooltipText")
+	end
+
+	for i = 2, 4 do
+		if _G["ItemRefTooltip"..i.."MoneyFrame1"] then
+			_G["ItemRefTooltip"..i.."MoneyFrame1PrefixText"]:SetFontObject("GameTooltipText")
+			_G["ItemRefTooltip"..i.."MoneyFrame1SuffixText"]:SetFontObject("GameTooltipText")
+			_G["ItemRefTooltip"..i.."MoneyFrame1GoldButton"]:SetNormalFontObject("GameTooltipText")
+			_G["ItemRefTooltip"..i.."MoneyFrame1SilverButton"]:SetNormalFontObject("GameTooltipText")
+			_G["ItemRefTooltip"..i.."MoneyFrame1CopperButton"]:SetNormalFontObject("GameTooltipText")
+		end
+	end
 end
 
 ----------------------------------------------------------------------------------------

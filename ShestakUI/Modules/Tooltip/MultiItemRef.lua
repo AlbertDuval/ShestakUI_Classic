@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.tooltip.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -38,15 +38,7 @@ local CreateTip = function(link)
 	tip:SetScript("OnDragStart", function(self) self:StartMoving() end)
 	tip:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 
-	if tip.SetBackdrop then
-		tip:SetBackdrop(nil)
-		tip.SetBackdrop = T.dummy
-		if tip.BackdropFrame then
-			tip.BackdropFrame:SetBackdrop(nil)
-		end
-	else
-		tip.NineSlice:SetAlpha(0)
-	end
+	tip.NineSlice:SetAlpha(0)
 	local bg = CreateFrame("Frame", nil, tip)
 	bg:SetPoint("TOPLEFT")
 	bg:SetPoint("BOTTOMRIGHT")

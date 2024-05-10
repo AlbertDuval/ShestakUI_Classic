@@ -1,4 +1,4 @@
-local T, C, L = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if T.Classic or C.nameplate.enable ~= true or C.nameplate.quests ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -133,6 +133,10 @@ local function Update(self, event, arg1)
 				element.Item:SetTexture(133639)
 			end
 		end
+	end
+
+	if element:IsShown() then
+		self.Level:SetAlpha(0)
 	end
 
 	if element.PostUpdate then

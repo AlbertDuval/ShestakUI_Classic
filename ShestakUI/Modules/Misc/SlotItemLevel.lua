@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.misc.item_level ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -25,10 +25,9 @@ local function _getRealItemLevel(slotId, unit)
 
 	for i = 2, #data.lines do
 		local lineData = data.lines[i]
-		local argVal = lineData and lineData.args
-		if argVal then
-			local text = argVal[2] and argVal[2].stringVal
-			local found = text and strfind(text, itemLevelString)
+		local text = lineData and lineData.leftText
+		if text then
+			local found = strfind(text, itemLevelString)
 			if found then
 				local level = strmatch(text, "(%d+)%)?$")
 				if level and (tonumber(level) > 0) then
@@ -96,9 +95,11 @@ local function _updateItems(unit, frame)
 
 				if gem1 and gem1 ~= "" then
 					numGem = numGem + 1
-				elseif gem2 and gem2 ~= "" then
+				end
+				if gem2 and gem2 ~= "" then
 					numGem = numGem + 1
-				elseif gem3 and gem3 ~= "" then
+				end
+				if gem3 and gem3 ~= "" then
 					numGem = numGem + 1
 				end
 				if numGem < numSocket then
@@ -273,16 +274,19 @@ local function SetupFlyoutLevel(button, bag, slot)
 
 	local link, level
 	if bag then
-		link = GetContainerItemLink(bag, slot)
+		link = C_Container.GetContainerItemLink(bag, slot)
 		level = _getRealItemLevel(link, bag, slot)
 	else
 		link = GetInventoryItemLink("player", slot)
 		level = _getRealItemLevel(link, "player", slot)
 	end
 
-	if level then
-		button.iLvl:SetText("|cFFFFFF00"..level)
+	level = level or ""
+	if level and tonumber(level) == 1 then
+		level = ""
 	end
+
+	button.iLvl:SetText("|cFFFFFF00"..level)
 end
 
 hooksecurefunc("EquipmentFlyout_DisplayButton", function(button)

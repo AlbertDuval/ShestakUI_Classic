@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.raidframe.plugins_aura_watch ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -48,6 +48,7 @@ do
 		},
 		["MAGE"] = {
 			["Curse"] = true,
+			["Magic"] = false, -- for Season of Discovery
 		},
 		["MONK"] = {
 			["Magic"] = false,
@@ -78,8 +79,12 @@ do
 end
 
 local function CheckSpec()
-	if oUF:IsClassic() then
-		if T.class == "PALADIN" then
+	if T.Classic then
+		if T.class == "MAGE" and T.SoD then
+			if IsSpellKnown(412113) then
+				DispellFilter.Magic = true
+			end
+		elseif T.class == "PALADIN" then
 			DispellFilter.Magic = true
 		elseif T.class == "PRIEST" then
 			DispellFilter.Magic = true
@@ -304,7 +309,7 @@ local Disable = function(self)
 		self.RaidDebuffs:Hide()
 		self.RaidDebuffs.__owner = nil
 	end
-	if oUF:IsClassic() and not oUF:IsWrath() then
+	if oUF:IsVanilla() or oUF:IsTBC() then
 		self:UnregisterEvent("CHARACTER_POINTS_CHANGED", CheckSpec)
 	else
 		self:UnregisterEvent("PLAYER_TALENT_UPDATE", CheckSpec)

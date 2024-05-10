@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -75,11 +75,18 @@ local function LoadSkin()
 	local portrait = InspectPVPFrame:CreateTexture(nil, "OVERLAY")
 	portrait:SetSize(55, 55)
 	portrait:SetPoint("CENTER", InspectPVPFrame.PortraitBackground, "CENTER", 0, 0)
-	-- InspectPVPFrame.PortraitBackground:Kill()
-	-- InspectPVPFrame.PortraitBackground:ClearAllPoints()
-	-- InspectPVPFrame.PortraitBackground:SetPoint("TOPLEFT", 10, -5)
 	InspectPVPFrame.SmallWreath:ClearAllPoints()
 	InspectPVPFrame.SmallWreath:SetPoint("TOPLEFT", 3, -25)
+
+	-- PvP Talents
+	for i = 1, 3 do
+		local slot = InspectPVPFrame["TalentSlot"..i]
+		local icon = slot.Texture
+		slot:StripTextures()
+		icon:SkinIcon()
+		icon:SetTexCoord(.15, .85, .15, .85)
+		slot.Border:Hide()
+	end
 
 	InspectPVPFrame.BG:Kill()
 

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -89,6 +89,9 @@ local function LoadSkin()
 		end
 	end
 	hooksecurefunc(CriteriaAlertSystem, "setUpFunction", SkinCriteriaAlert)
+	if T.Mainline then
+		hooksecurefunc(MonthlyActivityAlertSystem, "setUpFunction", SkinCriteriaAlert)
+	end
 
 	local function SkinDungeonCompletionAlert(frame)
 		frame:SetAlpha(1)
@@ -197,7 +200,7 @@ local function LoadSkin()
 			end
 			-- Icon border
 			if icon and icon:GetObjectType() == "Texture" then
-				if icon:GetTexture() == "Interface\\Icons\\Ability_Warlock_DemonicPower" then
+				if icon:GetTexture() == 236293 then
 					icon.b = CreateFrame("Frame", nil, frame)
 					icon.b:SetTemplate("Default")
 					icon.b:SetPoint("TOPLEFT", icon, "TOPLEFT", -2, 2)
@@ -751,6 +754,7 @@ local function LoadSkin()
 
 		-- Background
 		frame.StandardBackground:Kill()
+		frame.FancyBackground:Kill()
 		frame.glow:Kill()
 		frame.shine:Kill()
 
@@ -829,6 +833,9 @@ local function LoadSkin()
 		end
 	end
 	hooksecurefunc(NewRecipeLearnedAlertSystem, "setUpFunction", SkinNewRecipeLearnedAlert)
+	if T.Mainline then
+		hooksecurefunc(SkillLineSpecsUnlockedAlertSystem, "setUpFunction", SkinNewRecipeLearnedAlert)
+	end
 
 	local function SkinNewPetMountAlert(frame)
 		frame:SetAlpha(1)
@@ -867,6 +874,7 @@ local function LoadSkin()
 	if T.Mainline then
 		hooksecurefunc(NewToyAlertSystem, "setUpFunction", SkinNewPetMountAlert)
 		hooksecurefunc(NewRuneforgePowerAlertSystem, "setUpFunction", SkinNewPetMountAlert)
+		hooksecurefunc(NewCosmeticAlertFrameSystem, "setUpFunction", SkinNewPetMountAlert)
 	end
 
 	hooksecurefunc("StandardRewardAlertFrame_AdjustRewardAnchors", function(frame)

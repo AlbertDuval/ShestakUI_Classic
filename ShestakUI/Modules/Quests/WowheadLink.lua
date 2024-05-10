@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Add quest/achievement wowhead link
@@ -104,6 +104,14 @@ frame:SetScript("OnEvent", function(_, _, addon)
 			hooksecurefunc("AchievementButton_OnClick", function(self)
 				if self.id and IsControlKeyDown() then
 					local text = linkAchievement:format(self.id)
+					StaticPopup_Show("WATCHFRAME_URL", _, _, text)
+				end
+			end)
+		else
+			hooksecurefunc(AchievementTemplateMixin, "OnClick", function(self)
+				local elementData = self:GetElementData()
+				if elementData and elementData.id and IsControlKeyDown() then
+					local text = linkAchievement:format(elementData.id)
 					StaticPopup_Show("WATCHFRAME_URL", _, _, text)
 				end
 			end)

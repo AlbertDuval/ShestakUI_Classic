@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.actionbar.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -17,7 +17,9 @@ MultiBarBottomLeft:SetParent(bar)
 
 bar:RegisterEvent("PLAYER_ENTERING_WORLD")
 bar:SetScript("OnEvent", function(self, event)
-	-- self:UnregisterAllEvents()
+	if not T.Classic then
+		Settings.SetValue("PROXY_SHOW_ACTIONBAR_2", true)
+	end
 	local NumPerRows = C.actionbar.bar2_row
 	local NextRowButtonAnchor = _G["MultiBarBottomLeftButton1"]
 	for i = 1, 12 do
@@ -46,7 +48,6 @@ bar:SetScript("OnEvent", function(self, event)
 				b:SetPoint("LEFT", b2, "RIGHT", T.Scale(C.actionbar.button_space), 0)
 			end
 		end
-		-- b.SetPoint = T.dummy -- Prevent moving by EditMode
 	end
 end)
 

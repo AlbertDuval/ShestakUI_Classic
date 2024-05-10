@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	The best way to add or delete spell is to go at www.wowhead.com, search for a spell.
@@ -10,7 +10,7 @@ local function SpellName(id)
 	if name then
 		return {name, icon}
 	else
-		print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to EsreverWoW.|r")
+		print("|cffff0000ShestakUI: spell ID ["..tostring(id).."] no longer exists!|r")
 		return {"Empty", ""}
 	end
 end
@@ -336,11 +336,11 @@ if C.reminder.solo_buffs_enable == true then
 				},
 				["combat"] = true,
 				["instance"] = true,
-				-- ["level"] = 40,
+				-- ["level"] = 30,
 			},
 			[5] = {	-- Vampiric Embrace group
 				["spells"] = {
-					SpellName(15286),		-- Shadow Protection
+					SpellName(15286),		-- Vampiric Embrace
 				},
 				["role"] = "Caster",
 				["combat"] = true,
@@ -362,7 +362,23 @@ if C.reminder.solo_buffs_enable == true then
 			[1] = {	-- Main Hand Weapon Enchant group
 				["spells"] = {
 					SpellName(8679),	-- Instant Poison
+					SpellName(8686),	-- Instant Poison II
+					SpellName(8688),	-- Instant Poison III
+					SpellName(11338),	-- Instant Poison IV
+					SpellName(11339),	-- Instant Poison V
+					SpellName(11340),	-- Instant Poison VI
+					SpellName(26891),	-- Instant Poison VII
+					SpellName(57967),	-- Instant Poison VIII
+					SpellName(57968),	-- Instant Poison IX
 					SpellName(2823),	-- Deadly Poison
+					SpellName(2824),	-- Deadly Poison II
+					SpellName(11355),	-- Deadly Poison III
+					SpellName(11356),	-- Deadly Poison IV
+					SpellName(25351),	-- Deadly Poison V
+					SpellName(26967),	-- Deadly Poison VI
+					SpellName(27186),	-- Deadly Poison VII
+					SpellName(57972),	-- Deadly Poison VIII
+					SpellName(57973),	-- Deadly Poison IX
 					SpellName(3408),	-- Crippling Poison
 					SpellName(5761),	-- Mind-numbing Poison
 					SpellName(13219),	-- Wound Poison
@@ -377,7 +393,23 @@ if C.reminder.solo_buffs_enable == true then
 			[2] = {	-- Off-Hand Weapon Enchant group
 				["spells"] = {
 					SpellName(8679),	-- Instant Poison
+					SpellName(8686),	-- Instant Poison II
+					SpellName(8688),	-- Instant Poison III
+					SpellName(11338),	-- Instant Poison IV
+					SpellName(11339),	-- Instant Poison V
+					SpellName(11340),	-- Instant Poison VI
+					SpellName(26891),	-- Instant Poison VII
+					SpellName(57967),	-- Instant Poison VIII
+					SpellName(57968),	-- Instant Poison IX
 					SpellName(2823),	-- Deadly Poison
+					SpellName(2824),	-- Deadly Poison II
+					SpellName(11355),	-- Deadly Poison III
+					SpellName(11356),	-- Deadly Poison IV
+					SpellName(25351),	-- Deadly Poison V
+					SpellName(26967),	-- Deadly Poison VI
+					SpellName(27186),	-- Deadly Poison VII
+					SpellName(57972),	-- Deadly Poison VIII
+					SpellName(57973),	-- Deadly Poison IX
 					SpellName(3408),	-- Crippling Poison
 					SpellName(5761),	-- Mind-numbing Poison
 					SpellName(13219),	-- Wound Poison

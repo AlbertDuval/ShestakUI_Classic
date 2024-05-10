@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local function LoadSkin()
 	T.SkinCloseButton(ItemTextFrameCloseButton, ItemTextFrame.backdrop)
 	T.SkinNextPrevButton(ItemTextPrevPageButton)
 	T.SkinNextPrevButton(ItemTextNextPageButton)
-	T.SkinScrollBar(ItemTextScrollFrameScrollBar)
+	T.SkinScrollBar(ItemTextScrollFrame.ScrollBar)
 	ItemTextPageText:SetTextColor("P", 1, 1, 1)
 	ItemTextPageText.SetTextColor = T.dummy
 end

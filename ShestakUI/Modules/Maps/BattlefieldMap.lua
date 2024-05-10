@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.minimap.bg_map_stylization ~= true or IsAddOnLoaded("Capping") or IsAddOnLoaded("Aurora") or IsAddOnLoaded("EnhanceBattlefieldMinimap") then return end
 
 ----------------------------------------------------------------------------------------
@@ -21,7 +21,6 @@ tinymap:SetScript("OnEvent", function(_, _, addon)
 	BattlefieldMapFrame.BorderFrame:DisableDrawLayer("ARTWORK")
 
 	BattlefieldMapFrame.BorderFrame.CloseButton:Hide()
-	BattlefieldMapFrame.BorderFrame.CloseButtonBorder:Hide()
 
 	BattlefieldMapTab:SetParent(tinymap)
 

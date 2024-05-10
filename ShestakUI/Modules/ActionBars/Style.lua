@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(ShestakUI)
+local T, C, L = unpack(ShestakUI)
 if C.actionbar.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -23,6 +23,7 @@ local function StyleNormalButton(button, size)
 		local flyoutBorderShadow = _G[name.."FlyoutBorderShadow"]
 		local autocast = button.AutoCastable or _G[name.."AutoCastable"]
 		local shine = _G[name.."Shine"]
+		local spellAlert = button.SpellActivationAlert
 
 		local normal = button.NormalTexture or _G[name.."NormalTexture"]
 		local normal2 = button:GetNormalTexture()
@@ -99,7 +100,6 @@ local function StyleNormalButton(button, size)
 		if C.actionbar.hotkey == true then
 			hotkey:ClearAllPoints()
 			hotkey:SetPoint("TOPRIGHT", 0, -1)
-			hotkey.SetPoint = T.dummy -- BETA It's bad way but work while I find better
 			hotkey:SetFont(C.font.action_bars_font, C.font.action_bars_font_size, C.font.action_bars_font_style)
 			hotkey:SetShadowOffset(C.font.action_bars_font_shadow and 1 or 0, C.font.action_bars_font_shadow and -1 or 0)
 			hotkey:SetWidth(C.actionbar.button_size - 1)
@@ -110,6 +110,18 @@ local function StyleNormalButton(button, size)
 
 		if not isFlyout and not isMultiCast and not isExtraAction then
 			button:SetSize(size or C.actionbar.button_size, size or C.actionbar.button_size)
+
+			-- Dragonflight - Hide profession quality icons
+			if T.Mainline then
+				if button.ProfessionQualityOverlayFrame then
+					button.ProfessionQualityOverlayFrame:SetAlpha(0)
+				end
+				hooksecurefunc(button, "UpdateProfessionQuality", function(self)
+					if self.ProfessionQualityOverlayFrame then
+						self.ProfessionQualityOverlayFrame:SetAlpha(0)
+					end
+				end)
+			end
 		end
 		button:SetTemplate("Transparent")
 		if C.actionbar.classcolor_border == true then
@@ -138,6 +150,14 @@ local function StyleNormalButton(button, size)
 			button.QuickKeybindHighlightTexture:SetScale(0.0001)
 		end
 
+		if button.SpellCastAnimFrame then
+			button.SpellCastAnimFrame:SetScale(0.0001) -- 10.1.5 cast texture
+		end
+
+		if button.CooldownFlash and button.CooldownFlash.Flipbook then
+			-- button.CooldownFlash.Flipbook:Kill() -- 10.1.5 new GCD flash
+		end
+
 		if flyoutBorder then
 			flyoutBorder:SetTexture(0)
 		end
@@ -155,6 +175,11 @@ local function StyleNormalButton(button, size)
 			shine:SetSize(C.actionbar.button_size, C.actionbar.button_size)
 		end
 
+		if spellAlert then
+			spellAlert:SetSize((size or C.actionbar.button_size) * 1.4, (size or C.actionbar.button_size) * 1.4)
+			ActionButton_HideOverlayGlow(button)
+		end
+
 		button:StyleButton()
 
 		button.isSkinned = true
@@ -165,8 +190,13 @@ local function StyleSmallButton(normal, button, icon, name, pet)
 	if not button.isSkinned then
 		local flash = _G[name.."Flash"]
 		local hotkey = _G[name.."HotKey"]
+		local normal = _G[name.."NormalTexture"]
 
 		button:SetNormalTexture(0)
+
+		if normal then
+			normal:SetAlpha(0)
+		end
 
 		if button.IconMask then
 			button.IconMask:Hide()
@@ -221,7 +251,7 @@ local function StyleSmallButton(normal, button, icon, name, pet)
 		end
 
 		if button.QuickKeybindHighlightTexture then
-			button.QuickKeybindHighlightTexture:SetTexture(0)
+			button.QuickKeybindHighlightTexture:SetScale(0.0001)
 		end
 
 		button:StyleButton()
@@ -259,7 +289,7 @@ frame:SetScript("OnEvent", function(self, event)
 		StyleNormalButton(_G["MultiBarLeftButton"..i], C.actionbar.editor and C.actionbar.bar3_size)
 		StyleNormalButton(_G["MultiBarRightButton"..i], C.actionbar.editor and C.actionbar.bar4_size)
 		StyleNormalButton(_G["MultiBarBottomRightButton"..i], C.actionbar.editor and C.actionbar.bar5_size)
-		if T.Wrath then
+		if T.Wrath or T.Cata then
 			StyleNormalButton(_G["MultiCastActionButton"..i])
 		end
 		if T.Mainline then
@@ -316,7 +346,7 @@ end
 
 if C.actionbar.hotkey == true then
 	local gsub = string.gsub
-	local function UpdateHotkey(self)
+	local function UpdateHotkey(self, pass)
 		local hotkey = _G[self:GetName().."HotKey"]
 		local text = hotkey:GetText()
 		if not text then return end
@@ -343,6 +373,13 @@ if C.actionbar.hotkey == true then
 		text = gsub(text, KEY_MOUSEWHEELDOWN, "MWD")
 		text = gsub(text, KEY_MOUSEWHEELUP, "MWU")
 
+		if not pass then
+			hotkey:ClearAllPoints()
+			hotkey:SetPoint("TOPRIGHT", 0, -1)
+			hotkey:SetWidth(self:GetWidth() - 1)
+			hotkey:SetHeight(C.font.action_bars_font_size)
+		end
+
 		if hotkey:GetText() == _G["RANGE_INDICATOR"] then
 			hotkey:SetText("")
 		else
@@ -360,7 +397,7 @@ if C.actionbar.hotkey == true then
 			UpdateHotkey(_G["MultiBarBottomRightButton"..i])
 			UpdateHotkey(_G["MultiBarLeftButton"..i])
 			UpdateHotkey(_G["MultiBarRightButton"..i])
-			if T.Wrath then
+			if T.Wrath or T.Cata then
 				UpdateHotkey(_G["MultiCastActionButton"..i])
 			end
 			if T.Mainline then
@@ -370,30 +407,40 @@ if C.actionbar.hotkey == true then
 			end
 		end
 		for i = 1, 10 do
-			UpdateHotkey(_G["StanceButton"..i])
-			UpdateHotkey(_G["PetActionButton"..i])
+			UpdateHotkey(_G["StanceButton"..i], true)
+			UpdateHotkey(_G["PetActionButton"..i], true)
 		end
 		if T.Mainline then
-			UpdateHotkey(ExtraActionButton1)
+			UpdateHotkey(ExtraActionButton1, true)
 		end
 	end)
 end
 
-if T.Mainline and C.actionbar.hide_highlight == true then
-	local function HideHighlightButton(self)
-		if self.overlay then
-			self.overlay:Hide()
-			ActionButton_HideOverlayGlow(self)
+if T.Cata or T.Mainline then
+	if C.actionbar.hide_highlight == true then
+		local function HideHighlightButton(self)
+			if self.overlay then
+				self.overlay:Hide()
+				ActionButton_HideOverlayGlow(self)
+			end
 		end
-	end
 
-	hooksecurefunc("ActionButton_ShowOverlayGlow", HideHighlightButton)
+		hooksecurefunc("ActionButton_ShowOverlayGlow", HideHighlightButton)
+	elseif T.Mainline then
+		hooksecurefunc("ActionButton_ShowOverlayGlow", function(button)
+			-- Make proc glow better
+			button.SpellActivationAlert.ProcStartFlipbook:ClearAllPoints()
+			button.SpellActivationAlert.ProcStartFlipbook:SetPoint("TOPLEFT", button, -C.actionbar.button_size * 0.9, C.actionbar.button_size * 0.9)
+			button.SpellActivationAlert.ProcStartFlipbook:SetPoint("BOTTOMRIGHT", button, C.actionbar.button_size * 0.9, -C.actionbar.button_size * 0.9)
+			button.SpellActivationAlert.ProcLoop:Play()
+		end)
+	end
 end
 
 ----------------------------------------------------------------------------------------
 --	TotemBar style
 ----------------------------------------------------------------------------------------
-if not T.Wrath or T.class ~= "SHAMAN" then return end
+if (not T.Wrath and not T.Cata) or T.class ~= "SHAMAN" then return end
 
 local SLOT_EMPTY_TCOORDS = {
 	[EARTH_TOTEM_SLOT] = {

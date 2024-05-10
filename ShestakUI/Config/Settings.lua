@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	ShestakUI main configuration file
@@ -31,7 +31,7 @@ C["media"] = {
 ----------------------------------------------------------------------------------------
 C["general"] = {
 	["welcome_message"] = true,					-- Enable welcome message in chat
-	["auto_scale"] = true,						-- Autoscale
+	["auto_scale"] = true,						-- Auto UI Scale
 	["uiscale"] = 0.75,							-- Your value (between 0.2 and 1) if "auto_scale" is disable
 	-- Blizzard UI
 	["error_filter"] = "BLACKLIST",				-- Filter Blizzard red errors (BLACKLIST, WHITELIST, COMBAT, NONE)
@@ -41,8 +41,14 @@ C["general"] = {
 	["minimize_mouseover"] = false,				-- Mouseover for quest minimize button
 	["hide_banner"] = false,					-- Hide Boss Banner Loot Frame
 	["hide_talking_head"] = false,				-- Hide Talking Head Frame
-	["hide_maw_buffs"] = false,					-- Hide Maw Buffs frame in instances
 }
+
+--[[
+if T.screenHeight > 1400 and T.screenHeight < 1500 then
+	C.general.auto_scale = false
+	C.general.uiscale = 0.64
+end
+--]]
 
 ----------------------------------------------------------------------------------------
 --	Skins options
@@ -72,6 +78,7 @@ C["skins"] = {
 	["omen"] = false,							-- Omen skin
 	["opie"] = false,							-- OPie skin
 	["ovale"] = false,							-- OvaleSpellPriority skin
+	["plater"] = false,							-- Plater skin
 	["postal"] = false,							-- Postal skin
 	["recount"] = false,						-- Recount skin
 	["rematch"] = false,						-- Rematch skin
@@ -88,9 +95,9 @@ C["unitframe"] = {
 	-- Main
 	["enable"] = true,							-- Enable unit frames
 	["own_color"] = false,						-- Set your color for health bars
-	["uf_color"] = {0.4, 0.4, 0.4},				-- Color for health bars if ["own_color"] = true
-	["uf_color_bg"] = {0.1, 0.1, 0.1},			-- Color for background
-	["enemy_health_color"] = true,				-- If enable, enemy target color is red
+	["uf_color"] = {0.4, 0.4, 0.4},				-- Color of health bars if ["own_color"] = true
+	["uf_color_bg"] = {0.1, 0.1, 0.1},			-- Color of health background
+	["enemy_health_color"] = true,				-- If enable, enemy target healthbar color is red
 	["show_total_value"] = true,				-- Display of info text on player and target with XXXX/Total
 	["color_value"] = false,					-- Health/mana value is colored
 	["bar_color_value"] = false,				-- Health bar color by current health remaining
@@ -102,6 +109,7 @@ C["unitframe"] = {
 	["castbar_icon"] = true,					-- Show castbar icons
 	["castbar_latency"] = true,					-- Castbar latency
 	["castbar_ticks"] = true,					-- Castbar ticks
+	["castbar_focus_type"] = "ICON",			-- Icon for focus castbar (ICON, BAR, NONE)
 	-- Frames
 	["show_pet"] = true,						-- Show pet frame
 	["show_focus"] = true,						-- Show focus frame
@@ -149,6 +157,7 @@ if T.Classic then
 	C["unitframe"]["plugins_experience_bar"] = true
 else
 	C["unitframe"]["plugins_power_spark"] = false
+	C["unitframe"]["bar_color_happiness"] = false
 end
 
 ----------------------------------------------------------------------------------------
@@ -162,6 +171,7 @@ C["unitframe_class_bar"] = {
 	["chi"] = true,								-- Chi bar
 	["essence"] = true,							-- Essence bar
 	["stagger"] = true,							-- Stagger bar (for Monk Tanks)
+	["eclipse"] = true,							-- Eclipse bar
 	["holy"] = true,							-- Holy Power bar
 	["shard"] = true,							-- Shard/Burning bar
 	["rune"] = true,							-- Rune bar
@@ -242,6 +252,7 @@ end
 ----------------------------------------------------------------------------------------
 C["aura"] = {
 	["player_buff_size"] = 35,					-- Player buffs size
+	["player_buff_mouseover"] = false,			-- Player buffs on mouseover
 	["debuff_size"] = 35,						-- Debuffs size on unitframes
 	["show_spiral"] = false,					-- Spiral on aura icons
 	["show_timer"] = true,						-- Show cooldown timer on aura icons
@@ -289,6 +300,7 @@ C["actionbar"] = {
 	["stancebar_hide"] = false,					-- Hide stance bar
 	["stancebar_horizontal"] = true,			-- Enable horizontal stance bar
 	["stancebar_mouseover"] = true,				-- Stance bar on mouseover (only for horizontal stance bar)
+	["stancebar_mouseover_alpha"] = 0,			-- Stance bar mouseover alpha
 	-- MicroMenu
 	["micromenu"] = true,						-- Enable micro menu
 	["micromenu_mouseover"] = true,			-- Micro menu on mouseover
@@ -361,7 +373,6 @@ C["tooltip"] = {
 	["realm"] = true,							-- Player realm name in tooltip
 	["rank"] = true,							-- Player guild-rank in tooltip
 	["target"] = true,							-- Target player in tooltip
-	["talents"] = false,						-- Show specialization
 	["average_lvl"] = false,					-- Average items level
 	["show_shift"] = true,						-- Show items level and spec when Shift is pushed
 	["raid_icon"] = false,						-- Raid icon
@@ -435,6 +446,7 @@ C["nameplate"] = {
 	["quests"] = false,							-- Show quest icon
 	["low_health"] = false,						-- Show red border when low health
 	["low_health_value"] = 0.2,					-- Value for low health (between 0.1 and 1)
+	["low_health_color"] = {0.8, 0, 0},			-- Color for low health border
 	["cast_color"] = false,						-- Show color border for casting important spells
 	["kick_color"] = false,						-- Change cast color if interrupt on cd
 	-- Threat
@@ -478,6 +490,7 @@ C["combattext"] = {
 	["short_numbers"] = true,					-- Use short numbers ("25.3k" instead of "25342")
 	["merge_aoe_spam"] = true,					-- Merges multiple aoe damage/heal spam into single message
 	["merge_melee"] = true,						-- Merges multiple auto attack damage spam
+	["merge_all"] = false,						-- Merges all spells
 	["direction"] = true,						-- Change scrolling direction from bottom to top
 	["dk_runes"] = true,						-- Show Death Knight rune recharge
 	["killingblow"] = false,					-- Tells you about your killingblows
@@ -501,10 +514,6 @@ C["bag"] = {
 	["bank_columns"] = 17,						-- Horizontal number of columns in bank
 	["bag_columns"] = 10,						-- Horizontal number of columns in main bag
 }
-
-if T.Mainline then
-	C["bag"]["enable"] = false
-end
 
 ----------------------------------------------------------------------------------------
 --	Minimap options
@@ -532,10 +541,10 @@ end
 ----------------------------------------------------------------------------------------
 C["loot"] = {
 	["lootframe"] = true,						-- Enable loot frame
-	["rolllootframe"] = true,					-- Enable group roll frame (Blizzard doesn't use roll system anymore)
+	["rolllootframe"] = true,					-- Enable group roll frame
 	["icon_size"] = 22,							-- Icon size
 	["width"] = 221,							-- Loot window width
-	["auto_greed"] = false,						-- Push "greed" or "disenchant" button when green item roll at max level (Blizzard doesn't use roll system anymore)
+	["auto_greed"] = false,						-- Push "greed" or "disenchant" button for green item roll at max level
 	["auto_confirm_de"] = true,					-- Auto confirm disenchant and take BoP loot
 	["faster_loot"] = false,					-- Faster auto looting
 }
@@ -635,7 +644,7 @@ C["reminder"] = {
 
 if T.Vanilla or T.TBC then
 	C["reminder"]["raid_buffs_size"] = 16
-elseif T.Wrath then
+elseif T.Wrath or T.Cata then
 	C["reminder"]["raid_buffs_size"] = 19.1
 end
 
@@ -679,6 +688,7 @@ C["pulsecooldown"] = {
 	["anim_scale"] = 1.5,						-- Animation scaling
 	["hold_time"] = 0,							-- Max opacity hold time
 	["threshold"] = 3,							-- Minimal threshold time
+	["whitelist"] = false,						-- Use whitelist instead of ignore list
 }
 
 ----------------------------------------------------------------------------------------
@@ -755,6 +765,5 @@ C["misc"] = {
 	["click_cast"] = false,						-- Simple click2cast spell binder
 	["click_cast_filter"] = false,				-- Ignore Player and Target frames for click2cast
 	["chars_currency"] = false,					-- Tracks your currency tokens across multiple characters
-	["hide_raid_button"] = false,				-- Button to hide raid frames in DPS layout (top left mouseover)
 	["max_camera_distance"] = true,				-- Increases camera distance to max on login
 }

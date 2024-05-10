@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.show_arena ~= true or C.unitframe.plugins_diminishing ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -117,13 +117,9 @@ local eventRegistered = {
 local function CombatLogCheck(self)
 	local _, instanceType = IsInInstance()
 	if instanceType ~= "arena" then return end
-	local _, eventType, _, _, _, _, _, destGUID, _, _, _, spellID, spellName, _, auraType = CombatLogGetCurrentEventInfo()
+	local _, eventType, _, _, _, _, _, destGUID, _, _, _, spellID, _, _, auraType = CombatLogGetCurrentEventInfo()
 	if not eventRegistered[eventType] then return end
 	if destGUID ~= UnitGUID(self.target) then return end
-
-	if T.Vanilla  then
-		spellID = T.GetSpellID(spellName)
-	end
 
 	local needupdate = false
 	if eventType == "SPELL_AURA_APPLIED" then
@@ -212,11 +208,7 @@ end
 for spell in pairs(T.DiminishingSpells) do
 	local name = GetSpellInfo(spell)
 	if not name then
-		if T.Classic then
-			print("|cffff0000WARNING: spell ID ["..tostring(spell).."] no longer exists! Report this to EsreverWoW.|r")
-		else
-			print("|cffff0000WARNING: spell ID ["..tostring(spell).."] no longer exists! Report this to Shestak.|r")
-		end
+		print("|cffff0000ShestakUI: spell ID ["..tostring(spell).."] no longer exists!|r")
 	end
 end
 

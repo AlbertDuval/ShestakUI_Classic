@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.nameplate.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ local function SpellName(id)
 	if name then
 		return name
 	else
-		print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to EsreverWoW.|r")
+		print("|cffff0000ShestakUI: spell ID ["..tostring(id).."] no longer exists!|r")
 		return "Empty"
 	end
 end
@@ -81,7 +81,6 @@ T.DebuffWhiteList = {
 	[SpellName(6136)] = true,	-- Chilled (Frost Armor)
 	-- [SpellName(7321)] = true,	-- Chilled (Ice Armor)
 	[SpellName(120)] = true,	-- Cone of Cold
-	[SpellName(18469)] = true,	-- Counterspell - Silenced
 	[SpellName(31661)] = true,	-- Dragon's Breath
 	[SpellName(133)] = true,	-- Fireball
 	[SpellName(22959)] = true,	-- Fire Vulnerability (Improved Scorch)
@@ -93,12 +92,14 @@ T.DebuffWhiteList = {
 	[SpellName(12355)] = true,	-- Impact
 	[SpellName(118)] = true,	-- Polymorph
 	[SpellName(11366)] = true,	-- Pyroblast
+	[SpellName(18469)] = true,	-- Silenced - Improved Counterspell
 	[SpellName(31589)] = true,	-- Slow
 	[SpellName(12579)] = true,	-- Winter's Chill
 
 	-- Paladin
 	[SpellName(31935)] = true,	-- Avenger's Shield
-	-- [SpellName(26573)] = true,	-- Consecration
+	[SpellName(356110)] = true,	-- Blood Corruption
+	[SpellName(26573)] = true,	-- Consecration
 	[SpellName(853)] = true,	-- Hammer of Justice
 	[SpellName(31803)] = true,	-- Holy Vengeance
 	[SpellName(20184)] = true,	-- Judgement of Justice
@@ -139,7 +140,7 @@ T.DebuffWhiteList = {
 	[SpellName(3409)] = true,	-- Crippling Poison
 	[SpellName(2818)] = true,	-- Deadly Poison
 	[SpellName(26679)] = true,	-- Deadly Throw
-	[SpellName(32747)] = true,	-- Deadly Throw Interrupt
+	[SpellName(32747)] = true,	-- Deadly Interrupt Effect
 	[SpellName(8647)] = true,	-- Expose Armor
 	[SpellName(703)] = true,	-- Garrote
 	[SpellName(1330)] = true,	-- Garrote - Silence
@@ -312,8 +313,8 @@ T.BuffWhiteList = {
 	[SpellName(47000)] = true,	-- Improved Blink
 	-- [SpellName(66)] = true,		-- Invisibility
 	[SpellName(1463)] = true,	-- Mana Shield
-	[SpellName(130)] = true,	-- Slow Fall
 	[SpellName(12043)] = true,	-- Presence of Mind
+	[SpellName(130)] = true,	-- Slow Fall
 
 	-- Paladin
 	[SpellName(31884)] = true,	-- Avenging Wrath
@@ -453,8 +454,8 @@ T.BuffWhiteList = {
 	-- [SpellName(5500)] = true,	-- Sense Demons
 	[SpellName(17941)] = true,	-- Shadow Trance
 	[SpellName(6229)] = true,	-- Shadow Ward
-	[SpellName(20707)] = true,	-- Soulstone Resurrection
 	[SpellName(25228)] = true,	-- Soul Link
+	[SpellName(20707)] = true,	-- Soulstone Resurrection
 	[SpellName(19478)] = true,	-- Tainted Blood (Felhunter)
 
 	-- Warrior
@@ -508,16 +509,16 @@ T.PlateBlacklist = {
 	-- Raid
 }
 
-T.InterruptCast = {
+T.InterruptCast = { -- Yellow border for interruptible cast
 	-- [SpellID] = true,	-- Spell Name
 }
 
-T.ImportantCast = {
+T.ImportantCast = { -- Red border for non-interruptible cast
 	-- [SpellID] = true,	-- Spell Name
 }
 
 local color = C.nameplate.mob_color
-local color2 = {0, 0.7, 0.6}
+local color_alt = {0, 0.7, 0.6}
 T.ColorPlate = {
 	-- PvP
 		["5925"] = color,		-- Grounding Totem
@@ -562,7 +563,7 @@ T.ColorPlate = {
 		-- Sethekk Halls
 		["18325"] = color,		-- Sethekk Prophet
 		["18327"] = color,		-- Time-Lost Controller
-		["20343"] = color2,		-- Charming Totem
+		["20343"] = color_alt,		-- Charming Totem
 		-- Old Hillsbrad Foothills
 		["17833"] = color,		-- Durnholde Warden
 		["18934"] = color,		-- Durnholde Mage

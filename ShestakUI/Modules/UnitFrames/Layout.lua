@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ local function Shared(self, unit)
 		self.Health.colorReaction = true
 	end
 
-	if unit == "pet" and C.unitframe.bar_color_happiness == true then
+	if T.Classic and not T.Cata and unit == "pet" and C.unitframe.bar_color_happiness == true then
 		self.Health.colorHappiness = true
 	else
 		self.Health.colorHappiness = false
@@ -295,14 +295,14 @@ local function Shared(self, unit)
 		end
 
 		-- LFD role icons
-		if T.Mainline and C.raidframe.icons_role == true then
+		if (T.Wrath or T.Cata or T.Mainline) and C.raidframe.icons_role == true then
 			self.GroupRoleIndicator = self.Health:CreateTexture(nil, "OVERLAY")
 			self.GroupRoleIndicator:SetSize(12, 12)
 			self.GroupRoleIndicator:SetPoint("TOPLEFT", 10, 8)
 		end
 
 		-- Rune bar
-		if (T.Mainline or T.Wrath) and C.unitframe_class_bar.rune == true and T.class == "DEATHKNIGHT" then
+		if C.unitframe_class_bar.rune == true and T.class == "DEATHKNIGHT" then
 			self.Runes = CreateFrame("Frame", self:GetName().."_RuneBar", self)
 			self.Runes:CreateBackdrop("Default")
 			self.Runes:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
@@ -401,15 +401,16 @@ local function Shared(self, unit)
 		end
 
 		-- Holy Power bar
-		if T.Mainline and C.unitframe_class_bar.holy == true and T.class == "PALADIN" then
+		if (T.Cata or T.Mainline) and C.unitframe_class_bar.holy == true and T.class == "PALADIN" then
 			self.HolyPower = CreateFrame("Frame", self:GetName().."_HolyPowerBar", self)
 			self.HolyPower:CreateBackdrop("Default")
 			self.HolyPower:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 			self.HolyPower:SetSize(player_width, 7)
 
-			for i = 1, 5 do
+			local maxHolyPower = T.Classic and 3 or 5
+			for i = 1, maxHolyPower do
 				self.HolyPower[i] = CreateFrame("StatusBar", self:GetName().."_HolyPower"..i, self.HolyPower)
-				self.HolyPower[i]:SetSize((player_width - 4) / 5, 7)
+				self.HolyPower[i]:SetSize((player_width - (T.Classic and 2 or 4)) / maxHolyPower, 7)
 				if i == 1 then
 					self.HolyPower[i]:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 				else
@@ -426,15 +427,16 @@ local function Shared(self, unit)
 		end
 
 		-- Soul Shards bar
-		if T.Mainline and C.unitframe_class_bar.shard == true and T.class == "WARLOCK" then
+		if (T.Cata or T.Mainline) and C.unitframe_class_bar.shard == true and T.class == "WARLOCK" then
 			self.SoulShards = CreateFrame("Frame", self:GetName().."_SoulShardsBar", self)
 			self.SoulShards:CreateBackdrop("Default")
 			self.SoulShards:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 			self.SoulShards:SetSize(player_width, 7)
 
-			for i = 1, 5 do
+			local maxSoulShards = T.Classic and 3 or 5
+			for i = 1, maxSoulShards do
 				self.SoulShards[i] = CreateFrame("StatusBar", self:GetName().."_SoulShards"..i, self.SoulShards)
-				self.SoulShards[i]:SetSize((player_width - 4) / 5, 7)
+				self.SoulShards[i]:SetSize((player_width - (T.Classic and 2 or 4)) / maxSoulShards, 7)
 				if i == 1 then
 					self.SoulShards[i]:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 				else
@@ -452,14 +454,14 @@ local function Shared(self, unit)
 
 		-- Essence bar
 		if T.Mainline and C.unitframe_class_bar.essence == true and T.class == "EVOKER" then
-			self.Essence = CreateFrame("Frame", self:GetName().."_Essence", self, "BackdropTemplate", "BackdropTemplate")
+			self.Essence = CreateFrame("Frame", self:GetName().."_Essence", self, BackdropTemplateMixin and "BackdropTemplate", BackdropTemplateMixin and "BackdropTemplate")
 			local maxEssence = UnitPowerMax(self.unit, Enum.PowerType.Essence)
 			self.Essence:CreateBackdrop("Default")
 			self.Essence:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 			self.Essence:SetSize(player_width, 7)
 
 			for i = 1, 6 do
-				self.Essence[i] = CreateFrame("StatusBar", self:GetName().."_Essence"..i, self.Essence, "BackdropTemplate")
+				self.Essence[i] = CreateFrame("StatusBar", self:GetName().."_Essence"..i, self.Essence, BackdropTemplateMixin and "BackdropTemplate")
 				self.Essence[i]:SetSize((player_width - 5) / 6, 7)
 				if i == 1 then
 					self.Essence[i]:SetPoint("LEFT", self.Essence)
@@ -563,6 +565,40 @@ local function Shared(self, unit)
 			CreateFrame("Frame"):SetScript("OnUpdate", function() T.UpdateClassMana(self) end)
 			self.ClassMana = T.SetFontString(self.Power, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
 			self.ClassMana:SetTextColor(1, 0.49, 0.04)
+		end
+
+		-- Eclipse bar
+		if T.Cata and T.class == "DRUID" then
+			if C.unitframe_class_bar.eclipse == true then
+				self.EclipseBar = CreateFrame("Frame", self:GetName().."_EclipseBar", self)
+				self.EclipseBar:CreateBackdrop("Default")
+				self.EclipseBar:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
+				self.EclipseBar:SetSize(217, 7)
+
+				self.EclipseBar.LunarBar = CreateFrame("StatusBar", nil, self.EclipseBar)
+				self.EclipseBar.LunarBar:SetPoint("LEFT", self.EclipseBar, "LEFT", 0, 0)
+				self.EclipseBar.LunarBar:SetSize(self.EclipseBar:GetWidth(), self.EclipseBar:GetHeight())
+				self.EclipseBar.LunarBar:SetStatusBarTexture(C.media.texture)
+				self.EclipseBar.LunarBar:SetStatusBarColor(0.80, 0.80, 0.20)
+
+				self.EclipseBar.SolarBar = CreateFrame("StatusBar", nil, self.EclipseBar)
+				self.EclipseBar.SolarBar:SetPoint("LEFT", self.EclipseBar.LunarBar:GetStatusBarTexture(), "RIGHT", 0, 0)
+				self.EclipseBar.SolarBar:SetSize(self.EclipseBar:GetWidth(), self.EclipseBar:GetHeight())
+				self.EclipseBar.SolarBar:SetStatusBarTexture(C.media.texture)
+				self.EclipseBar.SolarBar:SetStatusBarColor(0.30, 0.30, 0.80)
+
+				self.EclipseBar.Text = T.SetFontString(self.EclipseBar.SolarBar, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
+				self.EclipseBar.Text:SetPoint("CENTER", self.EclipseBar, "CENTER", -6, 0)
+
+				self.EclipseBar.Pers = T.SetFontString(self.EclipseBar.SolarBar, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
+				self.EclipseBar.Pers:SetPoint("LEFT", self.EclipseBar.Text, "RIGHT", 2, 0)
+				self:Tag(self.EclipseBar.Pers, "[pereclipse]%")
+
+				self.EclipseBar:SetScript("OnShow", function() T.UpdateEclipse(self, false) end)
+				self.EclipseBar:SetScript("OnUpdate", function() T.UpdateEclipse(self, true) end)
+				self.EclipseBar:SetScript("OnHide", function() T.UpdateEclipse(self, false) end)
+				self.EclipseBar.PostUpdatePower = T.EclipseDirection
+			end
 		end
 
 		-- Experience bar
@@ -775,10 +811,12 @@ local function Shared(self, unit)
 			self.Debuffs.initialAnchor = "BOTTOMRIGHT"
 			self.Debuffs["growth-y"] = "UP"
 			self.Debuffs["growth-x"] = "LEFT"
-			if ((T.Mainline or T.Wrath) and T.class == "DEATHKNIGHT" and C.unitframe_class_bar.rune == true)
+			if (T.class == "DEATHKNIGHT" and C.unitframe_class_bar.rune == true)
+			or (T.Cata and T.class == "DRUID" and C.unitframe_class_bar.eclipse == true)
 			or ((T.class == "DRUID" or T.class == "ROGUE") and C.unitframe_class_bar.combo == true and C.unitframe_class_bar.combo_old ~= true)
+			or (T.Cata and T.class == "PALADIN" and C.unitframe_class_bar.holy == true)
 			or (T.class == "SHAMAN" and C.unitframe_class_bar.totem == true)
-			or (T.Mainline and T.class == "WARLOCK" and C.unitframe_class_bar.shard == true) then
+			or ((T.Cata or T.Mainline) and T.class == "WARLOCK" and C.unitframe_class_bar.shard == true) then
 				self.Debuffs:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 19)
 			else
 				self.Debuffs:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 5)
@@ -980,32 +1018,57 @@ local function Shared(self, unit)
 		end
 
 		if unit == "focus" then
-			self.Castbar.Button = CreateFrame("Frame", nil, self.Castbar)
-			self.Castbar.Button:SetSize(65, 65)
-			self.Castbar.Button:SetPoint(unpack(C.position.unitframes.focus_castbar))
-			self.Castbar.Button:SetTemplate("Default")
+			if C.unitframe.castbar_focus_type == "ICON" or C.unitframe.castbar_focus_type == "BAR" then
+				self.Castbar.Button = CreateFrame("Frame", self:GetName().."_CastbarIcon", self.Castbar)
+				self.Castbar.Button:SetPoint(unpack(C.position.unitframes.focus_castbar))
+				self.Castbar.Button:SetTemplate("Default")
 
-			self.Castbar.Icon = self.Castbar.Button:CreateTexture(nil, "ARTWORK")
-			self.Castbar.Icon:SetPoint("TOPLEFT", self.Castbar.Button, 2, -2)
-			self.Castbar.Icon:SetPoint("BOTTOMRIGHT", self.Castbar.Button, -2, 2)
-			self.Castbar.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-
-			self.Castbar.Time = T.SetFontString(self.Castbar, C.font.unit_frames_font, C.font.unit_frames_font_size * 2, C.font.unit_frames_font_style)
-			self.Castbar.Time:SetParent(self.Castbar.Button)
-			self.Castbar.Time:SetPoint("CENTER", self.Castbar.Icon, "CENTER", 0, 10)
-			self.Castbar.Time:SetTextColor(1, 1, 1)
-
-			self.Castbar.Time2 = T.SetFontString(self.Castbar, C.font.unit_frames_font, C.font.unit_frames_font_size * 2, C.font.unit_frames_font_style)
-			self.Castbar.Time2:SetParent(self.Castbar.Button)
-			self.Castbar.Time2:SetPoint("CENTER", self.Castbar.Icon, "CENTER", 0, -10)
-			self.Castbar.Time2:SetTextColor(1, 1, 1)
-
-			self.Castbar.CustomTimeText = function(self, duration)
-				self.Time:SetText(("%.1f"):format(self.max))
-				self.Time2:SetText(("%.1f"):format(self.channeling and duration or self.max - duration))
+				self.Castbar.Icon = self.Castbar.Button:CreateTexture(nil, "ARTWORK")
+				self.Castbar.Icon:SetPoint("TOPLEFT", self.Castbar.Button, 2, -2)
+				self.Castbar.Icon:SetPoint("BOTTOMRIGHT", self.Castbar.Button, -2, 2)
+				self.Castbar.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 			end
-			self.Castbar.CustomDelayText = function(self)
-				self.Time:SetText(("|cffaf5050%s %.1f|r"):format(self.channeling and "-" or "+", abs(self.delay)))
+			if C.unitframe.castbar_focus_type == "ICON" then
+				self.Castbar.Button:SetSize(65, 65)
+
+				self.Castbar.Time = T.SetFontString(self.Castbar, C.font.unit_frames_font, C.font.unit_frames_font_size * 2, C.font.unit_frames_font_style)
+				self.Castbar.Time:SetParent(self.Castbar.Button)
+				self.Castbar.Time:SetTextColor(1, 1, 1)
+				self.Castbar.Time:SetPoint("CENTER", self.Castbar.Icon, "CENTER", 0, 10)
+
+				self.Castbar.Time2 = T.SetFontString(self.Castbar, C.font.unit_frames_font, C.font.unit_frames_font_size * 2, C.font.unit_frames_font_style)
+				self.Castbar.Time2:SetParent(self.Castbar.Button)
+				self.Castbar.Time2:SetTextColor(1, 1, 1)
+				self.Castbar.Time2:SetPoint("CENTER", self.Castbar.Icon, "CENTER", 0, -10)
+
+				self.Castbar.CustomTimeText = function(self, duration)
+					self.Time:SetText(("%.1f"):format(self.max))
+					self.Time2:SetText(("%.1f"):format(self.channeling and duration or self.max - duration))
+				end
+				self.Castbar.CustomDelayText = function(self)
+					self.Time:SetText(("|cffaf5050%s %.1f|r"):format(self.channeling and "-" or "+", abs(self.delay)))
+				end
+			elseif C.unitframe.castbar_focus_type == "BAR" then
+				self.Castbar:ClearAllPoints()
+				self.Castbar:SetPoint("TOP", self.Castbar.Icon, "BOTTOM", 0, -7)
+				self.Castbar:SetWidth(C.unitframe.castbar_width - 40)
+				self.Castbar:SetHeight(C.unitframe.castbar_height)
+
+				self.Castbar.Text = T.SetFontString(self.Castbar, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
+				self.Castbar.Text:SetPoint("LEFT", self.Castbar, "LEFT", 2, 0)
+				self.Castbar.Text:SetTextColor(1, 1, 1)
+				self.Castbar.Text:SetJustifyH("LEFT")
+				self.Castbar.Text:SetWordWrap(false)
+				self.Castbar.Text:SetWidth(self.Castbar:GetWidth() - 50)
+
+				self.Castbar.Button:SetSize(self.Castbar:GetHeight() + 30, self.Castbar:GetHeight() + 30)
+
+				self.Castbar.Time = T.SetFontString(self.Castbar, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
+				self.Castbar.Time:SetPoint("RIGHT", self.Castbar, "RIGHT", 0, 0)
+				self.Castbar.Time:SetTextColor(1, 1, 1)
+				self.Castbar.Time:SetJustifyH("RIGHT")
+				self.Castbar.CustomTimeText = T.CustomCastTimeText
+				self.Castbar.CustomDelayText = T.CustomCastDelayText
 			end
 		end
 	end
@@ -1113,8 +1176,8 @@ local function Shared(self, unit)
 	end
 
 	if C.unitframe.show_boss and unit == "boss" then
-		if T.Mainline then
-			self.AlternativePower = CreateFrame("StatusBar", nil, self.Health, BackdropTemplateMixin and "BackdropTemplate" or nil)
+		if T.Cata or T.Mainline then
+			self.AlternativePower = CreateFrame("StatusBar", nil, self.Health, BackdropTemplateMixin and "BackdropTemplate")
 			self.AlternativePower:SetFrameLevel(self.Health:GetFrameLevel() + 1)
 			self.AlternativePower:SetHeight(5)
 			self.AlternativePower:SetStatusBarTexture(C.media.texture)
@@ -1197,10 +1260,6 @@ local function Shared(self, unit)
 			self.HealPrediction = healBar
 		else
 			T.CreateHealthPrediction(self)
-
-			if T.Classic then
-				self.HealthPrediction.frequentUpdates = true
-			end
 		end
 	end
 
@@ -1544,7 +1603,7 @@ end
 if C.raidframe.auto_position == "DYNAMIC" then
 	local prevNum = 5
 	local function Reposition(self, event)
-		if C.raidframe.layout == "HEAL" and not C.raidframe.raid_groups_vertical and C.raidframe.raid_groups > 5 then
+		if (C.raidframe.layout == "HEAL" or C.raidframe.layout == "AUTO") and not C.raidframe.raid_groups_vertical and C.raidframe.raid_groups > 5 then
 			if InCombatLockdown() then
 				self:RegisterEvent("PLAYER_REGEN_ENABLED")
 				return
@@ -1560,14 +1619,20 @@ if C.raidframe.auto_position == "DYNAMIC" then
 			if maxGroup >= C.raidframe.raid_groups then
 				maxGroup = C.raidframe.raid_groups
 			end
+			if C.raidframe.layout == "AUTO" and (((T.Wrath or T.Cata) and not T.Role == "Healer") or (T.Mainline and not T.IsHealerSpec())) then maxGroup = 5 end
 			if prevNum ~= maxGroup then
 				-- local offset = (maxGroup - 5) * (C.raidframe.heal_raid_height + 7) + ((maxGroup - ((maxGroup - 5))) * (C.raidframe.heal_raid_height - 26))
 				local offset = (maxGroup - 5) * (C.raidframe.heal_raid_height + 7)
+				if C.raidframe.layout == "AUTO" and (((T.Wrath or T.Cata) and not T.Role == "Healer") or (T.Mainline and not T.IsHealerSpec())) then offset = 0 end
 				if C.unitframe.unit_castbar then
 					if C.unitframe.castbar_icon == true then
-						oUF_Player_Castbar:SetPoint(C.position.unitframes.player_castbar[1], C.position.unitframes.player_castbar[2], C.position.unitframes.player_castbar[3], C.position.unitframes.player_castbar[4] + 11, C.position.unitframes.player_castbar[5] + offset)
+						if oUF_Player_Castbar then
+							oUF_Player_Castbar:SetPoint(C.position.unitframes.player_castbar[1], C.position.unitframes.player_castbar[2], C.position.unitframes.player_castbar[3], C.position.unitframes.player_castbar[4] + 11, C.position.unitframes.player_castbar[5] + offset)
+						end
 					else
-						oUF_Player_Castbar:SetPoint(C.position.unitframes.player_castbar[1], C.position.unitframes.player_castbar[2], C.position.unitframes.player_castbar[3], C.position.unitframes.player_castbar[4], C.position.unitframes.player_castbar[5] + offset)
+						if oUF_Player_Castbar then
+							oUF_Player_Castbar:SetPoint(C.position.unitframes.player_castbar[1], C.position.unitframes.player_castbar[2], C.position.unitframes.player_castbar[3], C.position.unitframes.player_castbar[4], C.position.unitframes.player_castbar[5] + offset)
+						end
 					end
 				end
 
@@ -1579,33 +1644,46 @@ if C.raidframe.auto_position == "DYNAMIC" then
 				self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 			end
 		else
-			self:UnregisterEvent("GROUP_ROSTER_UPDATE")
+			self:UnregisterAllEvents()
 		end
 	end
 
 	local frame = CreateFrame("Frame")
 	frame:RegisterEvent("PLAYER_LOGIN")
 	frame:RegisterEvent("GROUP_ROSTER_UPDATE")
+	if C.raidframe.layout == "AUTO" and (T.Wrath or T.Cata or T.Mainline) then
+		frame:RegisterUnitEvent("PLAYER_SPECIALIZATION_CHANGED", "player", "")
+	end
 	frame:SetScript("OnEvent", Reposition)
 elseif C.raidframe.auto_position == "STATIC" then
-	local function Reposition()
-		if C.raidframe.layout == "HEAL" and not C.raidframe.raid_groups_vertical and C.raidframe.raid_groups > 5 then
+	local function Reposition(self)
+		if (C.raidframe.layout == "HEAL" or C.raidframe.layout == "AUTO") and not C.raidframe.raid_groups_vertical and C.raidframe.raid_groups > 5 then
 			-- local offset = (C.raidframe.raid_groups - 5) * (C.raidframe.heal_raid_height + 7) + ((C.raidframe.raid_groups - ((C.raidframe.raid_groups - 5))) * (C.raidframe.heal_raid_height - 26))
 			local offset = (C.raidframe.raid_groups - 5) * (C.raidframe.heal_raid_height + 7)
+			if C.raidframe.layout == "AUTO" and (((T.Wrath or T.Cata) and not T.Role == "Healer") or (T.Mainline and not T.IsHealerSpec())) then offset = 0 end
 			if C.unitframe.unit_castbar then
 				if C.unitframe.castbar_icon == true then
-					oUF_Player_Castbar:SetPoint(C.position.unitframes.player_castbar[1], C.position.unitframes.player_castbar[2], C.position.unitframes.player_castbar[3], C.position.unitframes.player_castbar[4] + 11, C.position.unitframes.player_castbar[5] + offset)
+					if oUF_Player_Castbar then
+						oUF_Player_Castbar:SetPoint(C.position.unitframes.player_castbar[1], C.position.unitframes.player_castbar[2], C.position.unitframes.player_castbar[3], C.position.unitframes.player_castbar[4] + 11, C.position.unitframes.player_castbar[5] + offset)
+					end
 				else
-					oUF_Player_Castbar:SetPoint(C.position.unitframes.player_castbar[1], C.position.unitframes.player_castbar[2], C.position.unitframes.player_castbar[3], C.position.unitframes.player_castbar[4], C.position.unitframes.player_castbar[5] + offset)
+					if oUF_Player_Castbar then
+						oUF_Player_Castbar:SetPoint(C.position.unitframes.player_castbar[1], C.position.unitframes.player_castbar[2], C.position.unitframes.player_castbar[3], C.position.unitframes.player_castbar[4], C.position.unitframes.player_castbar[5] + offset)
+					end
 				end
 			end
 
 			player:SetPoint(C.position.unitframes.player[1], C.position.unitframes.player[2], C.position.unitframes.player[3], C.position.unitframes.player[4], C.position.unitframes.player[5] + offset)
 			target:SetPoint(C.position.unitframes.target[1], C.position.unitframes.target[2], C.position.unitframes.target[3], C.position.unitframes.target[4], C.position.unitframes.target[5] + offset)
+		else
+			self:UnregisterAllEvents()
 		end
 	end
 
 	local frame = CreateFrame("Frame")
 	frame:RegisterEvent("PLAYER_LOGIN")
+	if C.raidframe.layout == "AUTO" and (T.Wrath or T.Cata or T.Mainline) then
+		frame:RegisterUnitEvent("PLAYER_SPECIALIZATION_CHANGED", "player", "")
+	end
 	frame:SetScript("OnEvent", Reposition)
 end

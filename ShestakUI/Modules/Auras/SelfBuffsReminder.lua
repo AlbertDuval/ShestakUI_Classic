@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.reminder.solo_buffs_enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -7,6 +7,7 @@ if C.reminder.solo_buffs_enable ~= true then return end
 local tab = T.ReminderSelfBuffs[T.class]
 if not tab then return end
 local playerBuff = {}
+local isDeadlyBrew = T.SoD and C_Engraving.IsRuneEquipped(48141)
 
 local function OnEvent(self, event)
 	local group = tab[self.id]
@@ -38,10 +39,8 @@ local function OnEvent(self, event)
 	if event == "LEARNED_SPELL_IN_TAB" and self.icon:GetTexture() then
 		self:UnregisterAllEvents()
 		self:RegisterUnitEvent("UNIT_AURA", "player", "")
-		if T.Mainline or T.Wrath then
-			self:RegisterEvent("UNIT_ENTERED_VEHICLE")
-			self:RegisterEvent("UNIT_EXITED_VEHICLE")
-		end
+		self:RegisterEvent("UNIT_ENTERED_VEHICLE")
+		self:RegisterEvent("UNIT_EXITED_VEHICLE")
 
 		if group.combat then
 			self:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -83,14 +82,14 @@ local function OnEvent(self, event)
 	specpass == true and rolepass == true and not UnitInVehicle("player") then
 		if group.mainhand then
 			local hasMainHandEnchant = GetWeaponEnchantInfo()
-			if not hasMainHandEnchant then
+			if not hasMainHandEnchant and not isDeadlyBrew then
 				self:Show()
 				if canplaysound == true then PlaySoundFile(C.media.warning_sound, "Master") end
 			end
 			return
 		elseif group.offhand then
 			local _, _, _, _, hasOffHandEnchant = GetWeaponEnchantInfo()
-			if not hasOffHandEnchant and C_PaperDollInfo.OffhandHasWeapon() then
+			if not hasOffHandEnchant and C_PaperDollInfo.OffhandHasWeapon() and not isDeadlyBrew then
 				self:Show()
 				if canplaysound == true then PlaySoundFile(C.media.warning_sound, "Master") end
 			end
@@ -130,35 +129,36 @@ local function OnEvent(self, event)
 end
 
 for i = 1, #tab do
-	local frame = CreateFrame("Frame", "ReminderFrame"..i, UIParent)
-	frame:CreatePanel("Default", C.reminder.solo_buffs_size, C.reminder.solo_buffs_size, unpack(C.position.self_buffs))
-	frame:SetFrameLevel(6)
-	frame.id = i
+	-- Skip shields group for Shaman's in Vanilla when not playing SoD
+	if not T.Vanilla or T.SoD or (T.Vanilla and (T.class ~= "SHAMAN" or i ~= 1)) then
+		local frame = CreateFrame("Frame", "ReminderFrame"..i, UIParent)
+		frame:CreatePanel("Default", C.reminder.solo_buffs_size, C.reminder.solo_buffs_size, unpack(C.position.self_buffs))
+		frame:SetFrameLevel(6)
+		frame.id = i
 
-	frame.icon = frame:CreateTexture(nil, "OVERLAY")
-	frame.icon:CropIcon()
-	frame.icon:SetSize(C.reminder.solo_buffs_size, C.reminder.solo_buffs_size)
+		frame.icon = frame:CreateTexture(nil, "OVERLAY")
+		frame.icon:CropIcon()
+		frame.icon:SetSize(C.reminder.solo_buffs_size, C.reminder.solo_buffs_size)
 
-	frame:Hide()
+		frame:Hide()
 
-	frame:RegisterUnitEvent("UNIT_AURA", "player", "")
-	frame:RegisterEvent("PLAYER_LOGIN")
-	frame:RegisterEvent("PLAYER_REGEN_ENABLED")
-	frame:RegisterEvent("PLAYER_REGEN_DISABLED")
-	frame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-	if T.Mainline or T.Wrath then
+		frame:RegisterUnitEvent("UNIT_AURA", "player", "")
+		frame:RegisterEvent("PLAYER_LOGIN")
+		frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+		frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+		frame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 		frame:RegisterEvent("UNIT_ENTERED_VEHICLE")
 		frame:RegisterEvent("UNIT_EXITED_VEHICLE")
+		frame:SetScript("OnEvent", OnEvent)
+		frame:SetScript("OnUpdate", function(self)
+			if not self.icon:GetTexture() then
+				self:Hide()
+			end
+		end)
+		frame:SetScript("OnShow", function(self)
+			if not self.icon:GetTexture() then
+				self:Hide()
+			end
+		end)
 	end
-	frame:SetScript("OnEvent", OnEvent)
-	frame:SetScript("OnUpdate", function(self)
-		if not self.icon:GetTexture() then
-			self:Hide()
-		end
-	end)
-	frame:SetScript("OnShow", function(self)
-		if not self.icon:GetTexture() then
-			self:Hide()
-		end
-	end)
 end

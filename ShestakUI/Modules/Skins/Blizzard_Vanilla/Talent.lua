@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -17,23 +17,15 @@ local function LoadSkin()
 	_G["PlayerTalentFrameTitleText"]:ClearAllPoints()
 	_G["PlayerTalentFrameTitleText"]:SetPoint("TOP", _G["PlayerTalentFrame"].backdrop, "TOP", 0, -6)
 
-	if T.Wrath then
-		_G["PlayerTalentFrameSpentPointsText"]:ClearAllPoints()
-		_G["PlayerTalentFrameSpentPointsText"]:SetPoint("LEFT", _G["PlayerTalentFramePointsBar"], "LEFT", 8, -2)
+	_G["PlayerTalentFrameSpentPointsText"]:ClearAllPoints()
+	_G["PlayerTalentFrameSpentPointsText"]:SetPoint("LEFT", _G["PlayerTalentFramePointsBar"], "LEFT", 8, -2)
 
-		_G["PlayerTalentFrameTalentPointsText"]:ClearAllPoints()
-		_G["PlayerTalentFrameTalentPointsText"]:SetPoint("RIGHT", _G["PlayerTalentFramePointsBar"], "RIGHT", 0, 0)
+	_G["PlayerTalentFrameTalentPointsText"]:ClearAllPoints()
+	_G["PlayerTalentFrameTalentPointsText"]:SetPoint("RIGHT", _G["PlayerTalentFramePointsBar"], "RIGHT", 0, 0)
 
+	if _G["PlayerTalentFrameRoleButton"] then
 		_G["PlayerTalentFrameRoleButton"]:ClearAllPoints()
 		_G["PlayerTalentFrameRoleButton"]:SetPoint("TOPRIGHT", _G["PlayerTalentFrameScrollFrame"], "TOPRIGHT", 0, -6)
-	else
-		_G["PlayerTalentFrameSpentPoints"]:ClearAllPoints()
-		_G["PlayerTalentFrameSpentPoints"]:SetPoint("TOP", _G["PlayerTalentFrame"].backdrop, "TOP", 0, -30)
-
-		_G["PlayerTalentFrameTalentPointsText"]:ClearAllPoints()
-		_G["PlayerTalentFrameTalentPointsText"]:SetPoint("BOTTOMRIGHT", _G["PlayerTalentFrame"], "BOTTOMLEFT", 220, 84)
-
-		_G["PlayerTalentFrameCancelButton"]:Kill()
 	end
 
 	_G["PlayerTalentFrameTab1"]:ClearAllPoints()
@@ -69,39 +61,37 @@ local function LoadSkin()
 		end
 	end
 
-	if T.Wrath then
-		for i = 1, MAX_TALENT_TABS do
-			local tab = _G["PlayerSpecTab"..i]
-			tab:GetRegions():Hide()
+	for i = 1, MAX_TALENT_TABS do
+		local tab = _G["PlayerSpecTab"..i]
+		tab:GetRegions():Hide()
 
-			tab:SetTemplate("Default")
-			tab:StyleButton(true)
+		tab:SetTemplate("Default")
+		tab:StyleButton(true)
 
-			tab:GetNormalTexture():SetInside()
-			tab:GetNormalTexture():SetTexCoord(0.1, 0.9, 0.1, 0.9)
-		end
-
-		_G["PlayerTalentFrameStatusFrame"]:SetPoint("TOP", 8, -30)
-		_G["PlayerTalentFrameStatusFrame"]:StripTextures()
-
-		_G["PlayerTalentFrameActivateButton"]:SetPoint("TOP", -10, -40)
-		_G["PlayerTalentFrameActivateButton"]:SkinButton()
-
-		_G["PlayerTalentFrameResetButton"]:SetPoint("RIGHT", -2, -1)
-		_G["PlayerTalentFrameResetButton"]:SkinButton()
-
-		_G["PlayerTalentFrameLearnButton"]:SetPoint("RIGHT", _G["PlayerTalentFrameResetButton"], "LEFT", -3, 0)
-		_G["PlayerTalentFrameLearnButton"]:SkinButton()
-
-		_G["PlayerSpecTab1"]:SetPoint("TOPLEFT", _G["PlayerTalentFrame"], "TOPRIGHT", -33, -65)
-		_G["PlayerSpecTab1"].ClearAllPoints = T.dummy
-		_G["PlayerSpecTab1"].SetPoint = T.dummy
-
-		_G["PlayerTalentFramePreviewBar"]:StripTextures()
-		_G["PlayerTalentFramePreviewBarFiller"]:StripTextures()
-
-		_G["PlayerTalentFramePointsBar"]:StripTextures()
+		tab:GetNormalTexture():SetInside()
+		tab:GetNormalTexture():SetTexCoord(0.1, 0.9, 0.1, 0.9)
 	end
+
+	_G["PlayerTalentFrameStatusFrame"]:SetPoint("TOP", 8, -30)
+	_G["PlayerTalentFrameStatusFrame"]:StripTextures()
+
+	_G["PlayerTalentFrameActivateButton"]:SetPoint("TOP", -10, -40)
+	_G["PlayerTalentFrameActivateButton"]:SkinButton()
+
+	_G["PlayerTalentFrameResetButton"]:SetPoint("RIGHT", -2, -1)
+	_G["PlayerTalentFrameResetButton"]:SkinButton()
+
+	_G["PlayerTalentFrameLearnButton"]:SetPoint("RIGHT", _G["PlayerTalentFrameResetButton"], "LEFT", -3, 0)
+	_G["PlayerTalentFrameLearnButton"]:SkinButton()
+
+	_G["PlayerSpecTab1"]:SetPoint("TOPLEFT", _G["PlayerTalentFrame"], "TOPRIGHT", -33, -65)
+	_G["PlayerSpecTab1"].ClearAllPoints = T.dummy
+	_G["PlayerSpecTab1"].SetPoint = T.dummy
+
+	_G["PlayerTalentFramePreviewBar"]:StripTextures()
+	_G["PlayerTalentFramePreviewBarFiller"]:StripTextures()
+
+	_G["PlayerTalentFramePointsBar"]:StripTextures()
 
 	local f = CreateFrame("Frame")
 	f:RegisterEvent("CHARACTER_POINTS_CHANGED")

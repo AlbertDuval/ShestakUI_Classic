@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.announcements.feasts ~= true and C.announcements.portals ~= true and C.announcements.toys ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -8,10 +8,7 @@ local frame = CreateFrame("Frame")
 frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 frame:SetScript("OnEvent", function()
 	if not IsInGroup() or InCombatLockdown() then return end
-	local _, subEvent, _, _, srcName, _, _, _, destName, _, _, spellID, spellName = CombatLogGetCurrentEventInfo()
-	if T.Vanilla then
-		spellID = T.GetSpellID(spellName)
-	end
+	local _, subEvent, _, _, srcName, _, _, _, destName, _, _, spellID = CombatLogGetCurrentEventInfo()
 	if not subEvent or not spellID or not srcName then return end
 	if not UnitInRaid(srcName) and not UnitInParty(srcName) then return end
 

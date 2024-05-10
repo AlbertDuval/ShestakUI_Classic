@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.castbar_ticks ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ local function SpellName(id)
 	if name then
 		return name
 	else
-		print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to EsreverWoW.|r")
+		print("|cffff0000ShestakUI: spell ID ["..tostring(id).."] no longer exists!|r")
 		return "Empty"
 	end
 end
@@ -26,8 +26,13 @@ T.CastBarTicks = {
 	-- Mage
 	-- [SpellName(5143)] = 5,		-- Arcane Missiles (accurate for r8 - lower ranks have less ticks)
 	[SpellName(10)] = 8,		-- Blizzard
+	[SpellName(412510)] = 3,	-- Mass Regeneration [Season of Discovery]
+	[SpellName(401460)] = 3,	-- Rapid Regeneration [Season of Discovery]
+	[SpellName(401417)] = 3,	-- Regeneration [Season of Discovery]
 	-- Priest
 	[SpellName(15407)] = 3,		-- Mind Flay
+	[SpellName(413259)] = 5,	-- Mind Sear [Season of Discovery]
+	[SpellName(402174)] = 2,	-- Penance [Season of Discovery]
 	-- Warlock
 	[SpellName(1120)] = 5,		-- Drain Soul
 	[SpellName(755)] = 10,		-- Health Funnel

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ local function LoadSkin()
 
 	T.SkinCloseButton(SpellBookCloseButton, SpellBookFrame.backdrop)
 
-	if T.Wrath then
+	if T.Wrath or T.Cata then
 		T.SkinCheckBox(ShowAllSpellRanksCheckBox)
 		ShowAllSpellRanksCheckBox:SetPoint("TOPLEFT", _G.SpellButton1, "TOPLEFT", -7, 32)
 	end

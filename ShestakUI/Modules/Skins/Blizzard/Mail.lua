@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -58,13 +58,21 @@ local function LoadSkin()
 	-- Send mail
 	SendMailFrame:StripTextures()
 
-	if T.Mainline then
+	if T.Classic then
+		-- FIXME
+		--[[
+		MailEditBox:StripTextures(true)
+		MailEditBox:CreateBackdrop("Overlay")
+		MailEditBox.backdrop:SetPoint("TOPLEFT", 12, 0)
+		MailEditBox.backdrop:SetPoint("BOTTOMRIGHT", 2, 0)
+		T.SkinScrollBar(MailEditBoxScrollBar)
+		--]]
+	else
 		SendMailScrollFrame:StripTextures(true)
 		SendMailScrollFrame:CreateBackdrop("Overlay")
 		SendMailScrollFrame.backdrop:SetPoint("TOPLEFT", 12, 0)
 		SendMailScrollFrame.backdrop:SetPoint("BOTTOMRIGHT", 2, 0)
-
-		T.SkinScrollBar(SendMailScrollFrameScrollBar)
+		T.SkinScrollBar(SendMailScrollFrame.ScrollBar)
 	end
 
 	select(3, SendMailNameEditBox:GetRegions()):SetDrawLayer("OVERLAY")
@@ -140,8 +148,7 @@ local function LoadSkin()
 	OpenMailScrollFrame:CreateBackdrop("Overlay")
 	OpenMailScrollFrame.backdrop:SetPoint("TOPLEFT", 5, 5)
 	OpenMailScrollFrame.backdrop:SetPoint("BOTTOMRIGHT", 0, -5)
-
-	T.SkinScrollBar(OpenMailScrollFrameScrollBar)
+	T.SkinScrollBar(OpenMailScrollFrame.ScrollBar)
 
 	if T.Mainline then
 		SendMailBodyEditBox:SetTextColor(1, 1, 1)

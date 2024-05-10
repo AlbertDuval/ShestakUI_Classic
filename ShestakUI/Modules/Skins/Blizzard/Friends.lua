@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -35,7 +35,10 @@ local function LoadSkin()
 	}
 
 	for i = 1, #StripAllTextures do
-		StripAllTextures[i]:StripTextures()
+		local frame = StripAllTextures[i]
+		if frame then
+			frame:StripTextures()
+		end
 	end
 
 	local KillTextures = {
@@ -60,7 +63,6 @@ local function LoadSkin()
 		QuickJoinFrame.JoinQueueButton,
 		QuickJoinRoleSelectionFrame.AcceptButton,
 		QuickJoinRoleSelectionFrame.CancelButton,
-		-- FriendsListFrameScrollFrame.PendingInvitesHeaderButton,
 		FriendsFrameBattlenetFrame.BroadcastFrame.CancelButton,
 		FriendsFrameBattlenetFrame.BroadcastFrame.UpdateButton,
 		RecruitAFriendFrame.RewardClaiming.ClaimOrViewRewardButton,
@@ -82,7 +84,7 @@ local function LoadSkin()
 	}
 
 	for i = 1, #scrollbars do
-		T.SkinScrollBar(scrollbars[i])
+		T.SkinScrollBar(scrollbars[i], true)
 	end
 
 	-- Reposition buttons
@@ -177,10 +179,10 @@ local function LoadSkin()
 	FriendsFrameBattlenetFrame.BroadcastButton:SetAllPoints(FriendsFrameBattlenetFrame)
 
 	FriendsFrameBattlenetFrame.BroadcastFrame:CreateBackdrop("Transparent")
-	FriendsFrameBattlenetFrame.BroadcastFrame.backdrop:SetPoint("TOPLEFT", 1, 1)
-	FriendsFrameBattlenetFrame.BroadcastFrame.backdrop:SetPoint("BOTTOMRIGHT", 1, 1)
+	FriendsFrameBattlenetFrame.BroadcastFrame.backdrop:SetPoint("TOPLEFT", 6, 1)
+	FriendsFrameBattlenetFrame.BroadcastFrame.backdrop:SetPoint("BOTTOMRIGHT", -4, 1)
 
-	T.SkinEditBox(FriendsFrameBattlenetFrame.BroadcastFrame.EditBox, nil, 24)
+	T.SkinEditBox(FriendsFrameBattlenetFrame.BroadcastFrame.EditBox, nil, 18)
 
 	FriendsFrameBattlenetFrame.UnavailableInfoFrame:CreateBackdrop("Transparent")
 	FriendsFrameBattlenetFrame.UnavailableInfoFrame.backdrop:SetPoint("TOPLEFT", 4, -4)

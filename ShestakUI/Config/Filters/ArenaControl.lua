@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.show_arena ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ local function SpellName(id)
 	if name then
 		return name
 	else
-		print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to Shestak.|r")
+		print("|cffff0000ShestakUI: ArenaControl spell ID ["..tostring(id).."] no longer exists!|r")
 		return "Empty"
 	end
 end
@@ -33,6 +33,8 @@ T.ArenaControl = {
 	[SpellName(5211)] = 5,		-- Mighty Bash
 	[SpellName(22570)] = 5,		-- Maim
 	[SpellName(99)] = 5,		-- Incapacitating Roar
+	-- Evoker
+	[SpellName(360806)] = 5,	-- Sleep Walk
 	-- Hunter
 	[SpellName(3355)] = 5,		-- Freezing Trap
 	[SpellName(24394)] = 5,		-- Intimidation

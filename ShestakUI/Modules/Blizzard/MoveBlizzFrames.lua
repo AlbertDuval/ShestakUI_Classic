@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.general.move_blizzard ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -15,7 +15,9 @@ local frames = {
 	"StaticPopup2", "ScrollOfResurrectionSelectionFrame", "ProfessionsFrame",
 
 	"PVPFrame", "QuestLogFrame", "QuestLogDetailFrame", "PVPBannerFrame", "PetStableFrame",
-	"WorldStateScoreFrame", "BankFrame", "MacOptionsFrame", "MissingLootFrame", "ArenaRegistrarFrame"
+	"WorldStateScoreFrame", "BankFrame", "MacOptionsFrame", "MissingLootFrame", "ArenaRegistrarFrame",
+
+	"TicketStatusFrame"
 }
 
 for _, v in pairs(frames) do

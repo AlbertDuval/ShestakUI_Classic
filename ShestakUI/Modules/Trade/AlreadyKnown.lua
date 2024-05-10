@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.trade.already_known ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -74,26 +74,35 @@ end
 hooksecurefunc("OpenMailFrame_UpdateButtonPositions", OpenMailFrame_UpdateButtonPositions)
 
 -- Loot frame
-local function LootFrame_UpdateButton(index)
-	local numLootItems = LootFrame.numLootItems
-	local numLootToShow = LOOTFRAME_NUMBUTTONS
-	if numLootItems > LOOTFRAME_NUMBUTTONS then
-		numLootToShow = numLootToShow - 1
-	end
+if T.Classic then
+	local function LootFrame_UpdateButton(index)
+		local numLootItems = LootFrame.numLootItems
+		local numLootToShow = LOOTFRAME_NUMBUTTONS
+		if numLootItems > LOOTFRAME_NUMBUTTONS then
+			numLootToShow = numLootToShow - 1
+		end
 
-	local button = _G["LootButton"..index]
-	if button and button:IsShown() then
-		local slot = (numLootToShow * (LootFrame.page - 1)) + index
-		if slot <= numLootItems and LootSlotHasItem(slot) and index <= numLootToShow then
-			local texture, _, _, _, _, locked = GetLootSlotInfo(slot)
-			if texture and not locked and IsKnown(GetLootSlotLink(slot)) then
-				SetItemButtonTextureVertexColor(button, color.r, color.g, color.b)
+		local button = _G["LootButton"..index]
+		if button and button:IsShown() then
+			local slot = (numLootToShow * (LootFrame.page - 1)) + index
+			if slot <= numLootItems and LootSlotHasItem(slot) and index <= numLootToShow then
+				local texture, _, _, _, _, locked = GetLootSlotInfo(slot)
+				if texture and not locked and IsKnown(GetLootSlotLink(slot)) then
+					SetItemButtonTextureVertexColor(button, color.r, color.g, color.b)
+				end
 			end
 		end
 	end
-end
-if T.Classic then
 	hooksecurefunc("LootFrame_UpdateButton", LootFrame_UpdateButton)
+else
+	local function LootFrame_UpdateButton(self)
+		local slotIndex = self:GetSlotIndex()
+		local texture, _, _, _, _, locked = GetLootSlotInfo(slotIndex)
+		if texture and not locked and IsKnown(GetLootSlotLink(slotIndex)) then
+			SetItemButtonTextureVertexColor(self.Item, color.r, color.g, color.b)
+		end
+	end
+	hooksecurefunc(LootFrameElementMixin, "Init", LootFrame_UpdateButton)
 end
 
 -- Merchant frame
@@ -250,9 +259,9 @@ if IsAddOnLoaded("Blizzard_GuildBankUI") then
 end
 
 -- Auction frame
-local AuctionHouseFrame_RefreshScrollFrame
+local _hookNewAH
 if T.Classic then
-	AuctionHouseFrame_RefreshScrollFrame = function(self)
+	_hookNewAH = function(self)
 		local numResults = self.getNumEntries()
 		local buttons = HybridScrollFrame_GetButtons(self.ScrollFrame)
 		local buttonCount = buttons and #buttons or 0
@@ -276,21 +285,18 @@ if T.Classic then
 						button.SelectedHighlight:SetAlpha(.2)
 						-- Icon
 						button.cells[2].Icon:SetVertexColor(color.r, color.g, color.b)
-						button.cells[2].IconBorder:SetVertexColor(color.r, color.g, color.b)
 					else
 						-- Highlight
 						button.SelectedHighlight:SetVertexColor(1, 1, 1)
 						-- Icon
 						button.cells[2].Icon:SetVertexColor(1, 1, 1)
-						button.cells[2].IconBorder:SetVertexColor(1, 1, 1)
 					end
 				end
 			end
 		end
 	end
 else
-	AuctionHouseFrame_RefreshScrollFrame = function(self)
-		-- Derived from https://www.townlong-yak.com/framexml/10.0.0/Blizzard_AuctionHouseUI/Blizzard_AuctionHouseItemList.lua#322
+	_hookNewAH = function(self)
 		self.ScrollBox:ForEachFrame(function(button)
 			if button.rowData.itemKey.itemID then
 				local itemLink
@@ -306,13 +312,11 @@ else
 					button.SelectedHighlight:SetAlpha(.2)
 					-- Icon
 					button.cells[2].Icon:SetVertexColor(color.r, color.g, color.b)
-					button.cells[2].IconBorder:SetVertexColor(color.r, color.g, color.b)
 				else
 					-- Highlight
 					button.SelectedHighlight:SetVertexColor(1, 1, 1)
 					-- Icon
 					button.cells[2].Icon:SetVertexColor(1, 1, 1)
-					button.cells[2].IconBorder:SetVertexColor(1, 1, 1)
 				end
 			end
 		end)
@@ -322,7 +326,7 @@ end
 local isBlizzard_AuctionHouseUILoaded
 if IsAddOnLoaded("Blizzard_AuctionUI") then
 	isBlizzard_AuctionHouseUILoaded = true
-	hooksecurefunc(AuctionHouseFrame.BrowseResultsFrame.ItemList, "RefreshScrollFrame", AuctionHouseFrame_RefreshScrollFrame)
+	hooksecurefunc(AuctionHouseFrame.BrowseResultsFrame.ItemList, "RefreshScrollFrame", _hookNewAH)
 end
 
 local function AuctionFrameBrowse_Update()
@@ -424,7 +428,8 @@ if not (isBlizzard_GuildUILoaded and isBlizzard_GuildBankUILoaded and isBlizzard
 			hooksecurefunc(GuildBankFrame, "Update", GuildBankFrame_Update)
 		elseif addon == "Blizzard_AuctionHouseUI" then
 			isBlizzard_AuctionHouseUILoaded = true
-			hooksecurefunc(AuctionHouseFrame.BrowseResultsFrame.ItemList, "RefreshScrollFrame", AuctionHouseFrame_RefreshScrollFrame)
+			hooksecurefunc(AuctionHouseFrame.BrowseResultsFrame.ItemList, "RefreshScrollFrame", _hookNewAH)
+			hooksecurefunc(AuctionHouseFrame.BrowseResultsFrame.ItemList, "OnScrollBoxRangeChanged", _hookNewAH)
 		elseif addon == "Blizzard_AuctionUI" then
 			isBlizzard_AuctionUILoaded = true
 			hooksecurefunc("AuctionFrameBrowse_Update", AuctionFrameBrowse_Update)

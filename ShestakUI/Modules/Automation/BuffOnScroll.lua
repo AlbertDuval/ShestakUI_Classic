@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.automation.buff_on_scroll ~= true or T.level ~= MAX_PLAYER_LEVEL then return end
 
 ----------------------------------------------------------------------------------------
@@ -9,11 +9,7 @@ local function SpellName(id)
 	if name then
 		return name
 	else
-		if T.Classic then
-			print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to EsreverWoW.|r")
-		else
-			print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to Shestak.|r")
-		end
+		print("|cffff0000ShestakUI: spell ID ["..tostring(id).."] no longer exists!|r")
 		return "Empty"
 	end
 end
@@ -103,7 +99,7 @@ frame:RegisterEvent("SPELL_UPDATE_USABLE")
 frame:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 frame:RegisterEvent("PLAYER_LEAVE_COMBAT")
 frame:RegisterEvent("READY_CHECK")
-if T.Mainline or T.Wrath then
+if T.Wrath or T.Cata or T.Mainline then
 	frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 end
 frame:SetScript("OnEvent", CheckBuffs)

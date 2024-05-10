@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.nameplate.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ end
 
 frame:RegisterEvent("PLAYER_LOGIN")
 function frame:PLAYER_LOGIN()
-	if T.Mainline and C.nameplate.enhance_threat == true then
+	if C.nameplate.enhance_threat == true then
 		SetCVar("threatWarning", 3)
 	end
 	SetCVar("nameplateGlobalScale", 1)
@@ -49,7 +49,10 @@ function frame:PLAYER_LOGIN()
 
 	SetCVar("nameplateOtherTopInset", C.nameplate.clamp and 0.08 or -1)
 	SetCVar("nameplateOtherBottomInset", C.nameplate.clamp and 0.1 or -1)
+	SetCVar("clampTargetNameplateToScreen", C.nameplate.clamp and "1" or "0")
+
 	SetCVar("nameplateMaxDistance", C.nameplate.distance or 41)
+	SetCVar("nameplatePlayerMaxDistance", 60)
 
 	if C.nameplate.only_name then
 		SetCVar("nameplateShowOnlyNames", 1)
@@ -65,9 +68,10 @@ function frame:PLAYER_LOGIN()
 end
 
 local healList, exClass, healerSpecs = {}, {}, {}
-local testing = false
 
 exClass.DEATHKNIGHT = true
+exClass.DEMONHUNTER = true
+exClass.HUNTER = true
 exClass.MAGE = true
 exClass.ROGUE = true
 exClass.WARLOCK = true
@@ -80,6 +84,7 @@ if C.nameplate.healer_icon == true then
 	}
 	local healerSpecIDs = {
 		105,	-- Druid Restoration
+		1468,	-- Evoker Preservation
 		270,	-- Monk Mistweaver
 		65,		-- Paladin Holy
 		256,	-- Priest Discipline
@@ -140,6 +145,10 @@ if C.nameplate.healer_icon == true then
 						local _, talentSpec = GetSpecializationInfoByID(specID)
 						if name and healerSpecs[talentSpec] then
 							healList[name] = talentSpec
+							local nameplate = C_NamePlate.GetNamePlateForUnit(format("arena%d", i))
+							if nameplate then
+								nameplate.unitFrame:UpdateAllElements("UNIT_NAME_UPDATE")
+							end
 						end
 					end
 				end
@@ -166,7 +175,7 @@ if C.nameplate.healer_icon == true then
 end
 
 local totemData = {}
-if T.Classic and not T.Wrath then
+if T.Vanilla or T.TBC then
 	totemData = {
 		-- Earth
 		[GetSpellInfo(2484)]   = 136102,	-- Earthbind Totem
@@ -174,7 +183,6 @@ if T.Classic and not T.Wrath then
 		[GetSpellInfo(8071)]   = 136098,	-- Stoneskin Totem
 		[GetSpellInfo(8075)]   = 136023,	-- Strength of Earth Totem
 		[GetSpellInfo(8143)]   = 136108,	-- Tremor Totem
-		[GetSpellInfo(8177)]   = 136039,	-- Grounding Totem
 		-- Fire
 		[GetSpellInfo(1535)]   = 135824,	-- Fire Nova Totem
 		[GetSpellInfo(3599)]   = 135825,	-- Searing Totem
@@ -190,22 +198,30 @@ if T.Classic and not T.Wrath then
 		[GetSpellInfo(16190)]  = 135861,	-- Mana Tide Totem
 		-- Air
 		[GetSpellInfo(6495)]   = 136082,	-- Sentry Totem
+		[GetSpellInfo(8177)]   = 136039,	-- Grounding Totem
 		[GetSpellInfo(8512)]   = 136114,	-- Windfury Totem
 		[GetSpellInfo(8835)]   = 136046,	-- Grace of Air Totem
 		[GetSpellInfo(10595)]  = 136061,	-- Nature Resistance Totem
 		[GetSpellInfo(15107)]  = 136022,	-- Windwall Totem
 		[GetSpellInfo(25908)]  = 136013,	-- Tranquil Air Totem
 	}
+
+	if T.TBC then
+		totemData[GetSpellInfo(2062)] = 136024 -- Earth Elemental Totem
+		totemData[GetSpellInfo(2894)] = 135790 -- Fire Elemental Totem
+		totemData[GetSpellInfo(3738)] = 136092 -- Wrath of Air Totem
+	end
 elseif T.Wrath then
 	totemData = {
 		-- Earth
+		[GetSpellInfo(2062)]   = 136024,	-- Earth Elemental Totem
 		[GetSpellInfo(2484)]   = 136102,	-- Earthbind Totem
 		[GetSpellInfo(5730)]   = 136097,	-- Stoneclaw Totem
 		[GetSpellInfo(8071)]   = 136098,	-- Stoneskin Totem
 		[GetSpellInfo(8075)]   = 136023,	-- Strength of Earth Totem
 		[GetSpellInfo(8143)]   = 136108,	-- Tremor Totem
-		[GetSpellInfo(8177)]   = 136039,	-- Grounding Totem
 		-- Fire
+		[GetSpellInfo(2894)]   = 135790,	-- Fire Elemental Totem
 		[GetSpellInfo(1535)]   = 135824,	-- Fire Nova Totem
 		[GetSpellInfo(3599)]   = 135825,	-- Searing Totem
 		[GetSpellInfo(8181)]   = 135866,	-- Frost Resistance Totem
@@ -214,17 +230,41 @@ elseif T.Wrath then
 		-- Water
 		[GetSpellInfo(5394)]   = 135127,	-- Healing Stream Totem
 		[GetSpellInfo(5675)]   = 136053,	-- Mana Spring Totem
-		-- [GetSpellInfo(8166)]   = 136070,	-- Poison Cleansing Totem
-		[GetSpellInfo(8170)]   = 136019,	-- Disease Cleansing Totem
+		[GetSpellInfo(8170)]   = 136019,	-- Cleansing Totem
 		[GetSpellInfo(8184)]   = 135832,	-- Fire Resistance Totem
 		[GetSpellInfo(16190)]  = 135861,	-- Mana Tide Totem
 		-- Air
+		[GetSpellInfo(3738)]   = 136092,	-- Wrath of Air Totem
 		[GetSpellInfo(6495)]   = 136082,	-- Sentry Totem
+		[GetSpellInfo(8177)]   = 136039,	-- Grounding Totem
 		[GetSpellInfo(8512)]   = 136114,	-- Windfury Totem
-		-- [GetSpellInfo(8835)]   = 136046,	-- Grace of Air Totem
 		[GetSpellInfo(10595)]  = 136061,	-- Nature Resistance Totem
-		-- [GetSpellInfo(15107)]  = 136022,	-- Windwall Totem
-		-- [GetSpellInfo(25908)]  = 136013,	-- Tranquil Air Totem
+	}
+elseif T.Cata then
+	totemData = {
+		-- Earth
+		[GetSpellInfo(2062)]   = 136024,	-- Earth Elemental Totem
+		[GetSpellInfo(2484)]   = 136102,	-- Earthbind Totem
+		[GetSpellInfo(5730)]   = 136097,	-- Stoneclaw Totem
+		[GetSpellInfo(8071)]   = 136098,	-- Stoneskin Totem
+		[GetSpellInfo(8075)]   = 136023,	-- Strength of Earth Totem
+		[GetSpellInfo(8143)]   = 136108,	-- Tremor Totem
+		-- Fire
+		[GetSpellInfo(2894)]   = 135790,	-- Fire Elemental Totem
+		[GetSpellInfo(3599)]   = 135825,	-- Searing Totem
+		[GetSpellInfo(8190)]   = 135826,	-- Magma Totem
+		[GetSpellInfo(8227)]   = 136040,	-- Flametongue Totem
+		-- Water
+		[GetSpellInfo(5394)]   = 135127,	-- Healing Stream Totem
+		[GetSpellInfo(5675)]   = 136053,	-- Mana Spring Totem
+		[GetSpellInfo(8184)]   = 135832,	-- Elemental Resistance Totem
+		[GetSpellInfo(16190)]  = 135861,	-- Mana Tide Totem
+		-- Air
+		[GetSpellInfo(3738)]   = 136092,	-- Wrath of Air Totem
+		[GetSpellInfo(8177)]   = 136039,	-- Grounding Totem
+		[GetSpellInfo(8512)]   = 136114,	-- Windfury Totem
+		[GetSpellInfo(87718)]  = 136013,	-- Totem of Tranquil Mind
+		[GetSpellInfo(98008)]  = 237586,	-- Spirit Link Totem
 	}
 else
 	totemData = {
@@ -469,21 +509,17 @@ local function UpdateTarget(self)
 end
 
 local function UpdateName(self)
-	if C.nameplate.healer_icon == true and self.HPHeal then
+	if C.nameplate.healer_icon == true then
 		local name = self.unitName
 		if name then
-			if testing then
-				self.HPHeal:Show()
-			else
-				if healList[name] then
-					if exClass[healList[name]] then
-						self.HPHeal:Hide()
-					else
-						self.HPHeal:Show()
-					end
+			if healList[name] then
+				if exClass[healList[name]] then
+					self.HealerIcon:Hide()
 				else
-					self.HPHeal:Hide()
+					self.HealerIcon:Show()
 				end
+			else
+				self.HealerIcon:Hide()
 			end
 		end
 	end
@@ -519,12 +555,16 @@ end
 local kickID = 0
 if C.nameplate.kick_color then
 	if T.Classic then
-		if T.class == "DRUID" then
+		if T.class == "DRUID" and T.SoD then
+			kickID = 410176 -- Skull Bash [Season of Discovery]
+		elseif T.class == "DRUID" then
 			kickID = 0 -- TODO: Check for S3/S4 Arena Gloves which give Maim an Interrupt
 		elseif T.class == "HUNTER" then
 			kickID = 34490
 		elseif T.class == "MAGE" then
 			kickID = 2139
+		elseif T.class == "PALADIN" and T.SoD then
+			kickID = 425609 -- Rebuke [Season of Discovery]
 		elseif T.class == "PALADIN" and T.race == "BloodElf" then
 			kickID = 28730 -- Arcane Torrent
 		elseif T.class == "PRIEST" then
@@ -545,6 +585,8 @@ if C.nameplate.kick_color then
 			kickID = 183752
 		elseif T.class == "DRUID" then
 			kickID = 106839
+		elseif T.class == "EVOKER" then
+			kickID = 351338
 		elseif T.class == "HUNTER" then
 			kickID = GetSpecialization() == 3 and 187707 or 147362
 		elseif T.class == "MAGE" then
@@ -654,7 +696,7 @@ local function threatColor(self, forced)
 					local offTank = false
 					if IsInRaid() then
 						for i = 1, GetNumGroupMembers() do
-							if T.Classic then
+							if T.Vanilla or T.TBC then
 								if UnitExists("raid"..i) and not UnitIsUnit("raid"..i, "player") and T.Role == "TANK" then
 									local isTanking = UnitDetailedThreatSituation("raid"..i, self.unit)
 									if isTanking then
@@ -738,7 +780,7 @@ local function HealthPostUpdate(self, unit, cur, max)
 	elseif not isPlayer and C.nameplate.enhance_threat == true then
 		if C.nameplate.low_health then
 			if perc < C.nameplate.low_health_value then
-				SetColorBorder(self, 0.8, 0, 0)
+				SetColorBorder(self, unpack(C.nameplate.low_health_color))
 			else
 				SetColorBorder(self, unpack(C.media.border_color))
 			end
@@ -909,7 +951,7 @@ local function style(self, unit)
 
 	-- Target Glow
 	if C.nameplate.target_glow then
-		self.Glow = CreateFrame("Frame", nil, self, BackdropTemplateMixin and "BackdropTemplate" or nil)
+		self.Glow = CreateFrame("Frame", nil, self, BackdropTemplateMixin and "BackdropTemplate")
 		self.Glow:SetBackdrop({edgeFile = [[Interface\AddOns\ShestakUI\Media\Textures\Glow.tga]], edgeSize = 4 * T.noscalemult})
 		self.Glow:SetPoint("TOPLEFT", -7 * T.noscalemult, 7 * T.noscalemult)
 		self.Glow:SetPoint("BOTTOMRIGHT", 7 * T.noscalemult, -7 * T.noscalemult)
@@ -1000,10 +1042,10 @@ local function style(self, unit)
 
 	-- Healer Icon
 	if C.nameplate.healer_icon == true then
-		self.HPHeal = self.Health:CreateFontString(nil, "OVERLAY")
-		self.HPHeal:SetFont(C.font.nameplates_font, 32, C.font.nameplates_font_style)
-		self.HPHeal:SetText("|cFFD53333+|r")
-		self.HPHeal:SetPoint("BOTTOM", self.Name, "TOP", 0, C.nameplate.track_debuffs == true and 13 or 0)
+		self.HealerIcon = self.Health:CreateFontString(nil, "OVERLAY")
+		self.HealerIcon:SetFont(C.font.nameplates_font, 32, C.font.nameplates_font_style)
+		self.HealerIcon:SetText("|cFFD53333+|r")
+		self.HealerIcon:SetPoint("BOTTOM", self.Name, "TOP", 0, C.nameplate.track_debuffs == true and 13 or 0)
 	end
 
 	-- Quest Icon
@@ -1011,6 +1053,7 @@ local function style(self, unit)
 		self.QuestIcon = self:CreateTexture(nil, "OVERLAY", nil, 7)
 		self.QuestIcon:SetSize((C.nameplate.height * 2 * T.noscalemult), (C.nameplate.height * 2 * T.noscalemult))
 		self.QuestIcon:SetPoint("RIGHT", self.Health, "LEFT", -5, 0)
+		self.QuestIcon:Hide()
 
 		self.QuestIcon.Text = self:CreateFontString(nil, "OVERLAY")
 		self.QuestIcon.Text:SetPoint("RIGHT", self.QuestIcon, "LEFT", -1, 0)

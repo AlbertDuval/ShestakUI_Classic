@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ local function LoadSkin()
 
 	InspectFrameTab1:ClearAllPoints()
 	InspectFrameTab1:SetPoint("TOPLEFT", InspectFrame.backdrop, "BOTTOMLEFT", 2, -2)
-	for i = 1, not T.Vanilla and 3 or 2 do
+	for i = 1, T.Vanilla and 2 or 3 do
 		T.SkinTab(_G["InspectFrameTab"..i])
 	end
 
@@ -92,8 +92,8 @@ local function LoadSkin()
 	end
 
 	-- Talent Frame
-	if InspectTalentFrame then
-		if not T.Wrath then
+	if not T.Cata and InspectTalentFrame then
+		if not T.Wrath and not T.Cata then
 			InspectTalentFrameCancelButton:Kill()
 		end
 		InspectTalentFrameCloseButton:Kill()
@@ -122,7 +122,7 @@ local function LoadSkin()
 		T.SkinScrollBar(InspectTalentFrameScrollFrameScrollBar)
 		InspectTalentFrameScrollFrameScrollBar:SetPoint("TOPLEFT", InspectTalentFrameScrollFrame, "TOPRIGHT", 10, -16)
 
-		if not T.Wrath then
+		if not T.Wrath and not T.Cata then
 			InspectTalentFrameSpentPoints:SetPoint("BOTTOMLEFT", InspectTalentFrame, "BOTTOMLEFT", 8, 84)
 		end
 

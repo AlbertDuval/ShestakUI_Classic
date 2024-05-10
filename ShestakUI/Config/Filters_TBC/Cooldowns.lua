@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	The best way to add or delete spell is to go at www.wowhead.com, search for a spell.
@@ -38,6 +38,7 @@ if C.raidcooldown.enable == true then
 		{27871, 360},	-- Lightwell r3
 		{28275, 360},	-- Lightwell r4
 		-- Defense
+		{22812, 60},	-- Barkskin
 		{1022, 300},	-- Blessing of Protection r1 (300sec base / -120sec from talents)
 		{5599, 300},	-- Blessing of Protection r2 (300sec base / -120sec from talents)
 		{10278, 300},	-- Blessing of Protection r3 (300sec base / -120sec from talents)
@@ -45,6 +46,7 @@ if C.raidcooldown.enable == true then
 		-- {20729, 30},		-- Blessing of Sacrifice r2
 		-- {27147, 30},		-- Blessing of Sacrifice r3
 		-- {27148, 30},		-- Blessing of Sacrifice r4
+		{498, 300},		-- Divine Protection
 		{633, 3600},	-- Lay on Hands r1 (3600sec base / -1200sec from talents / -720sec from 4pc T3)
 		{2800, 3600},	-- Lay on Hands r2 (3600sec base / -1200sec from talents / -720sec from 4pc T3)
 		{10310, 3600},	-- Lay on Hands r3 (3600sec base / -1200sec from talents / -720sec from 4pc T3)
@@ -100,11 +102,11 @@ if C.enemycooldown.enable == true then
 		{19386, 120},	-- Wyvern Sting
 		{31661, 20},	-- Dragon's Breath
 		{11113, 30},	-- Blast Wave (30sec base / -4sec from 4pc T4)
-		{853, 35},		-- Hammer of Justice (60sec base / -10sec from 4pc PvP / -15sec from talents / -0.5sec from ZG neck)
+		{853, 35},		-- Hammer of Justice (60sec base / -10sec from 4pc PvP / -15sec from talents)
 		{20066, 60},	-- Repentance
 		{6789, 120},	-- Death Coil (120sec base / -18sec from 5pc ZG Set)
 		{8122, 23},		-- Psychic Scream (30sec base / -3sec from gloves / -4sec from talents)
-		{2094, 90},		-- Blind (180sec base / -90sec from talents)
+		{2094, 120},	-- Blind (180sec base / -60sec from talents)
 		{5484, 40},		-- Howl of Terror
 		{30283, 20},	-- Shadowfury
 		{12809, 45},	-- Concussion Blow
@@ -123,7 +125,7 @@ if C.enemycooldown.enable == true then
 		{31224, 60},	-- Cloak of Shadows
 		{5277, 210},	-- Evasion (300sec base / -90sec from talents / -60sec from 3pc AQ Set)
 		{1856, 210},	-- Vanish (300sec base / -90sec from talents / -30sec from 3pc T1)
-		-- {8178, 11},	-- Grounding Totem (15sec base / -2sec from talents / -1.5sec from 4pc PvP)
+		-- {8178, 11},	-- Grounding Totem Effect (15sec base / -2sec from talents / -1.5sec from 4pc PvP)
 		{18499, 30},	-- Berserker Rage
 		-- {23920, 10},		-- Spell Reflection
 		{20600, 180},	-- Perception
@@ -156,9 +158,22 @@ if C.enemycooldown.enable == true then
 end
 
 if C.pulsecooldown.enable == true then
+	local function SpellName(id)
+		local name = GetSpellInfo(id)
+		if name then
+			return name
+		else
+			print("|cffff0000ShestakUI: Pulse cooldown spell ID ["..tostring(id).."] no longer exists!|r")
+			return "Empty"
+		end
+	end
+
 	T.pulse_ignored_spells = {
-		-- GetSpellInfo(spellID),	-- Spell name
-		-- GetSpellInfo(6807),		-- Maul
-		-- GetSpellInfo(35395),		-- Crusader Strike
+		-- SpellName(spellID),	-- Spell name
+		-- SpellName(6807),		-- Maul
+		-- SpellName(35395),	-- Crusader Strike
 	}
+	for _, spell in pairs(C.pulsecooldown.spells_list) do
+		T.pulse_ignored_spells[SpellName(spell)] = true
+	end
 end

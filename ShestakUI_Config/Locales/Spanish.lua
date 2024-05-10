@@ -21,6 +21,17 @@ L_GUI_EXPERT_MODE = "Expert mode" -- Need review
 L_GUI_EXPERT_MODE_DESC = "Custom editing of Lua profile" -- Need review
 L_GUI_RESET_SPELLS_DESC = "CTRL-click to reset list" -- Need review
 
+-- Profile
+L.profile = "Profile" -- Need review
+L.profile_title = "Profile options" -- Need review
+L.profile_choose = "Choose profile" -- Need review
+L.profile_options = "Settings" -- Need review
+L.profile_movers = "Moving elements" -- Need review
+L.profile_export = "Export" -- Need review
+L.profile_import = "Import" -- Need review
+L.profile_error_lib = "To enable export and import - install WeakAuras" -- Need review
+L.profile_error_code = "Error in imported code!" -- Need review
+
 -- General options
 L_GUI_GENERAL_SUBTEXT = "These settings control the general user interface settings. Type in chat '/uihelp' for help." -- Need review
 L_GUI_GENERAL_WELCOME_MESSAGE = "Mensaje de bienvenida en el chat"
@@ -39,7 +50,6 @@ L.general_color_picker_desc = "Add copy/paste buttons and digit text entry for B
 L.general_minimize_mouseover = "Mouseover for quest minimize button" -- Need review
 L.general_hide_banner = "Hide Boss Banner Loot Frame" -- Need review
 L.general_hide_talking_head = "Hide Talking Head Frame" -- Need review
-L.general_hide_maw_buffs = "Hide Maw Buffs frame in instances" -- Need review
 
 -- Media options
 L.media_border_color = "Color for borders" -- Need review
@@ -74,6 +84,7 @@ L.font_subheader_bag = "Bags font" -- Need review
 L.font_subheader_blizzard = "System font size" -- Need review
 L.font_tooltip_header_font_size = "Tooltip header" -- Need review
 L.font_tooltip_font_size = "Tooltip text" -- Need review
+L.font_quest_tracker_font_mult = "Quest text scale" -- Need review
 L.font_global_font = "Disable Pixel font" -- Need review
 
 -- Skins options
@@ -83,12 +94,13 @@ L_GUI_SKINS_BLIZZARD = "Activar estilizado de marcos de Blizzard"
 L_GUI_SKINS_MINIMAP_BUTTONS = "Activar estilizado de los iconos de los addons en el minimapa"
 L_GUI_SKINS_SUBHEADER = "Stylization of addons" -- Need review
 L.skins_minimap_buttons_mouseover = "Addons icons on mouseover" -- Need review
+L.skins_bubbles = "Estilizar las burbujas de chat"
 
 -- Unit Frames options
 L_GUI_UF_SUBTEXT = "Customize player, target frames and etc." -- Need review
 L_GUI_UF_ENABLE = "Activar marcos de unidades"
 L_GUI_UF_OWN_COLOR = "Color para las barras de vida"
-L_GUI_UF_UF_COLOR = "Color de las Barras de vida (si color para las barras de vida está activo)"
+L_GUI_UF_UF_COLOR = "Color de las Barras de vida"
 L.unitframe_uf_color_bg = "Color of health background" -- Need review
 L.unitframe_enemy_health_color = "Barra de vida del enemigo objetivo en rojo"
 L_GUI_UF_TOTAL_VALUE = "Mostrar vida restante en jugador y objetivo con XXXX/Total"
@@ -102,6 +114,9 @@ L_GUI_UF_UNIT_CASTBAR = "Mostrar barras de lanzamiento"
 L_GUI_UF_CASTBAR_ICON = "Mostrar iconos en las barras de lanzamiento"
 L_GUI_UF_CASTBAR_LATENCY = "Latencia en la barra de lanzamiento"
 L_GUI_UF_CASTBAR_TICKS = "Castbar ticks" -- Needs review
+L.unitframe_castbar_focus_type = "Icon for focus castbar" -- Needs review
+L.unitframe_castbar_focus_type_icon = "Icon" -- Needs review
+L.unitframe_castbar_focus_type_bar = "Icon with bar" -- Needs review
 L_GUI_UF_SUBHEADER_FRAMES = "Frames" -- Need review
 L_GUI_UF_SHOW_PET = "Mostrar marco de la mascota"
 L_GUI_UF_SHOW_FOCUS = "Mostrar marco del foco"
@@ -160,6 +175,7 @@ L_GUI_UF_PLUGINS_COMBO_BAR_OLD = "Show combo point on the target" -- Need review
 L_GUI_UF_PLUGINS_ARCANE_BAR = "Enable Arcane Charge bar" -- Need review
 L_GUI_UF_PLUGINS_CHI_BAR = "Enable Chi bar" -- Needs review
 L_GUI_UF_PLUGINS_STAGGER_BAR = "Enable Stagger bar (for Monk Tanks)" -- Need review
+L_GUI_UF_PLUGINS_ECLIPSE_BAR = "Activar barra de eclipse"
 L_GUI_UF_PLUGINS_HOLY_BAR = "Activar barra de poder sagrado"
 L_GUI_UF_PLUGINS_SHARD_BAR = "Activar barra de fragmentos"
 L_GUI_UF_PLUGINS_RUNE_BAR = "Activar barra de Runas"
@@ -272,7 +288,6 @@ L.tooltip_health_value = "Valor de la vida en números"
 L.tooltip_hidebuttons = "Ocultar descripciones de las barras de acción"
 L.tooltip_hide_combat = "Ocultar descripción en combate"
 L.tooltip_subheader = "Plugins" -- Need review
-L.tooltip_talents = "Mostrar descripción de los talentos"
 L.tooltip_show_shift = "Show when Shift is pushed" -- Need review
 L.tooltip_show_shift_desc = "Show items level and spec when Shift is pushed" -- Need review
 L.tooltip_achievements = "Comparar logros en la descripción"
@@ -291,25 +306,24 @@ L.tooltip_mount = "Source of mount" -- Needs review
 L.tooltip_vendor_price = "Show vendor price" -- Needs review
 
 -- Chat options
-L_GUI_CHAT_SUBTEXT = "Here you can change the settings of the chat window." -- Need review
-L_GUI_CHAT_ENABLE = "Activar chat"
-L_GUI_CHAT_BACKGROUND = "Activar fondo del chat"
-L_GUI_CHAT_BACKGROUND_ALPHA = "Opacidad del fondo del chat"
+L.chat_subtext = "Here you can change the settings of the chat window." -- Need review
+L.chat_enable = "Activar chat"
+L.chat_background = "Activar fondo del chat"
+L.chat_background_alpha = "Opacidad del fondo del chat"
 L.chat_filter = "Remover ciertos mensajes de spam"
 L.chat_filter_desc = "Duels, change talents, NPC dialogue in city" -- Need review
 L.chat_spam = "Remover spam del algunos jugadores (Vendedores de oro)"
 L.chat_spam_list = "Black list" -- Need review
 L.chat_spam_list_desc = "List of words (separated by space, lowercase letters) to hide messages" -- Need review
-L_GUI_CHAT_WIDTH = "Anchura del chat"
-L_GUI_CHAT_HEIGHT = "Altura del chat"
-L_GUI_CHAT_BAR = "Pequeña barra de botones para cambiar de canal en el chat"
-L_GUI_CHAT_BAR_MOUSEOVER = "Lite Button Bar on mouseover" -- Needs review
-L_GUI_CHAT_WHISP = "Sonido cuando te susurran"
-L_GUI_CHAT_SKIN_BUBBLE = "Estilizar las burbujas de chat"
-L_GUI_CHAT_CL_TAB = "Mostrar la pestaña del Registro de Combate"
-L_GUI_CHAT_TABS_MOUSEOVER = "Chat tabs on mouseover" -- Needs review
-L_GUI_CHAT_STICKY = "Recordar último canal"
-L_GUI_CHAT_DAMAGE_METER_SPAM = "Merge damage meter spam in one line-link" -- Needs review
+L.chat_width = "Anchura del chat"
+L.chat_height = "Altura del chat"
+L.chat_chat_bar = "Pequeña barra de botones para cambiar de canal en el chat"
+L.chat_chat_bar_mouseover = "Lite Button Bar on mouseover" -- Needs review
+L.chat_whisp_sound = "Sonido cuando te susurran"
+L.chat_combatlog = "Mostrar la pestaña del Registro de Combate"
+L.chat_tabs_mouseover = "Chat tabs on mouseover" -- Needs review
+L.chat_sticky = "Recordar último canal"
+L.chat_damage_meter_spam = "Merge damage meter spam in one line-link" -- Needs review
 L.chat_loot_icons = "Icons for loot" -- Needs review
 L.chat_hide_combat = "Hide chat in combat" -- Needs review
 L.chat_custom_time_color = "Enable custom timestamp coloring" -- Needs review
@@ -389,6 +403,7 @@ L_GUI_COMBATTEXT_KILLINGBLOW = "Mostrar tus golpes de gracia"
 L.combattext_merge_aoe_spam = "Merges spell spam into single message" -- Needs review
 L.combattext_merge_aoe_spam_desc = "Unir el spam de daño de area en un solo mensaje"
 L_GUI_COMBATTEXT_MERGE_MELEE = "Merges multiple auto attack damage spam" -- Needs review
+L.combattext_merge_all = "Merges all spells" -- Needs review
 L_GUI_COMBATTEXT_DISPEL = "Mostrar tus disipaciones"
 L_GUI_COMBATTEXT_INTERRUPT = "Mostrar tus interrupciones"
 L_GUI_COMBATTEXT_DIRECTION = "Change scrolling direction from bottom to top" -- Need review
@@ -411,6 +426,7 @@ L_GUI_AURA_PLAYER_AURA_ONLY = "Solo tus perjuicios en el marco del objetivo"
 L_GUI_AURA_DEBUFF_COLOR_TYPE = "Color de los perjuicios por tipo"
 L_GUI_AURA_CAST_BY = "Mostrar quién lanza un beneficio/perjuicio en su descripción"
 L_GUI_AURA_CLASSCOLOR_BORDER = "Activar borde por color de clase para los beneficios del jugador"
+L.aura_player_buff_mouseover = "On mouseover" -- Needs review
 L.aura_subheader_buffs = "Player buffs" -- Need review
 L.aura_subheader_debuffs = "Debuffs" -- Need review
 
@@ -462,7 +478,7 @@ L.filger_show_proc = "Player procs" -- Need review
 L.filger_show_debuff = "Debuffs on target" -- Need review
 L.filger_show_aura_bar = "Aura bars on target" -- Need review
 L.filger_show_special = "Special buffs on player" -- Need review
-L.filger_show_pvp_player = "SPvP debuffs on player" -- Need review
+L.filger_show_pvp_player = "PvP debuffs on player" -- Need review
 L.filger_show_pvp_target = "PvP auras on target" -- Need review
 L.filger_show_cd = "Cooldowns" -- Need review
 L.filger_subheader_size = "Icons size" -- Need review
@@ -576,15 +592,17 @@ L.enemycooldown_show_inparty = "Show in party zone for allies" -- Need review
 L.enemycooldown_class_color = "Enable classcolor border" -- Need review
 
 -- Pulse cooldowns options
-L_GUI_COOLDOWN_PULSE = "Cuenta atrás de tiempos de reutilización"
-L_GUI_COOLDOWN_PULSE_SUBTEXT = "Track your cd using a pulse icon in the center of the screen." -- Need review
-L_GUI_COOLDOWN_PULSE_ENABLE = "Mostrar cuentas atrás de tiempos de reutilización"
-L_GUI_COOLDOWN_PULSE_SIZE = "Tamaño de los icono de las cuentas atras de tiempos de reutilización"
-L_GUI_COOLDOWN_PULSE_SOUND = "Aviso sonoro"
-L_GUI_COOLDOWN_PULSE_ANIM_SCALE = "Escalado animado"
-L_GUI_COOLDOWN_PULSE_HOLD_TIME = "Opacidad máxima del tiempo de espera"
-L_GUI_COOLDOWN_PULSE_THRESHOLD = "Threshold time" -- Need review
-L_GUI_COOLDOWN_PULSE_THRESHOLD_DESC = "Umbral de tiempo mínimo"
+L.pulsecooldown = "Cuenta atrás de tiempos de reutilización"
+L.pulsecooldown_subtext = "Track your cd using a pulse icon in the center of the screen." -- Need review
+L.pulsecooldown_enable = "Mostrar cuentas atrás de tiempos de reutilización"
+L.pulsecooldown_size = "Tamaño de los icono de las cuentas atras de tiempos de reutilización"
+L.pulsecooldown_sound = "Aviso sonoro"
+L.pulsecooldown_anim_scale = "Escalado animado"
+L.pulsecooldown_hold_time = "Opacidad máxima del tiempo de espera"
+L.pulsecooldown_threshold = "Threshold time" -- Need review
+L.pulsecooldown_threshold_desc = "Umbral de tiempo mínimo"
+L.pulsecooldown_subheader_whitelist = "Filtering list" -- Need review
+L.pulsecooldown_whitelist = "Use whitelist instead of ignore list" -- Need review
 
 -- Threat options
 L_GUI_THREAT = "Barras de Amenaza"
@@ -654,5 +672,3 @@ L.misc_click_cast_desc = "Allows you to assign spells (analog Clique) to the mou
 L.misc_click_cast_filter = "Ignore Player and Target frames for click2cast" -- Needs review
 L.misc_chars_currency = "Tracks your currency tokens across multiple characters" -- Needs review
 L.misc_chars_currency_desc = "Hover over the icon of the required currency in the character window to display information in the tooltip" -- Need review
-L.misc_hide_raid_button = "Button to hide raid frames in dps layout" -- Need review
-L.misc_hide_raid_button_desc = "The button is displayed by hovering the mouse in the upper left corner" -- Need review

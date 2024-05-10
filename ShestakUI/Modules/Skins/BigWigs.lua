@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.bigwigs ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -283,6 +283,7 @@ function T.UploadBW()
 	end
 end
 
+-- manual command /settings bw
 StaticPopupDialogs.SETTINGS_BIGWIGS = {
 	text = L_POPUP_SETTINGS_BW,
 	button1 = ACCEPT,

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 local backdropr, backdropg, backdropb, backdropa = unpack(C.media.backdrop_color)
 local borderr, borderg, borderb, bordera = unpack(C.media.border_color)
@@ -53,7 +53,7 @@ end
 local function CreateBorder(f, i, o)
 	if i then
 		if f.iborder then return end
-		local border = CreateFrame("Frame", "$parentInnerBorder", f, BackdropTemplateMixin and "BackdropTemplate" or nil)
+		local border = CreateFrame("Frame", "$parentInnerBorder", f, BackdropTemplateMixin and "BackdropTemplate")
 		border:SetPoint("TOPLEFT", Mult, -Mult)
 		border:SetPoint("BOTTOMRIGHT", -Mult, Mult)
 		border:SetBackdrop({
@@ -66,7 +66,7 @@ local function CreateBorder(f, i, o)
 
 	if o then
 		if f.oborder then return end
-		local border = CreateFrame("Frame", "$parentOuterBorder", f, BackdropTemplateMixin and "BackdropTemplate" or nil)
+		local border = CreateFrame("Frame", "$parentOuterBorder", f, BackdropTemplateMixin and "BackdropTemplate")
 		border:SetPoint("TOPLEFT", -Mult, Mult)
 		border:SetPoint("BOTTOMRIGHT", Mult, -Mult)
 		border:SetFrameLevel(f:GetFrameLevel() + 1)
@@ -90,9 +90,7 @@ local function GetTemplate(t)
 end
 
 local function SetTemplate(f, t)
-	if BackdropTemplateMixin then
-		Mixin(f, BackdropTemplateMixin) -- 9.0 to set backdrop
-	end
+	Mixin(f, BackdropTemplateMixin) -- 9.0 to set backdrop
 	GetTemplate(t)
 
 	f:SetBackdrop({
@@ -115,9 +113,7 @@ local function SetTemplate(f, t)
 end
 
 local function CreatePanel(f, t, w, h, a1, p, a2, x, y)
-	if BackdropTemplateMixin then
-		Mixin(f, BackdropTemplateMixin) -- 9.0 to set backdrop
-	end
+	Mixin(f, BackdropTemplateMixin) -- 9.0 to set backdrop
 	GetTemplate(t)
 
 	f:SetWidth(w)
@@ -148,6 +144,7 @@ local function CreatePanel(f, t, w, h, a1, p, a2, x, y)
 end
 
 local function CreateBackdrop(f, t)
+	local f = (f.IsObjectType and f:IsObjectType("Texture") and f:GetParent()) or f
 	if f.backdrop then return end
 	if not t then t = "Default" end
 
@@ -172,6 +169,7 @@ local StripTexturesBlizzFrames = {
 	"RightInset",
 	"NineSlice",
 	"BG",
+	"Bg",
 	"border",
 	"Border",
 	"BorderFrame",
@@ -215,6 +213,7 @@ end
 ----------------------------------------------------------------------------------------
 local HiddenFrame = CreateFrame("Frame")
 HiddenFrame:Hide()
+T.Hider = HiddenFrame
 local function Kill(object)
 	if object.UnregisterAllEvents then
 		object:UnregisterAllEvents()
@@ -424,7 +423,7 @@ addAPI(scrollFrame)
 T.SkinFuncs = {}
 T.SkinFuncs["ShestakUI"] = {}
 
-function T.SkinScrollBar(frame)
+function T.SkinScrollBar(frame, isMinimal)
 	frame:StripTextures()
 
 	local frameName = frame.GetName and frame:GetName()
@@ -434,8 +433,10 @@ function T.SkinScrollBar(frame)
 
 	local newThumb = frame.Back and frame:GetThumb()
 
+	local minimal = isMinimal or frame.GetWidth and frame:GetWidth() < 10
+
 	if UpButton and DownButton then
-		if not UpButton.icon then
+		if not UpButton.icon and not minimal then
 			T.SkinNextPrevButton(UpButton, nil, "Up")
 			if T.Wrath then
 				UpButton:SetSize(UpButton:GetWidth() + 3, UpButton:GetHeight() + 3)
@@ -444,7 +445,7 @@ function T.SkinScrollBar(frame)
 			end
 		end
 
-		if not DownButton.icon then
+		if not DownButton.icon and not minimal then
 			T.SkinNextPrevButton(DownButton, nil, "Down")
 			if T.Wrath then
 				DownButton:SetSize(DownButton:GetWidth() + 3, DownButton:GetHeight() + 3)
@@ -495,11 +496,16 @@ function T.SkinScrollBar(frame)
 				frame.Track:DisableDrawLayer("ARTWORK")
 			end
 			newThumb:DisableDrawLayer("BACKGROUND")
+			newThumb:DisableDrawLayer("ARTWORK")
 			if not frame.thumbbg then
-				frame.thumbbg = CreateFrame("Frame", nil, frame)
+				frame.thumbbg = CreateFrame("Frame", nil, newThumb)
 				frame.thumbbg:SetPoint("TOPLEFT", newThumb, "TOPLEFT", 0, -3)
 				frame.thumbbg:SetPoint("BOTTOMRIGHT", newThumb, "BOTTOMRIGHT", 0, 3)
 				frame.thumbbg:SetTemplate("Overlay")
+
+				if not newThumb:IsShown() then
+					frame:SetAlpha(0)
+				end
 
 				hooksecurefunc(newThumb, "Hide", function(self)
 					frame:SetAlpha(0)
@@ -508,6 +514,20 @@ function T.SkinScrollBar(frame)
 				hooksecurefunc(newThumb, "Show", function(self)
 					frame:SetAlpha(1)
 				end)
+
+				hooksecurefunc(newThumb, "SetShown", function(self, showThumb)
+					if showThumb then
+						frame:SetAlpha(1)
+					else
+						frame:SetAlpha(0)
+					end
+				end)
+			end
+
+			if minimal then
+				-- UpButton:SetSize(14, 14)
+				-- DownButton:SetSize(14, 14)
+				newThumb:SetWidth(10)
 			end
 		end
 	end
@@ -773,6 +793,29 @@ function T.SkinCheckBox(frame, size, default)
 	end
 end
 
+function T.SkinCheckBoxAtlas(checkbox, size)
+	if size then
+		checkbox:SetSize(size, size)
+	end
+
+	checkbox:CreateBackdrop("Overlay")
+	checkbox.backdrop:SetInside(nil, 4, 4)
+
+	for _, region in next, { checkbox:GetRegions() } do
+		if region:IsObjectType("Texture") then
+			if region:GetAtlas() == "checkmark-minimal" or region:GetTexture() == 130751 then
+				region:SetTexture(C.media.texture)
+
+				local checkedTexture = checkbox:GetCheckedTexture()
+				checkedTexture:SetColorTexture(1, 0.82, 0, 0.8)
+				checkedTexture:SetInside(checkbox.backdrop)
+			else
+				region:SetTexture("")
+			end
+		end
+	end
+end
+
 function T.SkinCloseButton(f, point, text, pixel)
 	f:StripTextures()
 	f:SetTemplate("Overlay")
@@ -829,6 +872,38 @@ function T.SkinSlider(f)
 
 	f:SetThumbTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
 	f:GetThumbTexture():SetBlendMode("ADD")
+end
+
+function T.SkinSliderStep(frame, minimal)
+	frame:StripTextures()
+
+	local slider = frame.Slider
+	if not slider then return end
+
+	slider:DisableDrawLayer("ARTWORK")
+
+	local thumb = slider.Thumb
+	if thumb then
+		thumb:SetTexture([[Interface\CastingBar\UI-CastingBar-Spark]])
+		thumb:SetBlendMode("ADD")
+		thumb:SetSize(20, 30)
+	end
+
+	local offset = minimal and 10 or 13
+	slider:CreateBackdrop("Overlay")
+	slider.backdrop:SetPoint("TOPLEFT", 10, -offset)
+	slider.backdrop:SetPoint("BOTTOMRIGHT", -10, offset)
+
+	if not slider.barStep then
+		local step = CreateFrame("StatusBar", nil, slider.backdrop)
+		step:SetStatusBarTexture(C.media.texture)
+		step:SetStatusBarColor(1, 0.82, 0, 1)
+		step:SetPoint("TOPLEFT", slider.backdrop, T.mult * 2, -T.mult * 2)
+		step:SetPoint("BOTTOMLEFT", slider.backdrop, T.mult * 2, T.mult * 2)
+		step:SetPoint("RIGHT", thumb, "CENTER")
+
+		slider.barStep = step
+	end
 end
 
 function T.SkinIconSelectionFrame(frame, numIcons, buttonNameTemplate, frameNameOverride)
@@ -910,6 +985,11 @@ function T.SkinIconSelectionFrame(frame, numIcons, buttonNameTemplate, frameName
 				button.Icon:SetTexture(texture)
 			end
 		end
+	end
+
+	local dropdown = frame.BorderBox.IconTypeDropDown and frame.BorderBox.IconTypeDropDown.DropDownMenu
+	if dropdown then
+		T.SkinDropDownBox(dropdown)
 	end
 end
 
@@ -1038,47 +1118,53 @@ function T.SkinFrame(frame, backdrop, x, y)
 end
 
 local iconColors = {
-	["auctionhouse-itemicon-border-gray"]		= {r = borderr, g = borderg, b = borderb},
-	["auctionhouse-itemicon-border-white"]		= {r = borderr, g = borderg, b = borderb},
-	["auctionhouse-itemicon-border-green"]		= BAG_ITEM_QUALITY_COLORS[2],
-	["auctionhouse-itemicon-border-blue"]		= BAG_ITEM_QUALITY_COLORS[3],
-	["auctionhouse-itemicon-border-purple"]		= BAG_ITEM_QUALITY_COLORS[4],
-	["auctionhouse-itemicon-border-orange"]		= BAG_ITEM_QUALITY_COLORS[5],
-	["auctionhouse-itemicon-border-artifact"]	= BAG_ITEM_QUALITY_COLORS[6],
-	["auctionhouse-itemicon-border-account"]	= BAG_ITEM_QUALITY_COLORS[7]
+	["uncollected"] = {r = borderr, g = borderg, b = borderb},
+	["gray"]		= {r = borderr, g = borderg, b = borderb},
+	["white"]		= {r = borderr, g = borderg, b = borderb},
+	["green"]		= BAG_ITEM_QUALITY_COLORS[2],
+	["blue"]		= BAG_ITEM_QUALITY_COLORS[3],
+	["purple"]		= BAG_ITEM_QUALITY_COLORS[4],
+	["orange"]		= BAG_ITEM_QUALITY_COLORS[5],
+	["artifact"]	= BAG_ITEM_QUALITY_COLORS[6],
+	["account"]		= BAG_ITEM_QUALITY_COLORS[7]
 }
 
-function T.SkinIconBorder(frame, border)
-	local backdrop = border or frame:GetParent().backdrop
+function T.SkinIconBorder(frame, parent)
+	local border = parent or frame:GetParent().backdrop
 	frame:SetAlpha(0)
 	hooksecurefunc(frame, "SetVertexColor", function(self, r, g, b)
 		if r ~= BAG_ITEM_QUALITY_COLORS[1].r ~= r and g ~= BAG_ITEM_QUALITY_COLORS[1].g then
-			backdrop:SetBackdropBorderColor(r, g, b)
+			border:SetBackdropBorderColor(r, g, b)
 		else
-			backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
+			border:SetBackdropBorderColor(unpack(C.media.border_color))
 		end
-		-- frame:SetAlpha(0)
 	end)
 
 	hooksecurefunc(frame, "SetAtlas", function(self, atlas)
-		local color = iconColors[atlas]
-		-- frame:SetAlpha(0)
+		local atlasAbbr = atlas and strmatch(atlas, "%-(%w+)$")
+		local color = atlasAbbr and iconColors[atlasAbbr]
 		if color then
-			backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
-		else
-			-- backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
+			border:SetBackdropBorderColor(color.r, color.g, color.b)
 		end
 	end)
 
 	hooksecurefunc(frame, "Hide", function(self)
-		backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
+		border:SetBackdropBorderColor(unpack(C.media.border_color))
 	end)
 
 	hooksecurefunc(frame, "SetShown", function(self, show)
 		if not show then
-			backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
+			border:SetBackdropBorderColor(unpack(C.media.border_color))
 		end
 	end)
+end
+
+function T.ReplaceIconString(frame, text)
+	if not text then text = frame:GetText() end
+	if not text or text == "" then return end
+
+	local newText, count = gsub(text, "|T([^:]-):[%d+:]+|t", "|T%1:14:14:0:0:64:64:5:59:5:59|t")
+	if count > 0 then frame:SetFormattedText("%s", newText) end
 end
 
 local LoadBlizzardSkin = CreateFrame("Frame")

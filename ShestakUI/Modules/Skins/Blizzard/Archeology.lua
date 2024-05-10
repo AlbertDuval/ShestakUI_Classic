@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -88,8 +88,7 @@ local function LoadSkin()
 	T.SkinNextPrevButton(ArchaeologyFrameCompletedPagePrevPageButton, nil, "Any")
 	T.SkinNextPrevButton(ArchaeologyFrameSummaryPageNextPageButton, nil, "Any")
 	T.SkinNextPrevButton(ArchaeologyFrameSummaryPagePrevPageButton, nil, "Any")
-
-	T.SkinScrollBar(ArchaeologyFrameArtifactPageHistoryScrollScrollBar)
+	T.SkinScrollBar(ArchaeologyFrameArtifactPageHistoryScroll.ScrollBar)
 
 	ArchaeologyFrameInfoButton:SetPoint("TOPLEFT", ArchaeologyFrame, 4, -4)
 

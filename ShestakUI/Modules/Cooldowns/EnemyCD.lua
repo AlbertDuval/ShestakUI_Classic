@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.enemycooldown.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -132,7 +132,8 @@ local StartTimer = function(sGUID, sID, sName)
 	icon:SetScript("OnEnter", OnEnter)
 	icon:SetScript("OnLeave", GameTooltip_Hide)
 	if T.Classic and HasWandEquipped() then
-		local wandSpeed = select(2, GetInventoryItemCooldown("player", 18)) or 0
+		local wandID = GetInventoryItemID("player", 18)
+		local wandSpeed = select(2, C_Container.GetItemCooldown(wandID)) or 0
 		if wandSpeed < 1.5 then wandSpeed = 1.5 end
 		if (T.enemy_spells[sID] or 0) > wandSpeed then
 			return CooldownFrame_Set(icon.Cooldown, GetTime(), T.EnemySpells[sID], 1)
@@ -147,12 +148,9 @@ end
 
 local OnEvent = function(_, event)
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		local _, eventType, _, sourceGUID, sourceName, sourceFlags, _, _, _, _, _, spellID, spellName = CombatLogGetCurrentEventInfo()
+		local _, eventType, _, sourceGUID, sourceName, sourceFlags, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
 
 		if eventType == "SPELL_CAST_SUCCESS" and sourceName ~= T.name then
-			if T.Vanilla then
-				spellID = T.GetSpellID(spellName)
-			end
 			local _, instanceType = IsInInstance()
 			if show[instanceType] then
 				if band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) ~= 0 then
@@ -178,11 +176,7 @@ end
 for spell in pairs(T.EnemySpells) do
 	local name = GetSpellInfo(spell)
 	if not name then
-		if T.Classic then
-			print("|cffff0000WARNING: spell ID ["..tostring(spell).."] no longer exists! Report this to EsreverWoW.|r")
-		else
-			print("|cffff0000WARNING: spell ID ["..tostring(spell).."] no longer exists! Report this to Shestak.|r")
-		end
+		print("|cffff0000ShestakUI: spell ID ["..tostring(spell).."] no longer exists!|r")
 	end
 end
 
@@ -194,7 +188,7 @@ addon:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 SlashCmdList.EnemyCD = function()
 	if T.Classic then
 		StartTimer(UnitGUID(T.name), 6552)
-		StartTimer(UnitGUID(T.name), 19244)
+		StartTimer(UnitGUID(T.name), 19647)
 		StartTimer(UnitGUID(T.name), 15487)
 		StartTimer(UnitGUID(T.name), 1499)
 	else

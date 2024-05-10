@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.announcements.spells ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -7,10 +7,7 @@ if C.announcements.spells ~= true then return end
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 frame:SetScript("OnEvent", function()
-	local _, event, _, sourceGUID, sourceName, _, _, _, destName, _, _, spellID, spellName = CombatLogGetCurrentEventInfo()
-	if T.Vanilla then
-		spellID = T.GetSpellID(spellName)
-	end
+	local _, event, _, sourceGUID, sourceName, _, _, _, destName, _, _, spellID = CombatLogGetCurrentEventInfo()
 	local _, _, difficultyID = GetInstanceInfo()
 	if difficultyID == 0 or event ~= "SPELL_CAST_SUCCESS" then return end
 

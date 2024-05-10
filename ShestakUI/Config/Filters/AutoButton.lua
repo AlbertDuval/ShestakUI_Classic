@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.misc.quest_auto_button ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -80,4 +80,8 @@ T.ABItems = {
 	[180170] = true,	-- Pulsing Animacone
 	[180876] = true,	-- Aqueous Material Accumulator
 	[188697] = true,	-- Kinematic Micro-Life Recalibrator
+}
+
+T.ABItemsIgnore = {
+	-- [itemID] = true,	-- Item name to ignore
 }

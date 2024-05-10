@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	ShestakUI variables
@@ -11,39 +11,27 @@ T.level = UnitLevel("player")
 T.client = GetLocale()
 T.realm = GetRealmName()
 T.color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[T.class]
-T.version = (GetAddOnMetadata or C_AddOns.GetAddOnMetadata)("ShestakUI", "Version")
+T.version = C_AddOns.GetAddOnMetadata("ShestakUI", "Version")
 T.screenWidth, T.screenHeight = GetPhysicalScreenSize()
-T.toc = select(4, GetBuildInfo())
-T.newPatch = T.toc >= 100002
-T.Mainline =_G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE
-T.Classic = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC or _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC or _G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC
-T.Vanilla = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
-T.TBC = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-T.Wrath = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC
-T.Wrath341 = T.Wrath and T.toc >= 30401
 T.HiDPI = GetScreenHeight() / T.screenHeight < 0.75
 
--- BETA
-if T.newPatch or T.Classic then
-	GetContainerNumSlots = _G.GetContainerNumSlots or C_Container.GetContainerNumSlots
-	GetContainerNumFreeSlots = _G.GetContainerNumFreeSlots or C_Container.GetContainerNumFreeSlots
-	GetContainerItemLink = _G.GetContainerItemLink or C_Container.GetContainerItemLink
-	GetContainerItemCooldown = _G.GetContainerItemCooldown or C_Container.GetContainerItemCooldown
-	UseContainerItem = _G.UseContainerItem or C_Container.UseContainerItem
-	GetContainerItemID = _G.GetContainerItemID or C_Container.GetContainerItemID
-	SortBags = C_Container.SortBags
-	SortBankBags = C_Container.SortBankBags
-	SortReagentBankBags = C_Container.SortReagentBankBags
-	SetSortBagsRightToLeft = C_Container.SetSortBagsRightToLeft
-	SetInsertItemsLeftToRight = C_Container.SetInsertItemsLeftToRight
-	PickupContainerItem = C_Container.PickupContainerItem
-	ContainerIDToInventoryID = C_Container.ContainerIDToInventoryID
-	GetContainerItemEquipmentSetInfo = C_Container.GetContainerItemEquipmentSetInfo
+T.toc = select(4, GetBuildInfo())
+T.newPatch = T.toc >= 100105
+T.Mainline =_G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE
+T.Classic = _G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_MAINLINE
+T.Vanilla = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
+T.Vanilla115 = T.Vanilla and T.toc >= 11500
+T.TBC = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+T.Wrath = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC
+T.Cata = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CATACLYSM_CLASSIC
+T.Hardcore = C_GameRules and C_GameRules.IsHardcoreActive()
+T.SoM = C_Seasons and C_Seasons.HasActiveSeason() and C_Seasons.GetActiveSeason() == Enum.SeasonID.SeasonOfMastery
+T.SoD = C_Seasons and C_Seasons.HasActiveSeason() and (C_Seasons.GetActiveSeason() == Enum.SeasonID.SeasonOfDiscovery or C_Seasons.GetActiveSeason() == Enum.SeasonID.Placeholder)
 
-	GetContainerItemInfo = GetContainerItemInfo or function(bagIndex, slotIndex)
-		local info = C_Container.GetContainerItemInfo(bagIndex, slotIndex)
-		if info then
-			return info.iconFileID, info.stackCount, info.isLocked, info.quality, info.isReadable, info.hasLoot, info.hyperlink, info.isFiltered, info.hasNoValue, info.itemID, info.isBound
-		end
+-- BETA
+GetContainerItemInfo = GetContainerItemInfo or function(bagIndex, slotIndex)
+	local info = C_Container.GetContainerItemInfo(bagIndex, slotIndex)
+	if info then
+		return info.iconFileID, info.stackCount, info.isLocked, info.quality, info.isReadable, info.hasLoot, info.hyperlink, info.isFiltered, info.hasNoValue, info.itemID, info.isBound
 	end
 end

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -41,11 +41,12 @@ local function LoadSkin()
 	QuestScrollFrame.DetailFrame.BottomDetail:Hide()
 	QuestScrollFrame.Contents.Separator.Divider:Hide()
 	QuestScrollFrame:SetSize(259, 463)
+	QuestScrollFrame.Edge:Hide()
 
 	local CampaignOverview = QuestMapFrame.CampaignOverview
 	CampaignOverview:StripTextures()
 	CampaignOverview.ScrollFrame:StripTextures()
-	T.SkinScrollBar(QuestMapFrameScrollBar)
+	T.SkinScrollBar(CampaignOverview.ScrollFrame.ScrollBar)
 	CampaignOverview:CreateBackdrop("Overlay")
 	CampaignOverview.backdrop:SetPoint("TOPLEFT", CampaignOverview.Header, "TOPLEFT",  8, -2)
 	CampaignOverview.backdrop:SetPoint("BOTTOMRIGHT", CampaignOverview.Header, "BOTTOMRIGHT", -4, 10)
@@ -181,10 +182,38 @@ local function LoadSkin()
 		tex:SetAllPoints(button.Icon)
 	end
 
+	local function HandyNotesButton(button)
+		local shadow = button:GetRegions()
+		shadow:Hide()
+
+		button.Background:Hide()
+		button.IconOverlay:SetAlpha(0)
+		button.Border:Hide()
+
+		local tex = button:GetHighlightTexture()
+		tex:SetAtlas(button.Icon:GetTexture())
+		tex:SetAllPoints(button.Icon)
+	end
+
 	-- Elements
 	WorldMapFloorNavigationDropDown(WorldMapFrame.overlayFrames[1])
 	WorldMapTrackingOptionsButton(WorldMapFrame.overlayFrames[2])
 	WorldMapTrackingPinButton(WorldMapFrame.overlayFrames[3])
+
+	for i = 1, 10 do
+		local button = _G["Krowi_WorldMapButtons"..i]
+		if button then
+			HandyNotesButton(button)
+		end
+	end
+
+	for i = 3, #WorldMapFrame.overlayFrames do
+		local frame = WorldMapFrame.overlayFrames[i]
+		if frame.BountyDropdownButton then
+			T.SkinNextPrevButton(frame.BountyDropdownButton)
+			break
+		end
+	end
 
 	-- QuestSessionManagement skin (based on skin from Aurora)
 	QuestMapFrame.QuestSessionManagement:StripTextures()

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.combattext.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -19,7 +19,6 @@ if C.combattext.merge_aoe_spam then
 	T.aoespam = {}
 	T.aoespam[6603] = 3				-- Auto Attack
 	T.aoespam[195222] = 4			-- Stormlash [Shaman]
-	--BETA T.aoespam[195256] = 4			-- Stormlash [Shaman]
 	T.aoespam[259756] = 6			-- Entropic Embrace (Void Elves)
 	T.aoespam[321519] = 5			-- Paralytic Poison (Covenant Night Fae)
 	T.aoespam[344155] = 1			-- Gluttonous Spike (Trinket)
@@ -376,7 +375,7 @@ elseif T.class == "PALADIN" then
 		T.aoespam[85222] = 1		-- Light of Dawn
 		T.aoespam[114852] = 0		-- Holy Prism
 		T.aoespam[119952] = 3		-- Arcing Light
-		T.aoespam[183811] = 6		-- Judgment of Light
+		T.aoespam[183811] = 6		-- Judgement of Light
 		T.aoespam[225311] = 1		-- Light of Dawn
 		T.aoespam[377129] = 3		-- Golden Path
 		-- Damaging spells
@@ -394,8 +393,8 @@ elseif T.class == "PALADIN" then
 		T.aoespam[114919] = 3		-- Arcing Light
 		T.aoespam[86704] = 0		-- Ancient Fury
 		T.aoespam[157122] = 3		-- Holy Shield
-		T.aoespam[209478] = 1		-- Tyr's Enforcer
-		T.aoespam[209202] = 1		-- Eye of Tyr
+		T.aoespam[378286] = 1		-- Tyr's Enforcer
+		T.aoespam[387174] = 1		-- Eye of Tyr
 		T.aoespam[105421] = 1		-- Blinding Light
 		T.aoespam[204301] = 8		-- Blessed Hammer
 		T.aoespam[224239] = 1		-- Divine Storm
@@ -427,7 +426,6 @@ elseif T.class == "PRIEST" then
 		-- Damaging spells
 		T.aoespam[204213] = 4		-- Purge the Wicked
 		T.aoespam[205386] = 0.5		-- Shadow Crash
-		T.aoespam[49821] = 3		-- Mind Sear
 		T.aoespam[263165] = 5		-- Void Torrent
 		T.aoespam[228361] = 1		-- Void Eruption
 		T.merge[228360] = 228361	-- Void Eruption
@@ -536,9 +534,6 @@ elseif T.class == "SHAMAN" then
 		T.merge[115360] = 115357	-- Windstrike Off-Hand
 		T.aoespam[192231] = 3		-- Liquid Magma
 		T.aoespam[157331] = 3		-- Wind Gust
-		--BETA T.aoespam[197385] = 6		-- Fury of Air
-		--BETA T.aoespam[210801] = 6		-- Crashing Storm
-		--BETA T.aoespam[210854] = 4		-- Hailstorm
 		T.aoespam[187874] = 1		-- Crash Lightning
 		T.aoespam[195592] = 1		-- Crash Lightning
 	end

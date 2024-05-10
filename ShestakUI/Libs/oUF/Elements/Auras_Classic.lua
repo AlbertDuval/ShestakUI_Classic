@@ -1,7 +1,7 @@
 local _, ns = ...
 local oUF = ns.oUF
 
-if(not oUF:IsClassic()) then return end
+if(oUF:IsMainline()) then return end
 
 local LibClassicDurations = (oUF:IsVanilla() and LibStub('LibClassicDurations'))
 

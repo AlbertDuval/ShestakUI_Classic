@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.raidframe.plugins_aura_watch ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -56,9 +56,6 @@ local function resetIcon(icon, count, duration, remaining)
 	if icon.count then
 		icon.count:SetText((count > 1 and count or ""))
 	end
-	if icon.overlay then
-		icon.overlay:Hide()
-	end
 	icon:SetAlpha(1)
 end
 
@@ -66,9 +63,6 @@ local function expireIcon(icon)
 	if icon.cd then icon.cd:Hide() end
 	if icon.count then icon.count:SetText() end
 	icon:SetAlpha(0)
-	if icon.overlay then
-		icon.overlay:Show()
-	end
 	icon:Show()
 end
 
@@ -145,14 +139,6 @@ local function setupIcons(self)
 				tex:SetAllPoints(icon)
 				tex:SetTexture(image)
 				icon.icon = tex
-				if not icon.overlay then
-					local overlay = icon:CreateTexture(nil, "OVERLAY")
-					overlay:SetTexture("Interface\\Buttons\\UI-Debuff-Overlays")
-					overlay:SetAllPoints(icon)
-					overlay:SetTexCoord(0.296875, 0.5703125, 0, 0.515625)
-					overlay:SetVertexColor(1, 0, 0)
-					icon.overlay = overlay
-				end
 			end
 
 			if not icon.count and not (watch.hideCount or icon.hideCount) then
@@ -177,11 +163,7 @@ local function setupIcons(self)
 
 			if watch.PostCreateButton then watch:PostCreateButton(icon, icon.spellID, name, self) end
 		else
-			if T.Classic then
-				print("|cffff0000WARNING: spell ID ["..tostring(icon.spellID).."] no longer exists! Report this to EsreverWoW.|r")
-			else
-				print("|cffff0000WARNING: spell ID ["..tostring(icon.spellID).."] no longer exists! Report this to Shestak.|r")
-			end
+			print("|cffff0000ShestakUI: spell ID ["..tostring(icon.spellID).."] no longer exists!|r")
 		end
 	end
 end

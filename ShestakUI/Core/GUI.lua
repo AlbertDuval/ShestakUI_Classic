@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 -- Spells lists initialization
 C.filger.buff_spells_list = {}
@@ -13,12 +13,15 @@ C.raidcooldown.spells_list = {}
 C.raidcooldown.spells_list_ver = 1
 C.enemycooldown.spells_list = {}
 C.enemycooldown.spells_list_ver = 1
+C.pulsecooldown.spells_list = {}
 C.nameplate.debuffs_list = {}
 C.nameplate.buffs_list = {}
 C.combattext.spells_list = {}
 C.chat.spam_list = ""
 C.font.global_font = false
 C.media.profile = "-- Insert Your code here\n"
+C.general.choose_profile = 1
+C.general.profile_name = "1"
 C.options = {}
 
 if not IsAddOnLoaded("ShestakUI_Config") then return end
@@ -30,6 +33,7 @@ if not IsAddOnLoaded("ShestakUI_Config") then return end
 if not ShestakUIOptionsGlobal then ShestakUIOptionsGlobal = {} end
 if ShestakUIOptionsGlobal[T.realm] == nil then ShestakUIOptionsGlobal[T.realm] = {} end
 if ShestakUIOptionsGlobal[T.realm][T.name] == nil then ShestakUIOptionsGlobal[T.realm][T.name] = false end
+if ShestakUIOptionsGlobal[T.realm]["Current_Profile"] == nil then ShestakUIOptionsGlobal[T.realm]["Current_Profile"] = {} end
 
 -- Create the main options table
 if ShestakUIOptions == nil then ShestakUIOptions = {} end
@@ -38,11 +42,33 @@ if ShestakUIOptions == nil then ShestakUIOptions = {} end
 local profile
 if ShestakUIOptionsGlobal[T.realm][T.name] == true then
 	if ShestakUIOptionsPerChar == nil then
-		ShestakUIOptionsPerChar = {}
+		ShestakUIOptionsPerChar = ShestakUIOptions
+		ShestakUIOptionsGlobal[T.realm]["Current_Profile"][T.name] = ShestakUIOptionsGlobal["Current_Profile"] or 1
 	end
-	profile = ShestakUIOptionsPerChar
+
+	if not ShestakUIOptionsPerChar.merged and not ShestakUIOptionsPerChar["1"] then	-- TODO delete after while
+		local backup = ShestakUIOptionsPerChar
+		ShestakUIOptionsPerChar = {}
+		ShestakUIOptionsPerChar["1"] = backup
+		ShestakUIOptionsPerChar.merged = true
+	end
+
+	ShestakUIOptionsGlobal[T.realm]["Current_Profile"][T.name] = ShestakUIOptionsGlobal[T.realm]["Current_Profile"][T.name] or 1
+	local i = tostring(ShestakUIOptionsGlobal[T.realm]["Current_Profile"][T.name])
+	ShestakUIOptionsPerChar[i] = ShestakUIOptionsPerChar[i] or {}
+	profile = ShestakUIOptionsPerChar[i]
 else
-	profile = ShestakUIOptions
+	if not ShestakUIOptions.merged and not ShestakUIOptions["1"] then	-- TODO delete after while
+		local backup = ShestakUIOptions
+		ShestakUIOptions = {}
+		ShestakUIOptions["1"] = backup
+		ShestakUIOptions.merged = true
+	end
+
+	ShestakUIOptionsGlobal["Current_Profile"] = ShestakUIOptionsGlobal["Current_Profile"] or 1
+	local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+	ShestakUIOptions[i] = ShestakUIOptions[i] or {}
+	profile = ShestakUIOptions[i]
 end
 
 -- Apply or remove saved settings as needed
@@ -57,7 +83,7 @@ for group, options in pairs(profile) do
 			end
 		end
 	else
-		profile[group] = nil
+		-- profile[group] = nil
 	end
 end
 

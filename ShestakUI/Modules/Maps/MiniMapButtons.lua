@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.minimap.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ end)
 farm:SetScript("OnEnter", function()
 	farm:FadeIn()
 	GameTooltip:SetOwner(farm, "ANCHOR_LEFT")
-	GameTooltip:AddLine(L_MINIMAP_FARM)
+	GameTooltip:AddLine(L_MINIMAP_FARM, 0.40, 0.78, 1)
 	GameTooltip:Show()
 end)
 

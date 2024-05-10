@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -22,6 +22,10 @@ local function LoadSkin()
 
 	CreateChannelPopup:StripTextures()
 	CreateChannelPopup:CreateBackdrop("Transparent")
+
+	if T.Mainline then
+		CreateChannelPopup.Header:StripTextures()
+	end
 
 	CreateChannelPopup.OKButton:SkinButton()
 	CreateChannelPopup.CancelButton:SkinButton()

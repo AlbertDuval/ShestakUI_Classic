@@ -1,10 +1,11 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.aura.player_auras ~= true then return end
 
 ----------------------------------------------------------------------------------------
 --	Style player buff(by Tukz)
 ----------------------------------------------------------------------------------------
 local rowbuffs = 16
+local alpha = 0
 
 local GetFormattedTime = function(s)
 	if s >= 86400 then
@@ -52,6 +53,16 @@ for i = 1, NUM_TEMP_ENCHANT_FRAMES do
 	duration:SetDrawLayer("ARTWORK")
 	duration:SetFont(C.font.auras_font, C.font.auras_font_size, C.font.auras_font_style)
 	duration:SetShadowOffset(C.font.auras_font_shadow and 1 or 0, C.font.auras_font_shadow and -1 or 0)
+
+	if C.aura.player_buff_mouseover then
+		buff:SetParent(BuffsAnchor)
+		buff:HookScript("OnEnter", function()
+			BuffsAnchor:SetAlpha(1)
+		end)
+		buff:HookScript("OnLeave", function()
+			BuffsAnchor:SetAlpha(alpha)
+		end)
+	end
 
 	charges:ClearAllPoints()
 	charges:SetPoint("BOTTOMLEFT", 1, 0)
@@ -117,10 +128,10 @@ local function UpdateBuffAnchors()
 			aboveBuff = buff
 		else
 			if numBuffs == 1 then
-				if mainhand and offhand and (T.Vanilla or T.TBC or not UnitHasVehicleUI("player")) then
+				if mainhand and offhand and not UnitHasVehicleUI("player") then
 					buff:SetPoint("RIGHT", TempEnchant2, "LEFT", -3, 0)
 					aboveBuff = TempEnchant1
-				elseif ((mainhand and not offhand) or (offhand and not mainhand)) and (T.Vanilla or T.TBC or not UnitHasVehicleUI("player")) then
+				elseif ((mainhand and not offhand) or (offhand and not mainhand)) and not UnitHasVehicleUI("player") then
 					buff:SetPoint("RIGHT", TempEnchant1, "LEFT", -3, 0)
 					aboveBuff = TempEnchant1
 				else
@@ -155,7 +166,7 @@ local function UpdateDuration(buff, timeLeft)
 	local name = buff:GetName()
 	if not strmatch(name, "TempEnchant") or name == "TempEnchant3" then return end
 
-	local index = strmatch (name, "%d+")
+	local index = strmatch(name, "%d+")
 	local hasMainHandEnchant, _, mainHandCharges, _, hasOffHandEnchant, _, offHandCharges = GetWeaponEnchantInfo()
 	local slotIndex = 16
 	local chargeCount = mainHandCharges
@@ -184,4 +195,16 @@ end
 
 hooksecurefunc("AuraButton_UpdateDuration", UpdateDuration)
 
-BuffFrame:SetScript("OnUpdate", nil) -- Disable BuffFrame_OnUpdate that change alpha
+-- Mouseover
+if C.aura.player_buff_mouseover then
+	BuffsAnchor:SetAlpha(alpha)
+	BuffsAnchor:HookScript("OnEnter", function()
+		BuffsAnchor:SetAlpha(1)
+	end)
+	BuffsAnchor:HookScript("OnLeave", function()
+		BuffsAnchor:SetAlpha(alpha)
+	end)
+end
+
+-- Disable BuffFrame_OnUpdate that changes alpha
+BuffFrame:SetScript("OnUpdate", nil)

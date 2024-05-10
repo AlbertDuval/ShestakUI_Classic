@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.threat.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -17,7 +17,8 @@ end
 local bar, tList, barList = {}, {}, {}
 local targeted = false
 
-RAID_CLASS_COLORS["PET"] = {r = 0, g = 0.7, b = 0, colorStr = "ff00b200"}
+local pet_color = {r = 0, g = 0.7, b = 0, colorStr = "ff00b200"}
+local shaman_color = {r = 0, g = 0.44, b = 0.98, colorStr = "ff0070de"}
 
 local CreateFS = function(frame)
 	local fstring = frame:CreateFontString(nil, "OVERLAY")
@@ -102,7 +103,14 @@ local UpdateBars = function()
 			end
 		end
 		bar[i]:SetValue(100 * cur.pct / max.pct)
-		local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[cur.class]
+		local color
+		if T.Vanilla and cur.class == "SHAMAN" then
+			color = shaman_color
+		elseif cur.class == "PET" then
+			color = pet_color
+		else
+			color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[cur.class]
+		end
 		bar[i]:SetStatusBarColor(color.r, color.g, color.b)
 		bar[i].bg:SetVertexColor(color.r, color.g, color.b, 0.2)
 		bar[i].left:SetText(cur.name)

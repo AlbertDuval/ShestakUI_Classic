@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if T.client ~= "zhCN" then return end
 
 ----------------------------------------------------------------------------------------
@@ -31,7 +31,6 @@ L_ANNOUNCE_FP_USE = "%s 使用了 %s。"
 L_ANNOUNCE_INTERRUPTED = "已打断"
 
 -- Tooltip
-L_TOOLTIP_NO_TALENT = "没有天赋"
 L_TOOLTIP_LOADING = "读取中..."
 L_TOOLTIP_ACH_STATUS = "你的状态: "
 L_TOOLTIP_ACH_COMPLETE = "你的状态: 完成"
@@ -51,6 +50,7 @@ L_MISC_UI_OUTDATED_CLASSIC = "ShestakUI 版本已过期，请至 https://github.
 L_MISC_HEADER_MARK = "鼠标悬停显示团队图标"
 L_MISC_BINDER_OPEN = "鼠标绑定"
 L_MISC_SCROLL = "附魔羊皮纸"
+L_MISC_HEADER_QUEST = "任务道具按钮"
 
 -- Raid Utility
 L_RAID_UTIL_DISBAND = "解散团队"
@@ -89,8 +89,8 @@ L_MINIMAP_FARM = "小地图缩放"
 L_MINIMAP_TOGGLE = "动作条自由折叠"
 
 -- Chat
-L_CHAT_WHISPER = "From"
-L_CHAT_BN_WHISPER = "From"
+L_CHAT_WHISPER = "来自"
+L_CHAT_BN_WHISPER = "来自"
 L_CHAT_AFK = "[AFK]"
 L_CHAT_DND = "[DND]"
 L_CHAT_GM = "[GM]"
@@ -185,7 +185,7 @@ L_POPUP_ARMORY = "英雄榜"
 
 -- Welcome message
 L_WELCOME_LINE_1 = "欢迎使用ShestakUI "
-L_WELCOME_LINE_2_1 = "键入 /cfg 进行插件设置, 或者访问https://github.com/Shestak/ShestakUI"
+L_WELCOME_LINE_2_1 = "键入 /cfg 进行插件设置, 或者访问https://github.com/Wetxius/ShestakUI_Help/wiki/English"
 L_WELCOME_LINE_2_2 = "获取更多信息。"
 L_WELCOME_LINE_1_CLASSIC = "欢迎使用ShestakUI (Classic) "
 L_WELCOME_LINE_2_1_CLASSIC = "键入 /cfg 进行插件设置, 或者访问https://github.com/EsreverWoW/ShestakUI_Classic"

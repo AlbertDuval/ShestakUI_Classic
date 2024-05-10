@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.chat.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -114,7 +114,11 @@ local function SetChatStyle(frame)
 		_G[format("ChatFrame%sTabSelectedMiddle", id)]:Kill()
 		_G[format("ChatFrame%sTabSelectedRight", id)]:Kill()
 	end
-	_G[format("ChatFrame%sButtonFrameMinimizeButton", id)]:Kill()
+	if T.Cata then
+		_G[format("ChatFrame%sMinimizeButton", id)]:Kill()
+	else
+		_G[format("ChatFrame%sButtonFrameMinimizeButton", id)]:Kill()
+	end
 	_G[format("ChatFrame%sButtonFrame", id)]:Kill()
 
 	-- Kills off the retarded new circle around the editbox
@@ -321,6 +325,16 @@ local function SetupChatPosAndFont()
 	end
 end
 
+for i = 3, NUM_CHAT_WINDOWS do
+	local tab = _G[format("ChatFrame%sTab", i)]
+	hooksecurefunc(tab, "SetPoint", function(self, point, anchor, attachTo, x, y)
+		if anchor == GeneralDockManagerScrollFrameChild and y == -1 then
+			self:ClearAllPoints()
+			self:SetPoint(point, anchor, attachTo, x, -2)
+		end
+	end)
+end
+
 GeneralDockManagerOverflowButton:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT", 0, 5)
 hooksecurefunc(GeneralDockManagerScrollFrame, "SetPoint", function(self, point, anchor, attachTo, x, y)
 	if anchor == GeneralDockManagerOverflowButton and x == 0 and y == 0 then
@@ -431,7 +445,7 @@ hooksecurefunc("ChatEdit_CustomTabPressed", UpdateTabChannelSwitch)
 ----------------------------------------------------------------------------------------
 --	Role icons
 ----------------------------------------------------------------------------------------
-if T.Mainline and C.chat.role_icons == true then
+if (T.Wrath or T.Cata or T.Mainline) and C.chat.role_icons == true then
 	local chats = {
 		CHAT_MSG_SAY = 1, CHAT_MSG_YELL = 1,
 		CHAT_MSG_WHISPER = 1, CHAT_MSG_WHISPER_INFORM = 1,

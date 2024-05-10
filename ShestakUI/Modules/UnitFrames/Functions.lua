@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -7,6 +7,34 @@ if C.unitframe.enable ~= true then return end
 local _, ns = ...
 local oUF = ns.oUF
 T.oUF = oUF
+
+T.EclipseDirection = function(self)
+	if GetEclipseDirection() == "sun" then
+		self.Text:SetText("|cff4478BC>>|r")
+	elseif GetEclipseDirection() == "moon" then
+		self.Text:SetText("|cffE5994C<<|r")
+	else
+		self.Text:SetText("")
+	end
+end
+
+T.UpdateEclipse = function(self, login)
+	local eb = self.EclipseBar
+	local txt = self.EclipseBar.Text
+
+	if login then
+		eb:SetScript("OnUpdate", nil)
+	end
+
+	if eb:IsShown() then
+		txt:Show()
+		if self.Debuffs then self.Debuffs:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 19) end
+	else
+		txt:Hide()
+		if (C.unitframe_class_bar.combo_always == true or GetShapeshiftFormID() == CAT_FORM) and C.unitframe_class_bar.combo_old ~= true then return end
+		if self.Debuffs then self.Debuffs:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 5) end
+	end
+end
 
 T.UpdateAllElements = function(frame)
 	for _, v in ipairs(frame.__elements) do
@@ -60,7 +88,7 @@ T.PostUpdateHealth = function(health, unit, min, max)
 	if unit == "pet" then
 		local _, class = UnitClass("player")
 		local r, g, b = unpack(T.oUF_colors.class[class])
-		if T.Classic and T.class == "HUNTER" and C.unitframe.bar_color_happiness then
+		if T.Classic and not T.Cata and T.class == "HUNTER" and C.unitframe.bar_color_happiness then
 			local mood = GetPetHappiness()
 			if mood then
 				if mood ~= 3 then
@@ -101,7 +129,7 @@ T.PostUpdateHealth = function(health, unit, min, max)
 	end
 	if min ~= max then
 		r, g, b = oUF:ColorGradient(min, max, 0.69, 0.31, 0.31, 0.65, 0.63, 0.35, 0.33, 0.59, 0.33)
-		if ((T.Vanilla or T.TBC) and unit == "player" or (unit == "player" and not UnitHasVehicleUI("player") or unit == "vehicle")) and health:GetAttribute("normalUnit") ~= "pet" then
+		if (unit == "player" and not UnitHasVehicleUI("player") or unit == "vehicle") and health:GetAttribute("normalUnit") ~= "pet" then
 			if C.unitframe.show_total_value == true then
 				if C.unitframe.color_value == true then
 					health.value:SetFormattedText("|cff559655%s|r |cffD7BEA5-|r |cff559655%s|r", T.ShortValue(min), T.ShortValue(max))
@@ -143,7 +171,7 @@ T.PostUpdateHealth = function(health, unit, min, max)
 			end
 		end
 	else
-		if ((T.Vanilla or T.TBC) and unit =="player") or (unit == "player" and not UnitHasVehicleUI("player") or unit == "vehicle") then
+		if unit == "player" and not UnitHasVehicleUI("player") or unit == "vehicle" then
 			if C.unitframe.color_value == true then
 				health.value:SetText("|cff559655"..max.."|r")
 			else
@@ -551,7 +579,7 @@ T.PostCastStart = function(Castbar, unit)
 		Castbar:SetStatusBarColor(0.8, 0, 0)
 		Castbar.bg:SetVertexColor(0.8, 0, 0, 0.2)
 		Castbar.Overlay:SetBackdropBorderColor(0.8, 0, 0)
-		if C.unitframe.castbar_icon == true and (unit == "target" or unit == "focus") then
+		if (C.unitframe.castbar_icon == true and unit == "target") or (unit == "focus" and C.unitframe.castbar_focus_type ~= "NONE") then
 			Castbar.Button:SetBackdropBorderColor(0.8, 0, 0)
 		end
 	else
@@ -578,15 +606,12 @@ T.PostCastStart = function(Castbar, unit)
 			end
 		end
 		Castbar.Overlay:SetBackdropBorderColor(unpack(C.media.border_color))
-		if C.unitframe.castbar_icon == true and (unit == "target" or unit == "focus") then
+		if (C.unitframe.castbar_icon == true and unit == "target") or (unit == "focus" and C.unitframe.castbar_focus_type ~= "NONE") then
 			Castbar.Button:SetBackdropBorderColor(unpack(C.media.border_color))
 		end
 		Castbar.Overlay:SetBackdropBorderColor(unpack(C.media.border_color))
 		if C.unitframe.castbar_icon == true and (unit == "target" or unit == "focus") then
-			-- FIXME
-			if BackdropTemplateMixin then
-				Castbar.Button:SetBackdropBorderColor(unpack(C.media.border_color))
-			end
+			Castbar.Button:SetBackdropBorderColor(unpack(C.media.border_color))
 		end
 	end
 
@@ -875,15 +900,16 @@ local CountOffSets = {
 }
 
 T.CreateAuraWatchIcon = function(_, icon)
-	icon:SetTemplate("Default")
-	icon.icon:SetPoint("TOPLEFT", icon, 1, -1)
-	icon.icon:SetPoint("BOTTOMRIGHT", icon, -1, 1)
+	icon:CreateBorder(nil, true)
+	if T.Classic then
+		icon.icon:SetPoint("TOPLEFT", icon, 0, 0)
+		icon.icon:SetPoint("BOTTOMRIGHT", icon, 0, 0)
+	end
 	icon.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 	icon.icon:SetDrawLayer("ARTWORK")
 	if icon.cd then
 		icon.cd:SetReverse(true)
 	end
-	icon.overlay:SetTexture()
 end
 
 T.CreateAuraWatch = function(self)
@@ -928,6 +954,7 @@ T.CreateAuraWatch = function(self)
 			else
 				tex:SetVertexColor(0.8, 0.8, 0.8)
 			end
+			icon.icon = tex
 
 			local count = T.SetFontString(icon, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
 			local point, anchorPoint, x, y = unpack(CountOffSets[spell[2]])

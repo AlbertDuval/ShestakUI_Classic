@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Based on LiteStats(by Katae)
@@ -11,14 +11,12 @@ local tthead = {r = 0.40, g = 0.78, b = 1}	-- Headers
 local ttsubh = {r = 0.75, g = 0.90, b = 1}	-- Subheaders
 
 -- Strata/Level for text objects
-local strata, level = "MEDIUM", 20
+local strata, level = "LOW", 20
 
 -- Globals
 local profiles = LPSTAT_PROFILES
 local font = LPSTAT_FONT
 local t_icon = LTIPICONSIZE or 20
-local IsAltKeyDown = IsAltKeyDown
-local UpdateMemUse = UpdateAddOnMemoryUsage
 local format = string.format
 local strmatch = string.match
 local strfind = string.find
@@ -177,7 +175,7 @@ local function Inject(name, stat)
 		anchor_to = m.anchor_to, anchor_from = m.anchor_from,
 		x_off = m.x_off, y_off = m.y_off,
 		height = m.height, width = m.width,
-		strata = m.strata or strata, level = level
+		strata = m.strata or strata, level = m.level or level
 	} do if not stat[k] then stat[k] = v end end
 	if not stat.text then stat.text = {} end
 
@@ -266,19 +264,6 @@ if clock.enabled then
 		MONTH_DECEMBER,
 	}
 
-	-- Torghast
-	--local TorghastWidgets, TorghastInfo = {
-	--	{nameID = 2925, levelID = 2930},	-- Fracture Chambers
-	--	{nameID = 2926, levelID = 2932},	-- Skoldus Hall
-	--	{nameID = 2924, levelID = 2934},	-- Soulforges
-	--	{nameID = 2927, levelID = 2936},	-- Coldheart Interstitia
-	--	{nameID = 2928, levelID = 2938},	-- Mort'regar
-	--	{nameID = 2929, levelID = 2940},	-- The Upper Reaches
-	--}
-	--local function CleanupLevelName(text)
-	--	return gsub(text, "|n", "")
-	--end
-
 	Inject("Clock", {
 		text = {
 			string = function()
@@ -315,7 +300,7 @@ if clock.enabled then
 					if extended then tr, tg, tb = 0.3, 1, 0.3 else tr, tg, tb = 1, 1, 1 end
 
 					local isHeroic, displayHeroic, displayMythic
-					if T.Mainline or T.Wrath then
+					if T.Wrath or T.Cata or T.Mainline then
 						_, _, isHeroic, _, displayHeroic, displayMythic = GetDifficultyInfo(difficulty)
 						if displayMythic then
 							diff = "M"
@@ -345,35 +330,6 @@ if clock.enabled then
 					end
 
 				end
-
-
-				-- Torghast
-				--if not TorghastInfo then
-				--	TorghastInfo = C_AreaPoiInfo.GetAreaPOIInfo(1543, 6640)
-				--end
-				--
-				--local TorghastTitle
-				--if TorghastInfo and C_QuestLog.IsQuestFlaggedCompleted(60136) then
-				--	for _, value in pairs(TorghastWidgets) do
-				--		local nameInfo = C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo(value.nameID)
-				--		if nameInfo and nameInfo.shownState == 1 then
-				--			if not TorghastTitle then
-				--				GameTooltip:AddLine(" ")
-				--				GameTooltip:AddLine(TorghastInfo.name, ttsubh.r, ttsubh.g, ttsubh.b)
-				--				TorghastTitle = true
-				--			end
-				--			local nameText = CleanupLevelName(nameInfo.text)
-				--			local levelInfo = C_UIWidgetManager.GetTextWithStateWidgetVisualizationInfo(value.levelID)
-				--			local levelText = AVAILABLE
-				--			if levelInfo and levelInfo.shownState == 1 then
-				--				levelText = CleanupLevelName(levelInfo.text)
-				--			end
-				--			GameTooltip:AddDoubleLine(nameText, levelText)
-				--		end
-				--
-				--	end
-				--end
-
 
 				-- In 9.0 seals not available
 				-- if T.level == MAX_PLAYER_LEVEL then
@@ -449,7 +405,7 @@ if fps.enabled then
 	local memoryt = {}
 	local function UpdateMemory()
 		local totalMemory = 0
-		UpdateMemUse()
+		UpdateAddOnMemoryUsage()
 		wipe(memoryt)
 		for i = 1, GetNumAddOns() do
 			local memory = GetAddOnMemoryUsage(i)
@@ -558,10 +514,10 @@ if fps.enabled then
 		OnLeave = function(self) self.hovered = false end,
 		OnClick = function(self, button)
 			if button == "RightButton" then
-				UpdateMemUse()
+				UpdateAddOnMemoryUsage()
 				local before = gcinfo()
 				collectgarbage()
-				UpdateMemUse()
+				UpdateAddOnMemoryUsage()
 				print(format("|cff66C6FF%s:|r %s", L_STATS_GARBAGE_COLLECTED, formatmem(before - gcinfo())))
 				self.timer, self.text.elapsed = nil, 5
 				self:GetScript("OnEnter")(self)
@@ -618,40 +574,24 @@ if friends.enabled then
 		totalBattleNetOnline = 0
 		wipe(BNTable)
 
-		if T.Classic then
-			for i = 1, total do
-				local presenceID, presenceName, battleTag, _, toonName, toonID, client, isOnline, _, isAFK, isDND, _, noteText = BNGetFriendInfo(i)
-				local _, _, _, realmName, _, faction, race, class, _, zoneName, level = BNGetGameAccountInfo(toonID or presenceID)
-				for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
-				if GetLocale() ~= "enUS" then
-					for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do if class == v then class = k end end
-				end
-				BNTable[i] = {presenceID, presenceName, battleTag, toonName or "", toonID, client, isOnline, isAFK, isDND, noteText, realmName, faction, race, class, zoneName, level}
-				if isOnline then
-					totalBattleNetOnline = totalBattleNetOnline + 1
-				end
+		for i = 1, total do
+			local accountInfo = C_BattleNet.GetFriendAccountInfo(i)
+			local class = accountInfo.gameAccountInfo.className
+			for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
+			if GetLocale() ~= "enUS" then
+				for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do if class == v then class = k end end
 			end
-		else
-			for i = 1, total do
-				local accountInfo = C_BattleNet.GetFriendAccountInfo(i)
-				local class = accountInfo.gameAccountInfo.className
-				for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
-				if GetLocale() ~= "enUS" then
-					for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do if class == v then class = k end end
-				end
-				BNTable[i] = {accountInfo.bnetAccountID, accountInfo.accountName, accountInfo.battleTag, accountInfo.gameAccountInfo.characterName, accountInfo.gameAccountInfo.gameAccountID, accountInfo.gameAccountInfo.clientProgram, accountInfo.gameAccountInfo.isOnline, accountInfo.isAFK, accountInfo.isDND, accountInfo.note, accountInfo.gameAccountInfo.realmName, accountInfo.gameAccountInfo.factionName, accountInfo.gameAccountInfo.raceName, class, accountInfo.gameAccountInfo.areaName, accountInfo.gameAccountInfo.characterLevel}
-				if accountInfo.gameAccountInfo.isOnline then
-					totalBattleNetOnline = totalBattleNetOnline + 1
-				end
+			BNTable[i] = {accountInfo.bnetAccountID, accountInfo.accountName, accountInfo.battleTag, accountInfo.gameAccountInfo.characterName, accountInfo.gameAccountInfo.gameAccountID, accountInfo.gameAccountInfo.clientProgram, accountInfo.gameAccountInfo.isOnline, accountInfo.isAFK, accountInfo.isDND, accountInfo.note, accountInfo.gameAccountInfo.realmName, accountInfo.gameAccountInfo.factionName, accountInfo.gameAccountInfo.raceName, class, accountInfo.gameAccountInfo.areaName, accountInfo.gameAccountInfo.characterLevel}
+			if accountInfo.gameAccountInfo.isOnline then
+				totalBattleNetOnline = totalBattleNetOnline + 1
 			end
 		end
 	end
-	local clientTags = {}
-
-	clientTags = {
+	local clientTags = {
 		["D3"] = "Diablo 3",
 		["OSI"] = "Diablo 2: Resurrected",
 		["ANBS"] = "Diablo Immortal",
+		["Fen"] = "Diablo 4",
 		["WTCG"] = "Hearthstone",
 		["Hero"] = "Heroes of the Storm",
 		["Pro"] = "Overwatch",
@@ -788,7 +728,7 @@ if friends.enabled then
 			end
 		end,
 		OnEnter = function(self)
-			C_FriendList.ShowFriends()
+			-- C_FriendList.ShowFriends() --FIXME not needed?
 			self.hovered = true
 			local online, total = C_FriendList.GetNumOnlineFriends(), C_FriendList.GetNumFriends()
 			local status, classc, levelc, zone_r, zone_g, zone_b, grouped, realm_r, realm_g, realm_b
@@ -796,17 +736,11 @@ if friends.enabled then
 			wipe(BNTableEnter)
 			if BNtotal > 0 then
 				for i = 1, BNtotal do
-					if T.Classic then
-						if select(8, BNGetFriendInfo(i)) then
+					local accountInfo = C_BattleNet.GetFriendAccountInfo(i)
+					if accountInfo then
+						BNTableEnter[i] = {accountInfo, accountInfo.gameAccountInfo.clientProgram}
+						if accountInfo.gameAccountInfo.isOnline then
 							BNonline = BNonline + 1
-						end
-					else
-						local accountInfo = C_BattleNet.GetFriendAccountInfo(i)
-						if accountInfo then
-							BNTableEnter[i] = {accountInfo, accountInfo.gameAccountInfo.clientProgram}
-							if accountInfo.gameAccountInfo.isOnline then
-								BNonline = BNonline + 1
-							end
 						end
 					end
 				end
@@ -854,41 +788,27 @@ if friends.enabled then
 				if BNonline > 0 then
 					GameTooltip:AddLine(" ")
 					GameTooltip:AddLine(BATTLENET_FRIEND)
-					for i = 1, T.Classic and BNtotal or #BNTableEnter do
-						local accountInfo, presenceName, battleTag, toonName, toonID, client, isOnline, isAFK, isDND
-						if T.Classic then
-							_, presenceName, battleTag, _, toonName, toonID, client, isOnline, _, isAFK, isDND = BNGetFriendInfo(i)
-							toonName = BNet_GetValidatedCharacterName(toonName, battleTag, client) or ""
-						else
-							accountInfo = BNTableEnter[i][1]
-							isOnline = accountInfo.gameAccountInfo.isOnline
-							client = accountInfo.gameAccountInfo.clientProgram
-							isAFK = accountInfo.isAFK
-							isDND = accountInfo.isDND
-						end
+					for i = 1, #BNTableEnter do
+						local accountInfo = BNTableEnter[i][1]
+						local isOnline = accountInfo.gameAccountInfo.isOnline
+						local client = accountInfo.gameAccountInfo.clientProgram
 						if isOnline then
 							if client == BNET_CLIENT_WOW then
-								if isAFK then
+								if accountInfo.isAFK then
 									status = "|cffE7E716"..L_CHAT_AFK.."|r"
 								else
-									if isDND then
+									if accountInfo.isDND then
 										status = "|cffff0000"..L_CHAT_DND.."|r"
 									else
 										status = ""
 									end
 								end
 
-								local characterName, realmName, class, areaName, level
-								if T.Classic then
-									_, characterName, client, realmName, _, _, _, class, _, areaName, level = BNGetGameAccountInfo(toonID)
-								else
-									presenceName = accountInfo.accountName
-									characterName = accountInfo.gameAccountInfo.characterName
-									realmName = accountInfo.gameAccountInfo.realmName
-									class = accountInfo.gameAccountInfo.className
-									areaName = accountInfo.gameAccountInfo.areaName
-									level = accountInfo.gameAccountInfo.characterLevel
-								end
+								local characterName = accountInfo.gameAccountInfo.characterName
+								local realmName = accountInfo.gameAccountInfo.realmName
+								local class = accountInfo.gameAccountInfo.className
+								local areaName = accountInfo.gameAccountInfo.areaName
+								local level = accountInfo.gameAccountInfo.characterLevel
 
 								for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
 								if GetLocale() ~= "enUS" then
@@ -899,40 +819,33 @@ if friends.enabled then
 									classc = {r = 1, g = 1, b = 1}
 								end
 								if UnitInParty(characterName) or UnitInRaid(characterName) then grouped = " |cffaaaaaa*|r" else grouped = "" end
-								if T.Mainline and accountInfo.gameAccountInfo.factionName ~= UnitFactionGroup("player") then
+								if accountInfo.gameAccountInfo.factionName ~= UnitFactionGroup("player") then
 									grouped = " |cffff0000*|r"
 								end
-								GameTooltip:AddDoubleLine(format("%s (|cff%02x%02x%02x%d|r |cff%02x%02x%02x%s|r%s) |cff%02x%02x%02x%s|r", client, levelc.r * 255, levelc.g * 255, levelc.b * 255, level, classc.r * 255, classc.g * 255, classc.b * 255, characterName, grouped, 255, 0, 0, status), presenceName, 238, 238, 238, 238, 238, 238)
+								GameTooltip:AddDoubleLine(format("%s (|cff%02x%02x%02x%d|r |cff%02x%02x%02x%s|r%s) |cff%02x%02x%02x%s|r", client, levelc.r * 255, levelc.g * 255, levelc.b * 255, level, classc.r * 255, classc.g * 255, classc.b * 255, characterName, grouped, 255, 0, 0, status), accountInfo.accountName, 238, 238, 238, 238, 238, 238)
 								if self.altdown then
 									if GetRealZoneText() == areaName then zone_r, zone_g, zone_b = 0.3, 1.0, 0.3 else zone_r, zone_g, zone_b = 0.65, 0.65, 0.65 end
 									if GetRealmName() == realmName then realm_r, realm_g, realm_b = 0.3, 1.0, 0.3 else realm_r, realm_g, realm_b = 0.65, 0.65, 0.65 end
-									GameTooltip:AddDoubleLine("  "..areaName, realmName, zone_r, zone_g, zone_b, realm_r, realm_g, realm_b)
+									if areaName then
+										GameTooltip:AddDoubleLine("  "..areaName, realmName, zone_r, zone_g, zone_b, realm_r, realm_g, realm_b)
+									end
 								end
 							else
-								local gameText, isGameAFK, isGameBusy
-								if T.Classic then
-									gameText, _, _, _, _, _, isGameAFK, isGameBusy = select(12, BNGetGameAccountInfo(toonID))
-								else
-									presenceName = accountInfo.accountName
-									gameText = accountInfo.gameAccountInfo.richPresence
-									isGameAFK = accountInfo.gameAccountInfo.isGameAFK
-									isGameBusy = accountInfo.gameAccountInfo.isGameBusy
-								end
 								if client == "App" then
-									client = gameText
+									client = accountInfo.gameAccountInfo.richPresence
 								else
 									client = clientTags[client] or ""
 								end
-								if isGameAFK then
+								if accountInfo.gameAccountInfo.isGameAFK then
 									status = "|cffE7E716"..L_CHAT_AFK.."|r"
 								else
-									if isGameBusy then
+									if accountInfo.gameAccountInfo.isGameBusy then
 										status = "|cffff0000"..L_CHAT_DND.."|r"
 									else
 										status = ""
 									end
 								end
-								GameTooltip:AddDoubleLine("|cffeeeeee"..presenceName.."|r".." "..status, "|cffeeeeee"..client.."|r")
+								GameTooltip:AddDoubleLine("|cffeeeeee"..accountInfo.accountName.."|r".." "..status, "|cffeeeeee"..client.."|r")
 							end
 						end
 					end
@@ -975,11 +888,7 @@ if guild.enabled then
 			end, update = 5
 		},
 		OnLoad = function(self)
-			if T.Classic then
-				GuildRoster()
-			else
-				C_GuildInfo.GuildRoster()
-			end
+			C_GuildInfo.GuildRoster()
 			SortGuildRoster(guild.sorting == "note" and "rank" or "note")
 			SortGuildRoster(guild.sorting)
 			CURRENT_GUILD_SORTING = guild.sorting
@@ -998,7 +907,7 @@ if guild.enabled then
 			if IsInGuild() then
 				AltUpdate(self)
 				if not self.gmotd then
-					if self.elapsed > 1 then if T.Classic then GuildRoster() else C_GuildInfo.GuildRoster() end; self.elapsed = 0 end
+					if self.elapsed > 1 then C_GuildInfo.GuildRoster(); self.elapsed = 0 end
 					if GetGuildRosterMOTD() ~= "" then self.gmotd = true; if self.hovered then self:GetScript("OnEnter")(self) end end
 					self.elapsed = self.elapsed + u
 				end
@@ -1072,11 +981,7 @@ if guild.enabled then
 		OnEnter = function(self)
 			if IsInGuild() then
 				self.hovered = true
-				if T.Classic then
-					GuildRoster()
-				else
-					C_GuildInfo.GuildRoster()
-				end
+				C_GuildInfo.GuildRoster()
 				local name, rank, level, zone, note, officernote, connected, status, class, isMobile, zone_r, zone_g, zone_b, classc, levelc, grouped
 				local total, _, online = GetNumGuildMembers()
 				local gmotd = GetGuildRosterMOTD()
@@ -1179,14 +1084,11 @@ if durability.enabled then
 									else
 										local data = C_TooltipInfo.GetInventoryItem(P, id)
 										if data then
-											local argVal = data.args and data.args[7]
-											if argVal and argVal.field == "repairCost" then
-												local cost = argVal.intVal
-												if cost ~= 0 and cost <= GetMoney() then
-													if not InRepairMode() then ShowRepairCursor() end
-													PickupInventoryItem(id)
-													total = total + cost
-												end
+											local cost = data.repairCost
+											if cost and cost ~= 0 and cost <= GetMoney() then
+												if not InRepairMode() then ShowRepairCursor() end
+												PickupInventoryItem(id)
+												total = total + cost
 											end
 										end
 									end
@@ -1230,9 +1132,13 @@ if durability.enabled then
 					if T.Classic then
 						totalcost, nodur = totalcost + select(3, LPDURA:SetInventoryItem(P, slot))
 					else
-						local data = LPDURA:GetTooltipData()
-						repairCost = data and data.repairCost or 0
-						totalcost, nodur = totalcost + repairCost
+						local data = C_TooltipInfo.GetInventoryItem(P, slot)
+						if data and data.repairCost then
+							totalcost = totalcost + data.repairCost
+							if totalcost > 0 then
+								nodur = false
+							end
+						end
 					end
 				end
 			end
@@ -1328,7 +1234,7 @@ if experience.enabled then
 		or sub == "curxp" and short(UnitXP(P),tt)
 		or sub == "remainingxp" and short(UnitXPMax(P) - UnitXP(P), tt)
 		or sub == "totalxp" and short(UnitXPMax(P), tt)
-		or sub == "cur%" and (UnitXPMax(P) > 0 and floor(UnitXP(P) / UnitXPMax(P) * 100) or 0)
+		or sub == "cur%" and floor(UnitXPMax(P) ~= 0 and UnitXP(P) / UnitXPMax(P) * 100 or 0)
 		or sub == "remaining%" and 100 - floor(UnitXP(P) / UnitXPMax(P) * 100)
 		or sub == "restxp" and short(GetXPExhaustion() or 0,tt)
 		or sub == "rest%" and min(150, floor((GetXPExhaustion() or 0) / UnitXPMax(P) * 100))
@@ -1344,7 +1250,7 @@ if experience.enabled then
 		or sub == "playedlevel" and fmttime(playedlevel + GetTime() - playedmsg, t)
 		or sub == "playedsession" and fmttime(GetTime() - logintime,t)
 		-- rep tags
-		or sub == "repname" and (t.faction_subs[repname] or repname)
+		or sub == "repname" and (t.faction_subs[repname] or T.UTF(repname, 25, true))
 		or sub == "repcolor" and "|cff"..repcolor
 		or sub == "standing" and standingname
 		or sub == "currep" and (currep ~= maxrep and abs(currep - minrep) or currep > 0 and 1 or 0)
@@ -1399,14 +1305,27 @@ if experience.enabled then
 					local reputationInfo = C_GossipInfo.GetFriendshipReputation(factionID)
 					local friendshipID = reputationInfo and reputationInfo.friendshipFactionID
 					if friendshipID and friendshipID > 0 then
+						local rankInfo = C_GossipInfo.GetFriendshipReputationRanks(factionID)
+						local currentRank = rankInfo and rankInfo.currentLevel
+						local maxRank = rankInfo and rankInfo.maxLevel
+						local rankText
+						if currentRank and maxRank and currentRank > 0 and maxRank > 0 then
+							rankText = (' %s / %s'):format(currentRank, maxRank)
+						end
 						local repInfo = C_GossipInfo.GetFriendshipReputation(factionID)
-						standingText = repInfo.reaction
+						standingText = repInfo.reaction..rankText
 						if repInfo.nextThreshold then
 							minrep, maxrep, currep = repInfo.reactionThreshold, repInfo.nextThreshold, repInfo.standing
 						else
 							minrep, maxrep, currep = 0, 1, 1
 						end
 						standing = 5
+					elseif C_Reputation.IsMajorFaction(factionID) then
+						local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
+						minrep, maxrep = 0, majorFactionData.renownLevelThreshold
+						currep = C_MajorFactions.HasMaximumRenown(factionID) and majorFactionData.renownLevelThreshold or majorFactionData.renownReputationEarned or 0
+						standing = 7
+						standingText = RENOWN_LEVEL_LABEL..majorFactionData.renownLevel
 					else
 						local value, nextThreshold = C_Reputation.GetFactionParagonInfo(factionID)
 						if value then
@@ -1572,10 +1491,10 @@ if T.Mainline and talents.enabled then
 				self:GetScript("OnMouseUp")(self, b)
 			end)
 
-			if T.Mainline then
-				RegEvents(self, "PLAYER_ENTERING_WORLD PLAYER_TALENT_UPDATE PLAYER_LOOT_SPEC_UPDATED")
-			else
+			if T.Classic then
 				RegEvents(self, "PLAYER_ENTERING_WORLD CHARACTER_POINTS_CHANGED PLAYER_LOOT_SPEC_UPDATED")
+			else
+				RegEvents(self, "PLAYER_ENTERING_WORLD PLAYER_TALENT_UPDATE PLAYER_LOOT_SPEC_UPDATED")
 			end
 		end,
 		OnEvent = function(self)
@@ -1590,6 +1509,7 @@ if T.Mainline and talents.enabled then
 			lootSpecName = lootSpec and select(2, GetSpecializationInfoByID(lootSpec)) or NO
 			specName = spec and select(2, GetSpecializationInfo(spec)) or NO
 
+			local specText = L_STATS_SPEC..":"
 			local specIcon, lootIcon = "", ""
 			local lootText = LOOT..":"
 
@@ -1600,8 +1520,8 @@ if T.Mainline and talents.enabled then
 			end
 
 			if lootSpec == 0 then
-				lootIcon = specIcon
-				lootText = "|cff55ff55"..lootText.."|r"
+				specText = "|cff55ff55"..specText.."|r"
+				lootText = ""
 				lootSpecName = "|cff55ff55"..specName.."|r"
 			else
 				local _, _, _, texture = GetSpecializationInfoByID(lootSpec)
@@ -1610,7 +1530,7 @@ if T.Mainline and talents.enabled then
 				end
 			end
 
-			self.text:SetText(L_STATS_SPEC..":")
+			self.text:SetText(specText)
 			self.text2:SetText(specIcon.." ")
 			self.text3:SetText(lootText)
 			self.text4:SetText(lootIcon)
@@ -1699,6 +1619,14 @@ if coords.enabled then
 			else
 				ToggleFrame(WorldMapFrame)
 			end
+		end,
+		OnEnter = function()
+			if T.Mainline and location.enabled then -- TODO: FIXME
+				LP_Location.hovered, LP_Location.init = true, true
+				GameTooltip:SetOwner(LP_Location, "ANCHOR_NONE")
+				GameTooltip:ClearAllPoints()
+				GameTooltip:SetPoint(modules.Location.tip_anchor, modules.Location.tip_frame, modules.Location.tip_x, modules.Location.tip_y)
+			end
 		end
 	})
 end
@@ -1718,13 +1646,29 @@ if location.enabled then
 			self.combat = {COMBAT_ZONE, {1, 0.1, 0.1}}
 			self.neutral = {"", {1, 0.93, 0.76}}
 		end,
-		OnEvent = function(self)
+		OnEvent = function(self, event)
 			self.subzone, self.zone, self.pvp = GetSubZoneText(), GetZoneText(), {GetZonePVPInfo()}
 			if not self.pvp[1] then self.pvp[1] = "neutral" end
 			local label = (self.subzone ~= "" and location.subzone) and self.subzone or self.zone
 			local r, g, b = unpack(self.pvp[1] and (self[self.pvp[1]][2] or self.other) or self.other)
 			self.text:SetText(location.truncate == 0 and label or strtrim(strsub(label, 1, location.truncate)))
 			self.text:SetTextColor(r, g, b, font.alpha)
+			if coords.enabled and event == "PLAYER_ENTERING_WORLD" then -- Hide null coords and reposition location
+				local _, instanceType = IsInInstance()
+				if instanceType == "raid" or instanceType == "party" then
+					LP_Coords.text:SetAlpha(0)
+					self:ClearAllPoints()
+					if C.minimap.enable and C.minimap.on_top then
+						self:SetPoint("BOTTOMRIGHT", MinimapAnchor, "TOPRIGHT", 4, 5)
+					else
+						self:SetPoint("RIGHT", UIParent, "BOTTOMRIGHT", -17, 11)
+					end
+				else
+					LP_Coords.text:SetAlpha(1)
+					self:ClearAllPoints()
+					self:SetPoint("RIGHT", LP_Coords, "LEFT", -3, 0)
+				end
+			end
 		end,
 		OnUpdate = function(self, u)
 			if self.hovered then
@@ -1775,14 +1719,11 @@ if damage.enabled then
 		text = {
 			string = function()
 				if IsAddOnLoaded("Details") then
-					local combat = Details:GetCurrentCombat()
-					local player = combat:GetActor(DETAILS_ATTRIBUTE_DAMAGE, T.name)
-					if player then
-						local damageDone = player.total
-						local combatTime = combat:GetCombatTime()
-						local effectiveDPS = damageDone / combatTime
-
-						return format(damage.fmt, DAMAGE, effectiveDPS)
+					_detalhes.data_broker_text = "{dps}"
+					_detalhes:BrokerTick()
+					local effectiveDPS = _detalhes.databroker.text
+					if effectiveDPS and effectiveDPS ~= "0" then
+						return format(damage.alt_fmt, DAMAGE, effectiveDPS)
 					end
 				elseif IsAddOnLoaded("Numeration") then
 					local text = LibStub:GetLibrary("LibDataBroker-1.1"):GetDataObjectByName("Numeration").text
@@ -1867,8 +1808,8 @@ if gold.enabled then
 				if conf.AutoSell and not (IsAltKeyDown() or IsShiftKeyDown()) then
 					-- local profit = 0
 					local numItem = 0
-					for bag = 0, NUM_BAG_SLOTS do for slot = 0, GetContainerNumSlots(bag) do
-						local link = GetContainerItemLink(bag, slot)
+					for bag = 0, NUM_BAG_SLOTS do for slot = 0, C_Container.GetContainerNumSlots(bag) do
+						local link = C_Container.GetContainerItemLink(bag, slot)
 						if link then
 							local itemstring, ignore = strmatch(link, "|Hitem:(%d-):"), false
 							for _, exception in pairs(ShestakUIStats.JunkIgnore) do
@@ -1880,10 +1821,10 @@ if gold.enabled then
 								-- profit = profit + (itemSellPrice * itemCount)
 								numItem = numItem + 1
 								if numItem < 12 then
-									UseContainerItem(bag, slot)
+									C_Container.UseContainerItem(bag, slot)
 								else
 									C_Timer.After(numItem/8, function()
-										UseContainerItem(bag, slot)
+										C_Container.UseContainerItem(bag, slot)
 									end)
 								end
 							end
@@ -1988,7 +1929,7 @@ if gold.enabled then
 				-- Currency(1580, false, true)	-- Seal of Wartorn Fate
 				-- end
 
-				if T.Wrath and C.stats.currency_raid and T.level == MAX_PLAYER_LEVEL then
+				if (T.Wrath or T.Cata) and C.stats.currency_raid and T.level == MAX_PLAYER_LEVEL then
 					--[[
 					titleName = L_STATS_CURRENCY_RAID
 					Currency(101, false, false)	-- Emblem of Heroism
@@ -2001,10 +1942,10 @@ if gold.enabled then
 
 				if C.stats.currency_misc then
 					if T.Mainline then
-						titleName = EXPANSION_NAME8
-						Currency(1813)	-- Reservoir Anima
-						Currency(1828)	-- Soul Ash
-						Currency(1767)	-- Stygia
+						titleName = EXPANSION_NAME9
+						Currency(2122)	-- Storm Sigil
+						Currency(2118)	-- Elemental Overflow
+						Currency(2003)	-- Dragon Isles Supplies
 					else
 						titleName = EXPANSION_NAME1
 						Currency(42)	-- Badge of Justice
@@ -2312,7 +2253,7 @@ if bags.enabled then
 		OnEvent = function(self)
 			local free, total = 0, 0
 			for i = 0, NUM_BAG_SLOTS do
-				free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)
+				free, total = free + C_Container.GetContainerNumFreeSlots(i), total + C_Container.GetContainerNumSlots(i)
 			end
 			self.text:SetText(format(bags.fmt, free, total))
 		end,
@@ -2320,7 +2261,7 @@ if bags.enabled then
 		OnEnter = function(self)
 			local free, total = 0, 0
 			for i = 0, NUM_BAG_SLOTS do
-				free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)
+				free, total = free + C_Container.GetContainerNumFreeSlots(i), total + C_Container.GetContainerNumSlots(i)
 			end
 			GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT", -3, 26)
 			GameTooltip:ClearLines()

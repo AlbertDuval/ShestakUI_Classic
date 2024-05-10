@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Based on tekticles(by Tekkub)
@@ -120,9 +120,10 @@ frame:SetScript("OnEvent", function(_, _, addon)
 	SetFont(QuestMapRewardsFont, NORMAL, 12, nil, nil, nil, nil, 0, 0, 0, 1, -1)
 	SetFont(NumberFontNormalSmall, NORMAL, 11, "OUTLINE")
 
-	-- Player title
-	if T.Mainline then
-		--BETA for _, butt in pairs(PaperDollTitlesPane.buttons) do butt.text:SetFontObject(GameFontHighlightSmallLeft) end
+	-- Quest tracker
+	if C.font.quest_tracker_font_mult > 1 then
+		SetFont(GameFontNormalMed2, NORMAL, 13 * C.font.quest_tracker_font_mult) -- Quest tracker
+		SetFont(ObjectiveFont, NORMAL, 13 * C.font.quest_tracker_font_mult) -- Quest title and objectives
 	end
 end)
 
@@ -143,6 +144,8 @@ end
 
 if LSM then
 	LSM:Register(LSM.MediaType.FONT, "Calibri", [[Interface\AddOns\ShestakUI\Media\Fonts\Normal.ttf]], LOCALE_MASK)
+	LSM:Register(LSM.MediaType.FONT, "Expressway", [[Interface\AddOns\ShestakUI\Media\Fonts\Expressway.ttf]], LOCALE_MASK)
+	LSM:Register(LSM.MediaType.FONT, "Expressway Bold", [[Interface\AddOns\ShestakUI\Media\Fonts\ExpresswayBold.ttf]], LOCALE_MASK)
 	LSM:Register(LSM.MediaType.FONT, "Hooge", [[Interface\AddOns\ShestakUI\Media\Fonts\Pixel.ttf]], LOCALE_MASK)
 	LSM:Register(LSM.MediaType.STATUSBAR, "Smooth!", [[Interface\AddOns\ShestakUI\Media\Textures\Texture.tga]])
 end

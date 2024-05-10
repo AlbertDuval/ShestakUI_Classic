@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.show_arena ~= true or C.unitframe.plugins_diminishing ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ T.DiminishingSpells = {
 	[58861] = {"stun"},				-- Bash (Spirit Wolf)
 	[60995] = {"stun"},				-- Demon Charge (Metamorphosis)
 	[22703] = {"stun"},				-- Inferno Effect
-	[30153] = {"stun"},				-- Intercept Stun (Felguard)
+	[30153] = {"stun"},				-- Intercept (Felguard)
 	[30283] = {"stun"},				-- Shadowfury r1
 	[30413] = {"stun"},				-- Shadowfury r2
 	[30414] = {"stun"},				-- Shadowfury r3
@@ -35,11 +35,11 @@ T.DiminishingSpells = {
 	[47847] = {"stun"},				-- Shadowfury r5
 	[7922] = {"stun"},				-- Charge Stun
 	[12809] = {"stun"},				-- Concussion Blow
-	[20253] = {"stun"},				-- Intercept Stun r1
-	[20614] = {"stun"},				-- Intercept Stun r2
-	[20615] = {"stun"},				-- Intercept Stun r3
-	[25273] = {"stun"},				-- Intercept Stun r4
-	[25274] = {"stun"},				-- Intercept Stun r5
+	[20253] = {"stun"},				-- Intercept r1
+	[20614] = {"stun"},				-- Intercept r2
+	[20615] = {"stun"},				-- Intercept r3
+	[25273] = {"stun"},				-- Intercept r4
+	[25274] = {"stun"},				-- Intercept r5
 	[46968] = {"stun"},				-- Shockwave
 	[20549] = {"stun"},				-- War Stomp (Racial)
 	[835] = {"stun"},				-- Tidal Charm
@@ -182,6 +182,8 @@ T.DiminishingSpells = {
 	[27088] = {"root"},				-- Frost Nova r5
 	[42917] = {"root"},				-- Frost Nova r6
 	-- [12494] = {"root"},				-- Frostbite
+	[55080] = {"root"},				-- Shattered Barrier
+	[53019] = {"root"},				-- Earth's Grasp
 	-- [58373] = {"root"},				-- Glyph of Hamstring
 	-- [23694] = {"root"},				-- Improved Hamstring
 	-- [27868] = {"root"},				-- Freeze (Magister's Regalia / Sorcerer's Regalia / Deadman's Hand)
@@ -200,7 +202,7 @@ T.DiminishingSpells = {
 	-- Silences
 	[47476] = {"silence"},			-- Strangulate
 	[34490] = {"silence"},			-- Silencing Shot
-	[18469] = {"silence"},			-- Counterspell - Silenced
+	[18469] = {"silence"},			-- Silenced - Improved Counterspell
 	[63529] = {"silence"},			-- Silenced - Shield of the Templar
 	[15487] = {"silence"},			-- Silence
 	[1330] = {"silence"},			-- Garrote - Silence
@@ -211,7 +213,7 @@ T.DiminishingSpells = {
 	[25046] = {"silence"},			-- Arcane Torrent (Energy)
 	[50613] = {"silence"},			-- Arcane Torrent (Runic Power)
 	-- [44835] = {"silence"},			-- Maim Interrupt (incorrect spellID)
-	[32747] = {"silence"},			-- Deadly Throw Interrupt
+	[32747] = {"silence"},			-- Interrupt
 	--]]
 
 	-- Cyclone / Blind

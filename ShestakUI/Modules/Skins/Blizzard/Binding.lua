@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -129,7 +129,6 @@ local function LoadSecondarySkin()
 	hooksecurefunc(frame.ScrollBox, "Update", HandleScrollChild)
 
 	frame.ScrollBar:StripTextures()
-	frame.ScrollBar.Background:Hide()
 	frame.ScrollBoxBackground:Hide()
 
 	local buttons = {

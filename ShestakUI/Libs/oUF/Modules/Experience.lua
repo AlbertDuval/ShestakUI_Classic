@@ -1,4 +1,4 @@
-local T, C, L = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.plugins_experience_bar ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ local function ShouldShowHonor()
 end
 
 local function GetValues()
-	local isHonor = not oUF:IsClassic() and ShouldShowHonor()
+	local isHonor = oUF:IsMainline() and ShouldShowHonor()
 	local cur = (isHonor and UnitHonor or UnitXP)('player')
 	local max = (isHonor and UnitHonorMax or UnitXPMax)('player')
 	local level = (isHonor and UnitHonorLevel or UnitLevel)('player')
@@ -148,7 +148,7 @@ end
 local function ElementEnable(self)
 	local element = self.Experience
 	self:RegisterEvent('PLAYER_XP_UPDATE', Path, true)
-	if(not oUF:IsClassic()) then
+	if(oUF:IsMainline()) then
 		self:RegisterEvent('HONOR_XP_UPDATE', Path, true)
 	end
 	self:RegisterEvent('ZONE_CHANGED', Path, true)
@@ -183,18 +183,12 @@ local function Visibility(self, event, unit)
 	local element = self.Experience
 	local shouldEnable
 
-	if(oUF:IsClassic() or oUF:IsTBC()) then
-		if(UnitLevel('player') ~= element.__accountMaxLevel) then
-			shouldEnable = true
-		end
-	elseif(oUF:IsWrath()) then
-		if(not UnitHasVehicleUI('player')) then
+	if(not UnitHasVehicleUI('player')) then
+		if(oUF:IsClassic()) then
 			if(UnitLevel('player') ~= element.__accountMaxLevel) then
 				shouldEnable = true
 			end
-		end
-	else
-		if(not UnitHasVehicleUI('player')) then
+		else
 			if(not IsPlayerMaxLevel() and not IsXPUserDisabled()) then
 				shouldEnable = true
 			elseif(ShouldShowHonor() and not IsPlayerMaxHonorLevel()) then
@@ -233,9 +227,7 @@ local function Enable(self, unit)
 
 		if(oUF:IsClassic()) then
 			self:RegisterEvent('PLAYER_MAX_LEVEL_UPDATE', VisibilityPath, true)
-		end
-
-		if(not oUF:IsClassic()) then
+		else
 			self:RegisterEvent('HONOR_LEVEL_UPDATE', VisibilityPath, true)
 
 			hooksecurefunc('SetWatchingHonorAsXP', function()
@@ -294,9 +286,7 @@ local function Disable(self)
 
 		if(oUF:IsClassic()) then
 			self:UnregisterEvent('PLAYER_MAX_LEVEL_UPDATE', VisibilityPath)
-		end
-
-		if(not oUF:IsClassic()) then
+		else
 			self:UnregisterEvent('HONOR_LEVEL_UPDATE', VisibilityPath)
 		end
 

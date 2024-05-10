@@ -1,4 +1,4 @@
-local T, C, L = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 local _, ns = ...
 local oUF = ns.oUF
 
@@ -7,16 +7,11 @@ local FAILED = _G.FAILED or 'Failed'
 local INTERRUPTED = _G.INTERRUPTED or 'Interrupted'
 local CASTBAR_STAGE_DURATION_INVALID = -1 -- defined in FrameXML/CastingBarFrame.lua
 
-local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
 local EventFunctions = {}
 
-local LibClassicCasterino = (oUF:IsVanilla() and LibStub('LibClassicCasterino', true))
+local LibClassicCasterino = (oUF:IsVanilla() and LibStub('LibClassicCasterino-ShestakUI', true))
 if(LibClassicCasterino) then
-	UnitCastingInfo = function(unit)
-		return LibClassicCasterino:UnitCastingInfo(unit)
-	end
-
 	UnitChannelInfo = function(unit)
 		return LibClassicCasterino:UnitChannelInfo(unit)
 	end
@@ -24,14 +19,6 @@ end
 
 -- Tradeskill block
 local tradeskillCurrent, tradeskillTotal, mergeTradeskill = 0, 0, false
-local UNIT_SPELLCAST_SENT = function (self, event, unit, target, castID, spellID)
-	local castbar = self.Castbar
-	castbar.curTarget = (target and target ~= '') and target or nil
-
-	if castbar.isTradeSkill then
-		castbar.tradeSkillCastId = castID
-	end
-end
 -- end block
 
 local function resetAttributes(self)
@@ -41,6 +28,11 @@ local function resetAttributes(self)
 	self.empowering = nil
 	self.notInterruptible = nil
 	self.spellID = nil
+	self.rank = nil
+	self.numStages = nil
+	self.curStage = nil
+
+	table.wipe(self.stagePoints)
 
 	for _, pip in next, self.Pips do
 		pip:Hide()
@@ -53,16 +45,22 @@ end
 
 local colorStage = {
 	[1] = {1, 0, 0},
+	[2] = {1, 0.9, 0},
+	[3] = {0, 1, 0.5},
+}
+
+local colorStages = {
+	[1] = {1, 0, 0},
 	[2] = {1, 0.4, 0},
 	[3] = {1, 0.9, 0},
 	[4] = {0, 1, 0.5},
 }
 
-local function CreatePip(element, stage)
+local function CreatePip(element, stage, numStages)
 	local frame = CreateFrame("Frame", nil, element)
 	frame:SetSize(2, element:GetHeight())
 
-	local color = colorStage[stage] or {0, 0, 0}
+	local color = numStages == 4 and colorStages[stage] or colorStage[stage] or {0, 0, 0}
 
 	frame.texture = element:CreateTexture(nil, "BORDER", nil, -2)
 	frame.texture:SetTexture(C.media.texture)
@@ -82,6 +80,8 @@ local function UpdatePips(element, numStages)
 	local stageMaxValue = element.max * 1000
 	local isHoriz = element:GetOrientation() == 'HORIZONTAL'
 	local elementSize = isHoriz and element:GetWidth() or element:GetHeight()
+	element.numStages = numStages
+	element.curStage = 0 -- NOTE: Updates only if the PostUpdateStage callback is present
 
 	for stage = 1, numStages do
 		local duration
@@ -93,6 +93,7 @@ local function UpdatePips(element, numStages)
 
 		if(duration > CASTBAR_STAGE_DURATION_INVALID) then
 			stageTotalDuration = stageTotalDuration + duration
+			element.stagePoints[stage] = stageTotalDuration / 1000
 
 			local portion = stageTotalDuration / stageMaxValue
 			local offset = elementSize * portion
@@ -108,7 +109,7 @@ local function UpdatePips(element, numStages)
 
 				* pip - a frame used to depict an empowered stage boundary, typically with a line texture (frame)
 				--]]
-				pip = (element.CreatePip or CreatePip) (element, stage)
+				pip = (element.CreatePip or CreatePip) (element, stage, numStages)
 				element.Pips[stage] = pip
 			end
 
@@ -164,6 +165,15 @@ local function UpdatePips(element, numStages)
 			end
 		end
 	end
+
+	--[[ Callback: Castbar:PostUpdatePips(numStages)
+	Called after the element has updated stage separators (pips) in an empowered cast.
+	* self - the Castbar widget
+	* numStages - the number of stages in the current cast (number)
+	--]]
+	if(element.PostUpdatePips) then
+		element:PostUpdatePips(numStages)
+	end
 end
 
 local function CastStart(self, event, unit)
@@ -179,16 +189,21 @@ local function CastStart(self, event, unit)
 		event = (numStages and numStages > 0) and 'UNIT_SPELLCAST_EMPOWER_START' or 'UNIT_SPELLCAST_CHANNEL_START'
 	end
 
-	if(not spellID and type(notInterruptible) == "number") then
-		spellID = notInterruptible -- there is no notInterruptible return in some builds of Classic/TBC Classic
-		notInterruptible = false
-	end
-
 	if(not name or (isTradeSkill and element.hideTradeSkills)) then
 		resetAttributes(element)
 		element:Hide()
 
 		return
+	end
+
+	local rank
+	if(oUF:IsClassic() and not oUF:IsCata()) then
+		rank = spellID and GetSpellSubtext(spellID)
+		rank = rank and strmatch(rank, "%d+")
+	end
+
+	if(not text or text == '' or text == CHANNELING) then
+		text = name
 	end
 
 	element.casting = event == 'UNIT_SPELLCAST_START'
@@ -209,6 +224,7 @@ local function CastStart(self, event, unit)
 	element.holdTime = 0
 	element.castID = castID
 	element.spellID = spellID
+	element.rank = rank
 
 	if(element.channeling) then
 		element.duration = endTime - GetTime()
@@ -217,14 +233,12 @@ local function CastStart(self, event, unit)
 	end
 
 	-- Tradeskill block
-	if(mergeTradeskill and isTradeSkill and UnitIsUnit(unit, 'player')) then
-		element.duration = element.duration + (element.max * tradeskillCurrent);
-		element.max = element.max * tradeskillTotal;
+	if(mergeTradeskill and isTradeSkill and unit == 'player') then
+		element.duration = element.duration + (element.max * tradeskillCurrent)
+		element.max = element.max * tradeskillTotal
 		element.holdTime = 1
 
-		if(unit == 'player') then
-			tradeskillCurrent = tradeskillCurrent + 1;
-		end
+		tradeskillCurrent = tradeskillCurrent + 1
 	end
 	-- end block
 
@@ -238,7 +252,11 @@ local function CastStart(self, event, unit)
 	if(element.Icon) then element.Icon:SetTexture(texture or FALLBACK_ICON) end
 	if(element.Shield) then element.Shield:SetShown(notInterruptible) end
 	if(element.Spark) then element.Spark:Show() end
-	if(element.Text) then element.Text:SetText(text) end
+	if(rank) then
+		if(element.Text) then element.Text:SetText(text .. " " .. rank) end
+	else
+		if(element.Text) then element.Text:SetText(text) end
+	end
 	if(element.Time) then element.Time:SetText() end
 
 	local safeZone = element.SafeZone
@@ -263,7 +281,7 @@ local function CastStart(self, event, unit)
 		safeZone[isHoriz and 'SetWidth' or 'SetHeight'](safeZone, element[isHoriz and 'GetWidth' or 'GetHeight'](element) * ratio)
 	end
 
-	if(element.empowering) then
+	if(element.empowering) and unit == "player" then
 		--[[ Override: Castbar:UpdatePips(numStages)
 		Handles updates for stage separators (pips) in an empowered cast.
 
@@ -371,7 +389,6 @@ local function CastStop(self, event, unit, castID, spellID)
 	end
 	-- end block
 
-
 	resetAttributes(element)
 
 	--[[ Callback: Castbar:PostCastStop(unit, spellID)
@@ -411,10 +428,8 @@ local function CastFail(self, event, unit, castID, spellID)
 	-- Tradeskill block
 	if mergeTradeskill and UnitIsUnit(unit, 'player') then
 		mergeTradeskill = false
-		element.tradeSkillCastId = nil
 	end
 	-- end block
-
 
 	resetAttributes(element)
 	element:SetValue(element.max)
@@ -501,6 +516,28 @@ local function onUpdate(self, elapsed)
 			end
 		end
 
+		--[[ Callback: Castbar:PostUpdateStage(stage)
+		Called after the current stage changes.
+		* self - the Castbar widget
+		* stage - the stage of the empowered cast (number)
+		--]]
+		if(self.empowering and self.PostUpdateStage) then
+			local old = self.curStage
+			for i = old + 1, self.numStages do
+				if(self.stagePoints[i]) then
+					if(self.duration > self.stagePoints[i]) then
+						self.curStage = i
+
+						if(self.curStage ~= old) then
+							self:PostUpdateStage(i)
+						end
+					else
+						break
+					end
+				end
+			end
+		end
+
 		self:SetValue(self.duration)
 	elseif(self.holdTime > 0) then
 		self.holdTime = self.holdTime - elapsed
@@ -524,42 +561,35 @@ local function Enable(self, unit)
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
+		self:RegisterEvent('UNIT_SPELLCAST_START', CastStart)
+		self:RegisterEvent('UNIT_SPELLCAST_STOP', CastStop)
+		self:RegisterEvent('UNIT_SPELLCAST_DELAYED', CastUpdate)
+		self:RegisterEvent('UNIT_SPELLCAST_FAILED', CastFail)
+		self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED', CastFail)
+		self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE', CastUpdate)
+
 		if(not oUF:IsVanilla() or self.unit == 'player') then
-			self:RegisterEvent('UNIT_SPELLCAST_START', CastStart)
 			self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_START', CastStart)
-			self:RegisterEvent('UNIT_SPELLCAST_STOP', CastStop)
 			self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_STOP', CastStop)
-			self:RegisterEvent('UNIT_SPELLCAST_DELAYED', CastUpdate)
-			self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE', CastUpdate)
-			self:RegisterEvent('UNIT_SPELLCAST_FAILED', CastFail)
-			self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED', CastFail)
-			if(not oUF:IsClassic()) then
-				self:RegisterEvent('UNIT_SPELLCAST_EMPOWER_START', CastStart)
-				self:RegisterEvent('UNIT_SPELLCAST_EMPOWER_STOP', CastStop)
-				self:RegisterEvent('UNIT_SPELLCAST_EMPOWER_UPDATE', CastUpdate)
-				self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', CastInterruptible)
-				self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', CastInterruptible)
-			end
 		elseif(LibClassicCasterino) then
 			local CastbarEventHandler = function(event, ...)
 				return EventFunctions[event](self, event, ...)
 			end
-			LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_START', CastbarEventHandler)
 			LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_START', CastbarEventHandler)
-			LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_STOP', CastbarEventHandler)
 			LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_STOP', CastbarEventHandler)
-			LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_DELAYED', CastbarEventHandler)
-			LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_UPDATE', CastbarEventHandler)
-			LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_FAILED', CastbarEventHandler)
-			LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_INTERRUPTED', CastbarEventHandler)
 		end
 
-		-- Tradeskill block
-		self:RegisterEvent('UNIT_SPELLCAST_SENT', UNIT_SPELLCAST_SENT, true)
-		-- end block
+		if(oUF:IsMainline()) then
+			self:RegisterEvent('UNIT_SPELLCAST_EMPOWER_START', CastStart)
+			self:RegisterEvent('UNIT_SPELLCAST_EMPOWER_STOP', CastStop)
+			self:RegisterEvent('UNIT_SPELLCAST_EMPOWER_UPDATE', CastUpdate)
+			self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', CastInterruptible)
+			self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', CastInterruptible)
+		end
 
 		element.holdTime = 0
-		element.Pips = {}
+		element.stagePoints = {}
+		element.Pips = element.Pips or {}
 
 		element:SetScript('OnUpdate', element.OnUpdate or onUpdate)
 
@@ -619,14 +649,8 @@ local function Disable(self)
 		self:UnregisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', CastInterruptible)
 
 		if(LibClassicCasterino) then
-			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_START')
 			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_START')
-			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_DELAYED')
-			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_UPDATE')
-			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_STOP')
 			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_STOP')
-			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_FAILED')
-			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_INTERRUPTED')
 		end
 
 		element:SetScript('OnUpdate', nil)
@@ -644,14 +668,8 @@ local function Disable(self)
 end
 
 if(LibClassicCasterino) then
-	EventFunctions['UNIT_SPELLCAST_START'] = CastStart
 	EventFunctions['UNIT_SPELLCAST_CHANNEL_START'] = CastStart
-	EventFunctions['UNIT_SPELLCAST_DELAYED'] = CastUpdate
-	EventFunctions['UNIT_SPELLCAST_CHANNEL_UPDATE'] = CastUpdate
-	EventFunctions['UNIT_SPELLCAST_STOP'] = CastStop
 	EventFunctions['UNIT_SPELLCAST_CHANNEL_STOP'] = CastStop
-	EventFunctions['UNIT_SPELLCAST_FAILED'] = CastFail
-	EventFunctions['UNIT_SPELLCAST_INTERRUPTED'] = CastFail
 end
 
 -- Tradeskill block

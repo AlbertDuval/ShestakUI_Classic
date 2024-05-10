@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -20,6 +20,8 @@ local function LoadSkin()
 	ClassTalentFrame.TalentsTab.SearchBox.backdrop:SetPoint("BOTTOMRIGHT", 0, 5)
 	ClassTalentFrame.TalentsTab.SearchPreviewContainer:StripTextures()
 	ClassTalentFrame.TalentsTab.SearchPreviewContainer:CreateBackdrop("Transparent")
+
+	ClassTalentFrame.TalentsTab.InspectCopyButton:SkinButton()
 
 	for _, tab in next, {ClassTalentFrame.TabSystem:GetChildren()} do
 		T.SkinTab(tab)
@@ -74,6 +76,7 @@ local function LoadSkin()
 	ClassTalentFrame.SpecTab:CreateBackdrop("Overlay")
 	ClassTalentFrame.SpecTab.backdrop:SetPoint("TOPLEFT", 4, -4)
 	ClassTalentFrame.SpecTab.backdrop:SetPoint("BOTTOMRIGHT", -4, 4)
+	ClassTalentFrame.SpecTab.backdrop.overlay:SetVertexColor(0.13, 0.13, 0.13, 1)
 	ClassTalentFrame.SpecTab.Background:SetAlpha(0)
 	ClassTalentFrame.SpecTab.BlackBG:SetAlpha(0)
 	hooksecurefunc(ClassTalentFrame.SpecTab, "UpdateSpecFrame", function(frame)

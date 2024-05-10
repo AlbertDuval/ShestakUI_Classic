@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.show_arena ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ local Update = function(self, event, ...)
 	local _, instanceType = IsInInstance()
 
 	if instanceType ~= 'arena' then
-		if(not oUF:IsClassic()) then
+		if(oUF:IsMainline()) then
 			self.Trinket.Icon:SetTexture("Interface\\Icons\\Ability_pvp_gladiatormedallion")
 		end
 		self.Trinket:Hide()

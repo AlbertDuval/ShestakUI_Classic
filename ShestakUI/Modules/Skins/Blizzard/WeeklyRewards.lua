@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -10,7 +10,6 @@ local function LoadSkin()
 		frame:StripTextures()
 
 		frame.HeaderFrame:StripTextures()
-		frame.SelectRewardButton:StripTextures()
 
 		local headers = {
 			frame.RaidFrame,
@@ -32,7 +31,7 @@ local function LoadSkin()
 	frame:CreateBackdrop("Transparent")
 
 	-- frame.HeaderFrame:StripTextures()
-	-- frame.SelectRewardButton:StripTextures()
+	frame.SelectRewardButton:StripTextures()
 	frame.SelectRewardButton:SkinButton()
 
 	local headers = {

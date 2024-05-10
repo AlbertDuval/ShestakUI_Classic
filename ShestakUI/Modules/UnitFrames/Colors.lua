@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Colors
@@ -42,3 +42,7 @@ T.oUF_colors = setmetatable({
 		[4] = {0.84, 0.75, 0.65},
 	}, {__index = oUF.colors.runes}),
 }, {__index = oUF.colors})
+
+if T.Vanilla then
+	T.oUF_colors.class.SHAMAN:SetRGB(0, 0.44, 0.87)
+end

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ local function Shared(self, unit)
 	end
 
 	-- LFD role icons
-	if T.Mainline and C.raidframe.icons_role == true and not (suffix == "target") then
+	if (T.Wrath or T.Cata or T.Mainline) and C.raidframe.icons_role == true and not (suffix == "target") then
 		self.GroupRoleIndicator = self.Health:CreateTexture(nil, "OVERLAY")
 		self.GroupRoleIndicator:SetSize(10 * C.raidframe.icon_multiplier, 10 * C.raidframe.icon_multiplier)
 		self.GroupRoleIndicator:SetPoint("TOP", self.Health, 0, 6)
@@ -257,10 +257,6 @@ local function Shared(self, unit)
 			self.HealPrediction = healBar
 		else
 			T.CreateHealthPrediction(self)
-
-			if T.Classic then
-				self.HealthPrediction.frequentUpdates = true
-			end
 		end
 	end
 
@@ -491,7 +487,7 @@ oUF:Factory(function(self)
 					"showRaid", true,
 					"groupFilter", tostring(i),
 					"groupBy", "CLASS",
-					"groupingOrder", (T.Classic or T.TBC) and "HUNTER,WARLOCK" or "DEATHKNIGHT,HUNTER,MAGE,WARLOCK",
+					"groupingOrder", (T.Vanilla or T.TBC) and "HUNTER,WARLOCK" or "DEATHKNIGHT,HUNTER,MAGE,WARLOCK",
 					"maxColumns", 5,
 					"unitsPerColumn", 1,
 					"columnSpacing", T.Scale(7),

@@ -1,17 +1,19 @@
-## Interface: 11404
-## Interface-Classic: 11404
+## Interface: 30403
+## Interface-Classic: 11502
 ## Interface-BCC: 20504
-## Interface-Wrath: 30401
+## Interface-Wrath: 30403
+## Interface-Cata: 40400
 ## Title: ShestakUI (Classic) Config
 ## Notes: In-game configuration for ShestakUI
 ## Author: Shestak
-## Version: 1.84
+## Version: 2.14
 ## X-Curse-Project-ID: 468754
 ## X-WoWI-ID: 25934
 ## X-Wago-ID: WqKQbyGx
 ## RequiredDeps: ShestakUI
 ## SavedVariables: ShestakUIOptionsGlobal, ShestakUIOptions
 ## SavedVariablesPerCharacter: ShestakUIOptionsPerChar
+## IconTexture: Interface\AddOns\ShestakUI\Media\Textures\Logo.tga
 
 ## X-Website: https://github.com/EsreverWoW/ShestakUI_Classic
 ## X-Credits: Haleth, Solor

@@ -1,9 +1,9 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	UIWidget position
 ----------------------------------------------------------------------------------------
-local top, below, power, maw = _G["UIWidgetTopCenterContainerFrame"], _G["UIWidgetBelowMinimapContainerFrame"], _G["UIWidgetPowerBarContainerFrame"], _G["MawBuffsBelowMinimapFrame"]
+local top, below, power = _G["UIWidgetTopCenterContainerFrame"], _G["UIWidgetBelowMinimapContainerFrame"], _G["UIWidgetPowerBarContainerFrame"]
 
 -- Top Widget
 local topAnchor = CreateFrame("Frame", "UIWidgetTopAnchor", UIParent)
@@ -48,25 +48,11 @@ if T.Mainline then
 			self:SetPoint("TOP", powerAnchor)
 		end
 	end)
-
-	-- Maw Buff Widget
-	if T.Mainline then
-		local mawAnchor = CreateFrame("Frame", "UIWidgetMawAnchor", UIParent)
-		mawAnchor:SetSize(210, 30)
-		mawAnchor:SetPoint("TOPRIGHT", BuffsAnchor, "BOTTOMRIGHT", 0, -3)
-
-		hooksecurefunc(maw, "SetPoint", function(self, _, anchor)
-			if anchor and anchor ~= mawAnchor then
-				self:ClearAllPoints()
-				self:SetPoint("TOPRIGHT", mawAnchor)
-			end
-		end)
-	end
 end
 
 -- Mover for all widgets
-for _, frame in pairs({top, below, maw}) do
-	local anchor = frame == top and topAnchor or frame == below and belowAnchor or mawAnchor
+for _, frame in pairs({top, below}) do
+	local anchor = frame == top and topAnchor or frame == below and belowAnchor
 	anchor:SetMovable(true)
 	anchor:SetClampedToScreen(true)
 	frame:SetClampedToScreen(true)
@@ -135,9 +121,7 @@ local function SkinStatusBar(widget)
 		bar.Spark:SetAlpha(0)
 		local parent = widget:GetParent():GetParent()
 		if parent.castBar or parent.UnitFrame then -- nameplate
-			if BackdropTemplateMixin then
-				Mixin(bar, BackdropTemplateMixin)
-			end
+			Mixin(bar, BackdropTemplateMixin)
 			bar:SetBackdrop({
 				bgFile = C.media.blank,
 				insets = {left = 0, right = 0, top = 0, bottom = 0}
@@ -194,7 +178,7 @@ local function SkinCaptureBar(widget)
 end
 
 if T.Mainline then
-	local VigorBar = CreateFrame("Frame", "VigotBar", UIParent)
+	local VigorBar = CreateFrame("Frame", "VigorBar", UIParent)
 	VigorBar:CreateBackdrop("Default")
 	VigorBar:SetPoint("TOP", powerAnchor, "TOP", 0, -2)
 	VigorBar:SetSize(250, 12)
@@ -216,29 +200,36 @@ if T.Mainline then
 		VigorBar[i].bg = VigorBar[i]:CreateTexture(nil, "BORDER")
 		VigorBar[i].bg:SetAllPoints()
 		VigorBar[i].bg:SetTexture(C.media.texture)
-		VigorBar[i].bg:SetVertexColor(0.2, 0.58, 0.8, 0.2)
+		VigorBar[i].bg:SetVertexColor(0.2 * 0.2, 0.58 * 0.2, 0.8 * 0.2)
 
 		VigorBar[i]:SetValue(0)
 	end
 
 	local function SkinVigorBar(widget)
-		VigorBar:Show()
+		if not widget:IsShown() then return end -- Hide our bar if Blizzard's not shown
 		local widgetInfo = C_UIWidgetManager.GetFillUpFramesWidgetVisualizationInfo(4460)
+		if not widgetInfo then return end
+		
+		VigorBar:Show()
 		local total = widgetInfo.numTotalFrames
 		for i = 1, total do
 			local value = 0
 
+			VigorBar[i]:SetStatusBarColor(0.2, 0.58, 0.8)
 			if widgetInfo.numFullFrames >= i then
 				value = widgetInfo.fillMax
 			elseif widgetInfo.numFullFrames + 1 == i then
 				value = widgetInfo.fillValue
+				VigorBar[i]:SetStatusBarColor(0.2 * 0.6, 0.58 * 0.6, 0.8 * 0.6)
 			else
 				value = widgetInfo.fillMin
 			end
 			VigorBar[i]:SetValue(value)
 		end
 
-		if total ~= 6 then
+		if total < 6 and IsPlayerSpell(377922) then total = 6 end -- sometimes it return 5
+
+		if total < 6 then
 			for i = total + 1, 6 do
 				VigorBar[i]:Hide()
 				VigorBar[i]:SetValue(0)
@@ -306,36 +297,3 @@ end)
 hooksecurefunc(UIWidgetTemplateStatusBarMixin, "Setup", function(widget)
 	SkinStatusBar(widget)
 end)
-
--- Maw Buffs skin
-if T.Mainline then
-	maw:SetSize(210, 40)
-	maw.Container:SkinButton()
-	maw.Container:SetSize(200, 30)
-
-	maw.Container.List:StripTextures()
-	maw.Container.List:SetTemplate("Overlay")
-	maw.Container.List:ClearAllPoints()
-	maw.Container.List:SetPoint("TOPRIGHT", maw.Container, "TOPLEFT", -15, 0)
-
-	maw.Container.List:HookScript("OnShow", function(self)
-		self.button:SetPushedTexture(0)
-		self.button:SetHighlightTexture(0)
-		self.button:SetWidth(200)
-		self.button:SetButtonState("NORMAL")
-		self.button:SetPushedTextOffset(0, 0)
-		self.button:SetButtonState("PUSHED", true)
-	end)
-
-	maw.Container.List:HookScript("OnHide", function(self)
-		self.button:SetPushedTexture(0)
-		self.button:SetHighlightTexture(0)
-		self.button:SetWidth(200)
-	end)
-
-	-- Hide Maw Buffs
-	if C.general.hide_maw_buffs then
-		maw:SetAlpha(0)
-		maw:SetScale(0.001)
-	end
-end

@@ -27,7 +27,6 @@ L_ANNOUNCE_FP_USE = "%s used a %s."
 L_ANNOUNCE_INTERRUPTED = INTERRUPTED
 
 -- Tooltip
-L_TOOLTIP_NO_TALENT = "No Talents"
 L_TOOLTIP_LOADING = "Loading..."
 L_TOOLTIP_ACH_STATUS = "Your Status:"
 L_TOOLTIP_ACH_COMPLETE = "Your Status: Completed on "
@@ -47,6 +46,8 @@ L_MISC_UI_OUTDATED_CLASSIC = "Your version of ShestakUI is out of date. You can 
 L_MISC_HEADER_MARK = "Mouseover Raid Icons"
 L_MISC_BINDER_OPEN = "Mouse Bindings"
 L_MISC_SCROLL = "Scroll"
+L_MISC_HEADER_QUEST = "Auto quest button"
+BINDING_NAME_QUEST_BUTTON = AUCTION_HOUSE_HEADER_ITEM
 
 -- Raid Utility
 L_RAID_UTIL_DISBAND = "Disband Group"
@@ -181,7 +182,7 @@ L_POPUP_ARMORY = "Armory"
 
 -- Welcome message
 L_WELCOME_LINE_1 = "Welcome to ShestakUI "
-L_WELCOME_LINE_2_1 = "Type /cfg to config interface, or visit https://github.com/Shestak/ShestakUI"
+L_WELCOME_LINE_2_1 = "Type /cfg to config interface, or visit https://github.com/Wetxius/ShestakUI_Help/wiki/English"
 L_WELCOME_LINE_2_2 = "for more information."
 L_WELCOME_LINE_1_CLASSIC = "Welcome to ShestakUI (Classic) "
 L_WELCOME_LINE_2_1_CLASSIC = "Type /cfg to config interface, or visit https://github.com/EsreverWoW/ShestakUI_Classic"

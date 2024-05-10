@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Prevent users config errors
@@ -40,6 +40,7 @@ end
 if IsAddOnLoaded("Grid") or IsAddOnLoaded("Grid2") or IsAddOnLoaded("HealBot") or IsAddOnLoaded("VuhDo") or IsAddOnLoaded("Cell") or IsAddOnLoaded("Aptechka") then
 	C.raidframe.show_party = false
 	C.raidframe.show_raid = false
+	C.raidframe.auto_position = "NONE"
 end
 
 if IsAddOnLoaded("TidyPlates") or IsAddOnLoaded("nPlates") or IsAddOnLoaded("Kui_Nameplates") or IsAddOnLoaded("rNamePlates") or IsAddOnLoaded("EKplates") or IsAddOnLoaded("bdNameplates") or IsAddOnLoaded("Plater") or IsAddOnLoaded("Nameplates") or IsAddOnLoaded("NeatPlates") then
@@ -85,11 +86,7 @@ if IsAddOnLoaded("DBM-SpellTimers") then
 	C.raidcooldown.enable = false
 end
 
-if IsAddOnLoaded("TipTacTalents") then
-	C.tooltip.talents = false
-end
-
-if IsAddOnLoaded("AdiBags") or IsAddOnLoaded("ArkInventory") or IsAddOnLoaded("cargBags_Nivaya") or IsAddOnLoaded("cargBags") or IsAddOnLoaded("Bagnon") or IsAddOnLoaded("Combuctor") or IsAddOnLoaded("TBag") or IsAddOnLoaded("BaudBag") then
+if IsAddOnLoaded("AdiBags") or IsAddOnLoaded("ArkInventory") or IsAddOnLoaded("cargBags_Nivaya") or IsAddOnLoaded("cargBags") or IsAddOnLoaded("Bagnon") or IsAddOnLoaded("Combuctor") or IsAddOnLoaded("TBag") or IsAddOnLoaded("BaudBag") or IsAddOnLoaded("Baganator") then
 	C.bag.enable = false
 end
 
@@ -136,4 +133,11 @@ end
 
 if IsAddOnLoaded("QuickQuest") then
 	C.automation.accept_quest = false
+end
+
+----------------------------------------------------------------------------------------
+--	Load external profile settings
+----------------------------------------------------------------------------------------
+if T.PostDisable then
+	T.PostDisable()
 end

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -10,7 +10,7 @@ local oUF = ns.oUF
 local CanDispel = {
 	DRUID = {Magic = false, Curse = true, Poison = true},
 	EVOKER = {Magic = false, Curse = true, Poison = true, Disease = true},
-	MAGE = {Curse = true},
+	MAGE = {Magic = false, Curse = true},
 	MONK = {Magic = false, Poison = true, Disease = true},
 	PALADIN = {Magic = false, Poison = true, Disease = true},
 	PRIEST = {Magic = false, Disease = true},
@@ -37,7 +37,11 @@ end
 
 local function CheckSpec()
 	if T.Classic then
-		if T.class == "PALADIN" then
+		if T.class == "MAGE" and T.SoD then
+			if IsSpellKnown(412113) then
+				dispellist.Magic = true
+			end
+		elseif T.class == "PALADIN" then
 			dispellist.Magic = true
 		elseif T.class == "PRIEST" then
 			dispellist.Magic = true
@@ -134,7 +138,7 @@ local function Enable(object)
 
 	-- Make sure aura scanning is active for this object
 	object:RegisterEvent("UNIT_AURA", Update)
-	if oUF:IsClassic() and not oUF:IsWrath() then
+	if oUF:IsVanilla() or oUF:IsTBC() then
 		object:RegisterEvent("CHARACTER_POINTS_CHANGED", CheckSpec, true)
 	else
 		object:RegisterEvent("PLAYER_TALENT_UPDATE", CheckSpec, true)
@@ -157,7 +161,7 @@ end
 local function Disable(object)
 	if object.DebuffHighlightBackdrop or object.DebuffHighlightBackdropBorder or object.DebuffHighlight then
 		object:UnregisterEvent("UNIT_AURA", Update)
-		if oUF:IsClassic() and not oUF:IsWrath() then
+		if oUF:IsVanilla() or oUF:IsTBC() then
 			object:UnregisterEvent("CHARACTER_POINTS_CHANGED", CheckSpec)
 		else
 			object:UnregisterEvent("PLAYER_TALENT_UPDATE", CheckSpec)

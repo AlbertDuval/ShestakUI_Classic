@@ -1,11 +1,11 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true or IsAddOnLoaded("QuestLogEx") then return end -- incomplete
 
 ----------------------------------------------------------------------------------------
 --	QuestLog skin
 ----------------------------------------------------------------------------------------
 local function LoadSkin()
-	if T.Wrath then
+	if T.Wrath or T.Cata then
 		return -- TODO
 	else
 		QuestLogTimerText:SetTextColor(1, 1, 1)
@@ -111,7 +111,7 @@ local function LoadSkin()
 				quality = select(3, GetItemInfo(link))
 			end
 
-			if not T.Vanilla and frame then
+			if frame then
 				Mixin(frame, BackdropTemplateMixin) -- 9.0 to set backdrop
 			end
 
@@ -120,7 +120,7 @@ local function LoadSkin()
 					local R, G, B = GetItemQualityColor(quality)
 					frame:SetBackdropBorderColor(R, G, B)
 				end
-				text:SetTextColor(GetItemQualityColor(quality))
+				text:SetTextColor(GetItemQualityColor(quality) or 1, 1, 1)
 			else
 				if frame then
 					frame:SetBackdropBorderColor(unpack(C.media.backdrop_color))
@@ -264,9 +264,9 @@ local function LoadSkin()
 			QuestLogListScrollFrame:Show()
 		end)
 
-		QUESTS_DISPLAYED = 20
+		QUESTS_DISPLAYED = 25
 
-		for i = 7, 20 do
+		for i = 7, QUESTS_DISPLAYED do
 			local questLogTitle = CreateFrame("Button", "QuestLogTitle"..i, QuestLogFrame, "QuestLogTitleButtonTemplate")
 
 			questLogTitle:SetID(i)

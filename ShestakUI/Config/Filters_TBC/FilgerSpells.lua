@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.filger.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -560,9 +560,9 @@ C["filger_spells"] = {
 			-- Maim
 			{spellID = 22570, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Mangle (Bear)
-			{spellID = 33878, unitID = "target", caster = "player", filter = "DEBUFF"},
+			{spellID = 33878, unitID = "target", caster = "all", filter = "DEBUFF"},
 			-- Mangle (Cat)
-			{spellID = 33876, unitID = "target", caster = "player", filter = "DEBUFF"},
+			{spellID = 33876, unitID = "target", caster = "all", filter = "DEBUFF"},
 			-- Moonfire
 			{spellID = 8921, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Pounce r1
@@ -719,7 +719,7 @@ C["filger_spells"] = {
 			-- Shadowmeld (Night Elf)
 			{spellID = 20580, filter = "CD"},
 			-- War Stomp (Tauren)
-			{spellID = 20600, filter = "CD", absID = true},
+			{spellID = 20549, filter = "CD", absID = true},
 
 			-- Items
 			-- Back
@@ -784,8 +784,6 @@ C["filger_spells"] = {
 			{spellID = 19615, unitID = "pet", caster = "all", filter = "BUFF"},
 			-- Furious Howl (Wolf)
 			{spellID = 24604, unitID = "player", caster = "all", filter = "BUFF"},
-			-- Master Tactician
-			{spellID = 34833, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Mend Pet
 			{spellID = 136, unitID = "pet", caster = "player", filter = "BUFF"},
 			-- Misdirection
@@ -821,6 +819,8 @@ C["filger_spells"] = {
 			-- Buffs
 			-- Ferocious Inspiration
 			{spellID = 34456, unitID = "player", caster = "all", filter = "BUFF"},
+			-- Master Tactician
+			{spellID = 34833, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Quick Shots
 			{spellID = 6150, unitID = "player", caster = "player", filter = "BUFF"},
 
@@ -1191,7 +1191,7 @@ C["filger_spells"] = {
 			-- Stoneform (Dwarf)
 			{spellID = 20594, filter = "CD"},
 			-- War Stomp (Tauren)
-			{spellID = 20600, filter = "CD", absID = true},
+			{spellID = 20549, filter = "CD", absID = true},
 
 			-- Items
 			-- Back
@@ -1222,8 +1222,6 @@ C["filger_spells"] = {
 
 			-- Arcane Power
 			{spellID = 12042, unitID = "player", caster = "player", filter = "BUFF"},
-			-- Blazing Speed
-			{spellID = 31643, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Combustion
 			{spellID = 28682, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Evocation
@@ -1289,6 +1287,8 @@ C["filger_spells"] = {
 			Position = {"TOP", P_PROC_ICON_Anchor},
 
 			-- Buffs
+			-- Blazing Speed
+			{spellID = 31643, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Clearcasting [Arcane Concentration]
 			{spellID = 12536, unitID = "player", caster = "player", filter = "BUFF", absID = true},
 
@@ -1474,8 +1474,20 @@ C["filger_spells"] = {
 			IconSize = C.filger.buffs_size,
 			Position = {"TOP", T_DEBUFF_ICON_Anchor},
 
-			-- Blast Wave
-			{spellID = 11113, unitID = "target", caster = "player", filter = "DEBUFF"},
+			-- Blast Wave r1
+			{spellID = 11113, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
+			-- Blast Wave r2
+			{spellID = 13018, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
+			-- Blast Wave r3
+			{spellID = 13019, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
+			-- Blast Wave r4
+			{spellID = 13020, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
+			-- Blast Wave r5
+			{spellID = 13021, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
+			-- Blast Wave r6
+			{spellID = 27133, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
+			-- Blast Wave r7
+			{spellID = 33933, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
 			-- Blizzard
 			-- {spellID = 10, unitID = "target", caster = "player", filter = "DEBUFF"},
 			--[[
@@ -1502,8 +1514,6 @@ C["filger_spells"] = {
 			{spellID = 10161, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
 			-- Cone of Cold r6
 			{spellID = 27087, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
-			-- Counterspell - Silenced
-			{spellID = 18469, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Dragon's Breath
 			{spellID = 31661, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Fireball r1
@@ -1539,7 +1549,7 @@ C["filger_spells"] = {
 			-- Flamestrike
 			-- {spellID = 2120, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
 			-- Frost Nova
-			{spellID = 122, unitID = "target", caster = "player", filter = "DEBUFF"},
+			{spellID = 122, unitID = "target", caster = "all", filter = "DEBUFF"},
 			-- Frostbite
 			{spellID = 12494, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Frostbolt r1
@@ -1576,6 +1586,8 @@ C["filger_spells"] = {
 			{spellID = 12355, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Pyroblast
 			{spellID = 11366, unitID = "target", caster = "player", filter = "DEBUFF"},
+			-- Silenced - Improved Counterspell
+			{spellID = 18469, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Slow
 			{spellID = 31589, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Winter's Chill
@@ -2186,8 +2198,10 @@ C["filger_spells"] = {
 
 			-- Avenger's Shield
 			{spellID = 31935, unitID = "target", caster = "player", filter = "DEBUFF"},
+			-- Blood Corruption
+			{spellID = 356110, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Consecration
-			-- {spellID = 26573, unitID = "target", caster = "player", filter = "DEBUFF"},
+			{spellID = 26573, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Hammer of Justice
 			{spellID = 853, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Holy Vengeance
@@ -2884,6 +2898,8 @@ C["filger_spells"] = {
 			{spellID = 14177, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Evasion
 			{spellID = 5277, unitID = "player", caster = "player", filter = "BUFF"},
+			-- Envenom
+			{spellID = 32645, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Find Weakness
 			{spellID = 31234, unitID = "player", caster = "player", filter = "BUFF"},
 			-- Ghostly Strike
@@ -3095,14 +3111,14 @@ C["filger_spells"] = {
 			-- Cheap Shot
 			{spellID = 1833, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Crippling Poison r1
-			{spellID = 3409, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
+			{spellID = 3409, unitID = "target", caster = "all", filter = "DEBUFF", absID = true},
 			-- Crippling Poison r2
-			{spellID = 11201, unitID = "target", caster = "player", filter = "DEBUFF", absID = true},
+			{spellID = 11201, unitID = "target", caster = "all", filter = "DEBUFF", absID = true},
 			-- Deadly Poison
 			{spellID = 2818, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Deadly Throw
 			{spellID = 26679, unitID = "target", caster = "player", filter = "DEBUFF"},
-			-- Deadly Throw Interrupt
+			-- Deadly Interrupt Effect
 			{spellID = 32747, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Expose Armor
 			{spellID = 8647, unitID = "target", caster = "all", filter = "DEBUFF"},
@@ -3117,13 +3133,15 @@ C["filger_spells"] = {
 			-- Kick - Silenced
 			{spellID = 18425, unitID = "target", caster = "player", filter = "DEBUFF"},
 			-- Kidney Shot
-			{spellID = 408, unitID = "target", caster = "player", filter = "DEBUFF"},
+			{spellID = 408, unitID = "target", caster = "all", filter = "DEBUFF"},
 			-- Mind-numbing Poison
 			{spellID = 5760, unitID = "target", caster = "all", filter = "DEBUFF"},
 			-- Riposte
-			{spellID = 14251, unitID = "target", caster = "player", filter = "DEBUFF"},
+			{spellID = 14251, unitID = "target", caster = "all", filter = "DEBUFF"},
 			-- Rupture
 			{spellID = 1943, unitID = "target", caster = "player", filter = "DEBUFF"},
+			-- Sap
+			{spellID = 6770, unitID = "target", caster = "all", filter = "DEBUFF"},
 			-- Wound Poison
 			{spellID = 13218, unitID = "target", caster = "all", filter = "DEBUFF"},
 
@@ -3867,7 +3885,7 @@ C["filger_spells"] = {
 			-- Gift of the Naaru (Draenei)
 			{spellID = 28880, filter = "CD"},
 			-- War Stomp (Tauren)
-			{spellID = 20600, filter = "CD", absID = true},
+			{spellID = 20549, filter = "CD", absID = true},
 
 			-- Items
 			-- Back
@@ -4807,6 +4825,8 @@ C["filger_spells"] = {
 			{spellID = 12292, filter = "CD"},
 			-- Disarm
 			{spellID = 676, filter = "CD", absID = true},
+			-- Heroic Strike
+			{spellID = 78, filter = "CD"},
 			-- Intercept
 			{spellID = 20252, filter = "CD"},
 			-- Intervene
@@ -4868,7 +4888,7 @@ C["filger_spells"] = {
 			-- Stoneform (Dwarf)
 			{spellID = 20594, filter = "CD"},
 			-- War Stomp (Tauren)
-			{spellID = 20600, filter = "CD", absID = true},
+			{spellID = 20549, filter = "CD", absID = true},
 			-- Will of the Forsaken (Forsaken)
 			{spellID = 7744, filter = "CD"},
 
@@ -5076,7 +5096,7 @@ C["filger_spells"] = {
 			{spellID = 1044, unitID = "player", caster = "all", filter = "BUFF"},
 			-- Fear Ward
 			{spellID = 6346, unitID = "player", caster = "all", filter = "BUFF"},
-			-- Grounding Totem
+			-- Grounding Totem Effect
 			{spellID = 8178, unitID = "player", caster = "all", filter = "BUFF"},
 			-- Divine Intervention
 			{spellID = 19752, unitID = "player", caster = "all", filter = "BUFF"},
@@ -5312,7 +5332,7 @@ C["filger_spells"] = {
 			-- Silences
 			-- Silencing Shot
 			{spellID = 34490, unitID = "player", caster = "all", filter = "DEBUFF", absID = true},
-			-- Counterspell - Silenced
+			-- Silenced - Improved Counterspell
 			{spellID = 18469, unitID = "player", caster = "all", filter = "DEBUFF"},
 			-- Silence
 			{spellID = 15487, unitID = "player", caster = "all", filter = "DEBUFF", absID = true},
@@ -5332,7 +5352,7 @@ C["filger_spells"] = {
 			{spellID = 25046, unitID = "player", caster = "all", filter = "DEBUFF", absID = true},
 			-- Maim Interrupt (incorrect spellID)
 			-- {spellID = 44835, unitID = "player", caster = "all", filter = "DEBUFF"},
-			-- Deadly Throw Interrupt
+			-- Deadly Interrupt Effect
 			{spellID = 32747, unitID = "player", caster = "all", filter = "DEBUFF"},
 
 			-- Roots
@@ -5691,7 +5711,7 @@ C["filger_spells"] = {
 			{spellID = 76577, unitID = "target", caster = "all", filter = "DEBUFF"},
 
 			-- Shaman
-			-- Grounding Totem
+			-- Grounding Totem Effect
 			{spellID = 8178, unitID = "target", caster = "all", filter = "BUFF"},
 			-- Spiritwalker's Grace
 			{spellID = 79206, unitID = "target", caster = "all", filter = "BUFF"},
@@ -5800,3 +5820,4 @@ C["filger_spells"] = {
 }
 
 T.CustomFilgerSpell = T.CustomFilgerSpell or {}
+T.FilgerIgnoreSpell = T.FilgerIgnoreSpell or {}

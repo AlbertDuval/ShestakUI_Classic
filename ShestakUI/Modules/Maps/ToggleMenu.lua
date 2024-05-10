@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.minimap.enable ~= true or C.minimap.toggle_menu ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -72,10 +72,10 @@ C["togglemainmenu"] = {
 				SlashCmdList.alThreat()
 			end
 			SlashCmdList.DBMTEST()
-			if T.Mainline then
+			if T.Cata or T.Mainline then
 				SlashCmdList.TEST_EXTRABUTTON()
 				SlashCmdList.TEST_ACHIEVEMENT()
-			elseif T.Wrath then
+			elseif T.Wrath or T.Cata then
 				SlashCmdList.TEST_ACHIEVEMENT()
 			end
 			--SlashCmdList.GRIDONSCREEN()
@@ -275,7 +275,7 @@ OpenMenuBG:SetScript("OnMouseUp", function()
 	end
 end)
 OpenMenuBG:HookScript("OnEnter", function(self)
-	if (T.class == "MAGE" and T.level >= 11) and _G["TeleportMenu"]:IsShown() then
+	if (T.class == "MAGE" and T.level >= 11) and _G["TeleportMenu"] and _G["TeleportMenu"]:IsShown() then
 	else
 		self:FadeIn()
 	end

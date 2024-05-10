@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Reskin Blizzard windows(by Tukz and Co)
@@ -28,8 +28,6 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 		local bgskins = {
 			"GameMenuFrame",
 			"BNToastFrame",
-			"TicketStatusFrameButton",
-			"AutoCompleteBox",
 			"ReadyCheckFrame",
 			"ColorPickerFrame",
 			"LFDRoleCheckPopup",
@@ -46,20 +44,21 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 		GameMenuFrame:StripTextures()
 		OpacityFrame:StripTextures()
 
-		if T.Classic then
-			AutoCompleteBox:StripTextures()
-			TicketStatusFrameButton:StripTextures()
-		end
-
-		if T.Wrath then
+		if T.Wrath or T.Cata then
 			RolePollPopup:StripTextures()
 		end
 
-		if T.Mainline then
+		if T.Wrath or T.Cata or T.Mainline then
 			QueueStatusFrame:StripTextures()
 			LFDRoleCheckPopup:StripTextures()
+		end
+
+		if T.Mainline then
 			ColorPickerFrame.Border:Hide()
 		end
+
+		AutoCompleteBox.NineSlice:SetTemplate("Transparent")
+		TicketStatusFrameButton.NineSlice:SetTemplate("Transparent")
 
 		for i = 1, getn(bgskins) do
 			local frame = _G[bgskins[i]]
@@ -145,18 +144,22 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 		_G["PetBattleQueueReadyFrame"].DeclineButton:SkinButton()
 
 		-- Reskin Dropdown menu
+		local dropdowns = {"DropDownList", "L_DropDownList", "Lib_DropDownList"}
 		hooksecurefunc("UIDropDownMenu_InitializeHelper", function()
-			for i = 1, UIDROPDOWNMENU_MAXLEVELS do
-				if _G["DropDownList"..i.."MenuBackdrop"].NineSlice then
-					_G["DropDownList"..i.."MenuBackdrop"].NineSlice:SetAlpha(0)
+			for _, name in next, dropdowns do
+				for i = 1, UIDROPDOWNMENU_MAXLEVELS do
+					local backdrop = _G[name..i.."Backdrop"]
+					if backdrop then
+						backdrop:SetTemplate("Transparent")
+						local menu = _G[name..i.."MenuBackdrop"].NineSlice or _G[name..i.."MenuBackdrop"]
+						if menu then
+							menu:SetTemplate("Transparent")
+						end
+						if backdrop.Bg then
+							backdrop.Bg:SetAlpha(0)
+						end
+					end
 				end
-
-				if T.Mainline then
-					_G["DropDownList"..i]["Border"]:StripTextures()
-				end
-
-				_G["DropDownList"..i.."Backdrop"]:SetTemplate("Transparent")
-				_G["DropDownList"..i.."MenuBackdrop"]:SetTemplate("Transparent")
 			end
 		end)
 
@@ -177,7 +180,8 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 
 				button.backdrop:Hide()
 
-				if not button.notCheckable then
+				local texture = check:GetTexture()
+				if not button.notCheckable and (T.Classic or texture == 375502) then
 					uncheck:SetTexture()
 					local _, co = check:GetTexCoord()
 					if co == 0 then
@@ -189,7 +193,7 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 					else
 						check:SetTexture(C.media.blank)
 						check:SetVertexColor(1, 0.82, 0, 0.8)
-						check:SetSize(5, 5)
+						check:SetSize(6, 6)
 						check:SetDesaturated(false)
 						button.backdrop:SetOutside(check)
 					end
@@ -206,6 +210,10 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 			RaiderIO_CustomDropDownListMenuBackdrop:StripTextures()
 		end
 
+		if MyFrameDropDownBackdrop then
+			MyFrameDropDownBackdrop:SetTemplate("Transparent")
+		end
+
 		-- Reskin menu
 		local ChatMenus = {
 			"ChatMenu",
@@ -217,13 +225,21 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 		for i = 1, getn(ChatMenus) do
 			if _G[ChatMenus[i]] == _G["ChatMenu"] then
 				_G[ChatMenus[i]]:HookScript("OnShow", function(self)
-					self:SetTemplate("Transparent")
+					if self.NineSlice then
+						self.NineSlice:SetTemplate("Transparent")
+					else
+						self:SetTemplate("Transparent")
+					end
 					self:ClearAllPoints()
 					self:SetPoint("BOTTOMRIGHT", ChatFrame1, "BOTTOMRIGHT", 0, 30)
 				end)
 			else
 				_G[ChatMenus[i]]:HookScript("OnShow", function(self)
-					self:SetTemplate("Transparent")
+					if self.NineSlice then
+						self.NineSlice:SetTemplate("Transparent")
+					else
+						self:SetTemplate("Transparent")
+					end
 				end)
 			end
 		end
@@ -267,8 +283,6 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 			"ReadyCheckFrameNoButton",
 			"ColorPickerOkayButton",
 			"ColorPickerCancelButton",
-			"BaudErrorFrameClearButton",
-			"BaudErrorFrameCloseButton",
 			"GuildInviteFrameJoinButton",
 			"GuildInviteFrameDeclineButton",
 			"RolePollPopupAcceptButton",
@@ -300,19 +314,6 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 		if T.Mainline then
 			LFDReadyCheckPopup.YesButton:SkinButton(true)
 			LFDReadyCheckPopup.NoButton:SkinButton(true)
-		end
-
-		-- Reskin scrollbars
-		local scrollbars = {
-			"BaudErrorFrameListScrollBoxScrollBarScrollBar",
-			"BaudErrorFrameDetailScrollFrameScrollBar"
-		}
-
-		for _, scrollbar in pairs(scrollbars) do
-			local bars = _G[scrollbar]
-			if bars then
-				T.SkinScrollBar(bars)
-			end
 		end
 
 		-- Button position or text
@@ -363,12 +364,6 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 		end
 
 		if C.skins.blizzard_frames == true then
-			-- Social Browser frame
-			SocialBrowserFrame:StripTextures()
-			SocialBrowserFrame:SetTemplate("Transparent")
-			T.SkinCloseButton(SocialBrowserFrame.CloseButton)
-			SocialBrowserFrame.CloseButton:SetSize(16, 16)
-
 			-- What's new frame
 			if T.Mainline then
 				SplashFrame:CreateBackdrop("Transparent")
@@ -377,29 +372,37 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 			end
 
 			-- NavBar Buttons (Used in EncounterJournal and HelpFrame)
+			local function NavButtonXOffset(button, point, anchor, point2, _, yoffset, skip)
+				if not skip then
+					button:SetPoint(point, anchor, point2, 1, yoffset, true)
+				end
+			end
+
 			local function SkinNavBarButtons(self)
 				if self:GetParent():GetName() == "WorldMapFrame" then return end
-				local navButton = self.navList[#self.navList]
-				if navButton and not navButton.isSkinned then
-					navButton:SkinButton(true)
-					if navButton.MenuArrowButton then
-						navButton.MenuArrowButton:SetNormalTexture(0)
-						navButton.MenuArrowButton:SetPushedTexture(0)
-						navButton.MenuArrowButton:SetHighlightTexture(0)
+				local total = #self.navList
+				local navButton = self.navList[total]
+				if navButton then
+					if total == 2 then
+						-- EJ.navBar.home.xoffset = 1 (this causes a taint, use the hook below instead)
+						NavButtonXOffset(navButton, navButton:GetPoint())
+						hooksecurefunc(navButton, "SetPoint", NavButtonXOffset)
 					end
-					navButton.xoffset = 1
-					navButton.isSkinned = true
+
+					if not navButton.isSkinned then
+						navButton:SkinButton(true)
+						if navButton.MenuArrowButton then
+							navButton.MenuArrowButton:SetNormalTexture(0)
+							navButton.MenuArrowButton:SetPushedTexture(0)
+							navButton.MenuArrowButton:SetHighlightTexture(0)
+						end
+
+						navButton.xoffset = 1
+						navButton.isSkinned = true
+					end
 				end
 			end
 			hooksecurefunc("NavBar_AddButton", SkinNavBarButtons)
-
-			local function SetHomeButtonOffsetX(self)
-				if self:GetParent():GetName() == "WorldMapFrame" then return end
-				if self.homeButton then
-					self.homeButton.xoffset = 1
-				end
-			end
-			hooksecurefunc("NavBar_Initialize", SetHomeButtonOffsetX)
 
 			if T.client == "ruRU" then
 				_G["DeclensionFrame"]:SetTemplate("Transparent")
@@ -452,10 +455,5 @@ SkinBlizzUI:SetScript("OnEvent", function(_, _, addon)
 				end)
 			end
 		end
-	end
-
-	if addon == "Blizzard_GuildUI" and T.client == "ruRU" and T.Mainline then
-		_G["GuildFrameTab1"]:ClearAllPoints()
-		_G["GuildFrameTab1"]:SetPoint("TOPLEFT", _G["GuildFrame"], "BOTTOMLEFT", -4, 2)
 	end
 end)

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -34,11 +34,11 @@ local function LoadSkin()
 	QuestFrameCompleteQuestButton:SkinButton(true)
 
 	T.SkinCloseButton(QuestFrameCloseButton, QuestFrame.backdrop)
-	T.SkinScrollBar(QuestDetailScrollFrameScrollBar)
-	T.SkinScrollBar(QuestProgressScrollFrameScrollBar)
-	T.SkinScrollBar(QuestRewardScrollFrameScrollBar)
-	T.SkinScrollBar(QuestGreetingScrollFrameScrollBar)
-	T.SkinScrollBar(QuestNPCModelTextScrollFrameScrollBar)
+	T.SkinScrollBar(QuestDetailScrollFrame.ScrollBar)
+	T.SkinScrollBar(QuestProgressScrollFrame.ScrollBar)
+	T.SkinScrollBar(QuestRewardScrollFrame.ScrollBar)
+	T.SkinScrollBar(QuestGreetingScrollFrame.ScrollBar)
+	T.SkinScrollBar(QuestNPCModelTextScrollFrame.ScrollBar)
 
 	for i = 1, 6 do
 		local button = _G["QuestProgressItem"..i]
@@ -95,7 +95,7 @@ local function LoadSkin()
 
 	QuestLogPopupDetailFrameScrollFrame:StripTextures()
 	QuestLogPopupDetailFrameScrollFrame:SetPoint("TOPLEFT", 13, -65)
-	T.SkinScrollBar(QuestLogPopupDetailFrameScrollFrameScrollBar)
+	T.SkinScrollBar(QuestLogPopupDetailFrameScrollFrame.ScrollBar)
 
 	QuestLogPopupDetailFrame.ShowMapButton:SkinButton(true)
 	QuestLogPopupDetailFrame.ShowMapButton.Text:ClearAllPoints()
@@ -253,8 +253,10 @@ local function LoadSkin()
 		local isQuestLog = QuestInfoFrame.questLog ~= nil
 		local isMapQuest = rewardsFrame == MapQuestInfoRewardsFrame
 
-		local numSpellRewards = isQuestLog and GetNumQuestLogRewardSpells() or GetNumRewardSpells()
-		if numSpellRewards > 0 then
+		local questID = isQuestLog and C_QuestLog.GetSelectedQuest() or GetQuestID()
+		local spellRewards = C_QuestInfoSystem.GetQuestRewardSpells(questID) or {}
+		local numSpellRewards = #spellRewards
+		if numSpellRewards and numSpellRewards > 0 then
 			-- Spell Headers
 			for spellHeader in rewardsFrame.spellHeaderPool:EnumerateActive() do
 				spellHeader:SetVertexColor(1, 1, 1)
@@ -344,6 +346,14 @@ local function LoadSkin()
 					end
 					spellReward.isSkinned = true
 				end
+			end
+		end
+
+		-- Reputation Rewards
+		for repReward in rewardsFrame.reputationRewardPool:EnumerateActive() do
+			if not repReward.isSkinned then
+				SkinReward(repReward, isMapQuest)
+				repReward.isSkinned = true
 			end
 		end
 	end)
@@ -549,6 +559,12 @@ local function LoadSkin()
 				callingHeader.HighlightBackground:SetAlpha(0)
 				callingHeader.SelectedTexture:SetAlpha(0)
 				callingHeader.Divider:SetAlpha(0)
+			end
+		end
+		for header in QuestScrollFrame.campaignHeaderMinimalFramePool:EnumerateActive() do
+			if not header.CollapseButton.styled then
+				SkinExpandOrCollapse(header.CollapseButton)
+				header.CollapseButton.styled = true
 			end
 		end
 	end)

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.automation.dismount_stand ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -35,8 +35,8 @@ local shapeshiftMessages = {
 local shapeshiftSpells = {
 	[GetSpellInfo(5487)]		= true, -- Bear Form
 	[GetSpellInfo(9634)]		= true, -- Dire Bear Form
-	[GetSpellInfo(768)]		= true, -- Cat Form
-	[GetSpellInfo(783)]		= true, -- Travel Form
+	[GetSpellInfo(768)]			= true, -- Cat Form
+	[GetSpellInfo(783)]			= true, -- Travel Form
 	[GetSpellInfo(1066)]		= true, -- Aquatic Form
 	[GetSpellInfo(24858)]		= true, -- Moonkin Form
 	[GetSpellInfo(2645)]		= true, -- Ghost Wolf
@@ -50,7 +50,7 @@ local function CheckErrorMessage(_, _, _, msg)
 		DoEmote("stand")
 		UIErrorsFrame:Clear()
 	elseif shapeshiftMessages[msg] then
-		for k, _ in pairs(shapeshiftSpells) do
+		for k in pairs(shapeshiftSpells) do
 			if not InCombatLockdown() then
 				CancelSpellByName(k)
 			end

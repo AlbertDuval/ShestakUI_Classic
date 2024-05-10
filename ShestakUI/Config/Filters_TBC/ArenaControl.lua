@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.show_arena ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ local function SpellName(id)
 	if name then
 		return name
 	else
-		print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to EsreverWoW.|r")
+		print("|cffff0000ShestakUI: spell ID ["..tostring(id).."] no longer exists!|r")
 		return "Empty"
 	end
 end
@@ -77,7 +77,7 @@ T.ArenaControl = {
 
 	-- Silences
 	[SpellName(34490)] = 4,		-- Silencing Shot
-	[SpellName(18469)] = 4,		-- Counterspell - Silenced
+	[SpellName(18469)] = 4,		-- Silenced - Improved Counterspell
 	[SpellName(15487)] = 4,		-- Silence
 	[SpellName(1330)] = 4,		-- Garrote - Silence
 	[SpellName(18425)] = 4,		-- Kick - Silenced
@@ -86,7 +86,7 @@ T.ArenaControl = {
 	[SpellName(28730)] = 4,		-- Arcane Torrent (Mana)
 	-- [SpellName(25046)] = 4,		-- Arcane Torrent (Energy)
 	-- [SpellName(44835)] = 4,		-- Maim Interrupt (incorrect spellID)
-	[SpellName(32747)] = 4,		-- Deadly Throw Interrupt
+	[SpellName(32747)] = 4,		-- Deadly Interrupt Effect
 
 	-- Roots
 	[SpellName(45334)] = 3,		-- Feral Charge Effect
@@ -136,7 +136,7 @@ T.ArenaControl = {
 	-- Rogue
 	[SpellName(13877)] = 1,		-- Blade Flurry
 	-- Shaman
-	[SpellName(8178)] = 1,		-- Grounding Totem
+	[SpellName(8178)] = 1,		-- Grounding Totem Effect
 	[SpellName(16190)] = 1,		-- Mana Tide Totem
 	-- Warlock
 	[SpellName(18708)] = 1,		-- Fel Domination

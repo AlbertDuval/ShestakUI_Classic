@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.show_arena ~= true or C.unitframe.plugins_diminishing ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -178,7 +178,7 @@ T.DiminishingSpells = {
 	--[[
 	-- Silences
 	[34490] = {"silence"},			-- Silencing Shot
-	[18469] = {"silence"},			-- Counterspell - Silenced
+	[18469] = {"silence"},			-- Silenced - Improved Counterspell
 	[15487] = {"silence"},			-- Silence
 	[1330] = {"silence"},			-- Garrote - Silence
 	[18425] = {"silence"},			-- Kick - Silenced
@@ -187,7 +187,7 @@ T.DiminishingSpells = {
 	[28730] = {"silence"},			-- Arcane Torrent (Mana)
 	[25046] = {"silence"},			-- Arcane Torrent (Energy)
 	-- [44835] = {"silence"},			-- Maim Interrupt (incorrect spellID)
-	[32747] = {"silence"},			-- Deadly Throw Interrupt
+	[32747] = {"silence"},			-- Deadly Interrupt Effect
 	--]]
 
 	-- Cyclone / Blind

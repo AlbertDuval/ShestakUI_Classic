@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.actionbar.enable ~= true or C.actionbar.toggle_mode ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ local SplitBars = function()
 			ToggleBar[3]:SetPoint("BOTTOMLEFT", SplitBarRight, "BOTTOMRIGHT", C.actionbar.button_space, 0)
 			ToggleBar[4]:ClearAllPoints()
 			ToggleBar[4]:SetPoint("BOTTOMRIGHT", SplitBarLeft, "BOTTOMLEFT", -C.actionbar.button_space, 0)
-			if T.Mainline or T.Wrath then
+			if T.Wrath or T.Cata or T.Mainline then
 				VehicleButtonAnchor:ClearAllPoints()
 				VehicleButtonAnchor:SetPoint("BOTTOMRIGHT", SplitBarLeft, "BOTTOMLEFT", -C.actionbar.button_space, 0)
 			end
@@ -212,7 +212,7 @@ local SplitBars = function()
 			ToggleBar[3]:SetPoint("BOTTOMLEFT", ActionBarAnchor, "BOTTOMRIGHT", C.actionbar.button_space, 0)
 			ToggleBar[4]:ClearAllPoints()
 			ToggleBar[4]:SetPoint("BOTTOMRIGHT", ActionBarAnchor, "BOTTOMLEFT", -C.actionbar.button_space, 0)
-			if T.Mainline or T.Wrath then
+			if T.Wrath or T.Cata or T.Mainline then
 				VehicleButtonAnchor:ClearAllPoints()
 				VehicleButtonAnchor:SetPoint("BOTTOMRIGHT", ActionBarAnchor, "BOTTOMLEFT", -C.actionbar.button_space, 0)
 			end
@@ -336,6 +336,7 @@ for i = 1, 5 do
 			end
 
 			LockCheck(i)
+			ToggleBar[i]:GetScript("OnEnter")(ToggleBar[i])
 		end)
 		ToggleBar[i]:SetScript("OnEvent", function() LockCheck(i) end)
 	end
@@ -375,7 +376,7 @@ for i = 1, 5 do
 				ToggleBar[3]:FadeIn()
 				ToggleBar[4]:FadeIn()
 			end
-			if T.Mainline or T.Wrath then
+			if T.Wrath or T.Cata or T.Mainline then
 				VehicleButtonAnchor:ClearAllPoints()
 				VehicleButtonAnchor:SetPoint("BOTTOMRIGHT", ToggleBar[4], "BOTTOMLEFT", -C.actionbar.button_space, 0)
 			end
@@ -389,7 +390,8 @@ for i = 1, 5 do
 		end
 		if i == 5 then
 			GameTooltip:SetOwner(ToggleBar[i], "ANCHOR_LEFT")
-			GameTooltip:AddLine(L_MINIMAP_TOGGLE)
+			GameTooltip:AddLine(L_MINIMAP_TOGGLE, 0.40, 0.78, 1)
+			GameTooltip:AddDoubleLine(" ", TALENT_TREE_LOCKED..": "..(ShestakUISettingsPerChar.BarsLocked and "|cff55ff55"..L_STATS_ON or "|cffff5555"..strupper(OFF)), 1, 1, 1, 0.75, 0.90, 1)
 			GameTooltip:Show()
 		end
 	end)
@@ -412,7 +414,7 @@ for i = 1, 5 do
 				ToggleBar[4]:FadeOut()
 			end
 			VehicleButtonAnchor:ClearAllPoints()
-			if T.Mainline or T.Wrath then
+			if T.Wrath or T.Cata or T.Mainline then
 				if ShestakUISettingsPerChar.SplitBars == true then
 					VehicleButtonAnchor:SetPoint("BOTTOMRIGHT", SplitBarLeft, "BOTTOMLEFT", -C.actionbar.button_space, 0)
 				else

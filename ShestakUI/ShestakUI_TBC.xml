@@ -21,7 +21,7 @@
 
 	<Script file="Libs\LibStub\LibStub.lua"/>
 	<Script file="Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua"/>
-	<Script file="Libs\LibRangeCheck-2.0\LibRangeCheck-2.0.lua"/>
+	<Script file="Libs\LibRangeCheck-3.0\LibRangeCheck-3.0.lua"/>
 	<Script file="Libs\LibHealComm-4.0\ChatThrottleLib.lua"/>
 	<Script file="Libs\LibHealComm-4.0\LibHealComm-4.0.lua"/>
 
@@ -180,14 +180,15 @@
 	<Script file="Modules\Maps\ToggleMenu.lua"/>
 	<Script file="Modules\Maps\WorldMap_Vanilla.lua"/>
 
-	<Script file="Modules\Quests\AutoAccept_Vanilla.lua"/>
+	<Script file="Modules\Quests\AutoAccept.lua"/>
 	<Script file="Modules\Quests\AutoButton.lua"/>
 	<Script file="Modules\Quests\ObjectiveTracker_Vanilla.lua"/>
 
-	<Include file="Modules\Skins\Blizzard_TBC\LoadFrames.xml"/>
+	<Include file="Modules\Skins\Blizzard_TBC\!LoadFrames.xml"/>
 	<Script file="Modules\Skins\Ace3.lua"/>
 	<Script file="Modules\Skins\AtlasLoot.lua"/>
 	<Script file="Modules\Skins\Aurora.lua"/>
+	<Script file="Modules\Skins\BaudErrorFrame.lua"/>
 	<Script file="Modules\Skins\BigWigs.lua"/>
 	<Script file="Modules\Skins\Capping.lua"/>
 	<Script file="Modules\Skins\Clique.lua"/>
@@ -204,6 +205,7 @@
 	<Script file="Modules\Skins\VanasKoS.lua"/>
 	<Script file="Modules\Skins\WeakAuras.lua"/>
 	<Script file="Modules\Skins\oPie.lua"/>
+	<Script file="Modules\Skins\Plater.lua"/>
 	<Script file="Modules\Skins\Postal.lua"/>
 	<Script file="Modules\Skins\lsToasts.lua"/>
 

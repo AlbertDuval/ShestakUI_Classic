@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.actionbar.enable ~= true then return end
 
 ------------------------------------------------------------------------------------------
@@ -55,7 +55,8 @@ C_Timer.After(0.1, function()
 end)
 
 hooksecurefunc("ExtraActionBar_Update", function()
-	if ShestakUIPositions["ZoneButtonAnchor"] then return end
+	local positionTable = T.CurrentProfile()
+	if positionTable["ZoneButtonAnchor"] then return end
 	if HasExtraActionBar() then
 		zoneAnchor:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMLEFT", -3, 0)
 	else
@@ -122,3 +123,22 @@ end
 
 hooksecurefunc(ZoneAbilityFrame, "UpdateDisplayedZoneAbilities", SkinZoneAbilities)
 ZoneAbilityFrame.Style:SetAlpha(0)
+
+------------------------------------------------------------------------------------------
+--	Skin ExtraQuestButton
+------------------------------------------------------------------------------------------
+if IsAddOnLoaded("ExtraQuestButton") then
+	local button = ExtraQuestButton
+	ExtraQuestButtonArtwork:Hide()
+	button:StyleButton()
+	ExtraQuestButtonNormalTexture:SetAlpha(0)
+	ExtraQuestButtonIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+	ExtraQuestButtonIcon:SetPoint("TOPLEFT", button, 2, -2)
+	ExtraQuestButtonIcon:SetPoint("BOTTOMRIGHT", button, -2, 2)
+	ExtraQuestButtonIcon:SetDrawLayer("BACKGROUND", 7)
+	ExtraQuestButtonCooldown:SetDrawEdge(false)
+	button:SetTemplate("Transparent")
+	if C.actionbar.classcolor_border == true then
+		button:SetBackdropBorderColor(unpack(C.media.classborder_color))
+	end
+end

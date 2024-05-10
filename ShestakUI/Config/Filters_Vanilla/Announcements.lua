@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	The best way to add or delete spell is to go at www.wowhead.com, search for a spell.
@@ -9,6 +9,7 @@ if C.announcements.spells == true then
 	T.announce_spells = {
 		20484,	-- Rebirth
 		20707,	-- Soulstone
+		407804,	-- Divine Sacrifice [Season of Discovery]
 		633,	-- Lay on Hands
 		19801,	-- Tranquilizing Shot
 	}
@@ -59,21 +60,21 @@ if C.announcements.bad_gear == true then
 	T.AnnounceBadGear = {
 		-- Head
 		[1] = {
-			19972,	-- Lucky Fishing Hat
+			[19972] = true,	-- Lucky Fishing Hat
 		},
 		-- Feet
 		[8] = {
-			19969,	-- Nat Pagle's Extreme Anglin' Boots
+			[19969] = true,	-- Nat Pagle's Extreme Anglin' Boots
 		},
 		-- Main-Hand
 		[16] = {
-			19970,	-- Arcanite Fishing Pole
-			19022,	-- Nat Pagle's Extreme Angler FC-5000
-			6367,	-- Big Iron Fishing Pole
-			6366,	-- Darkwood Fishing Pole
-			6365,	-- Strong Fishing Pole
-			12225,	-- Blump Family Fishing Pole
-			6256,	-- Fishing Pole
+			[19970] = true,	-- Arcanite Fishing Pole
+			[19022] = true,	-- Nat Pagle's Extreme Angler FC-5000
+			[6367] = true,	-- Big Iron Fishing Pole
+			[6366] = true,	-- Darkwood Fishing Pole
+			[6365] = true,	-- Strong Fishing Pole
+			[12225] = true,	-- Blump Family Fishing Pole
+			[6256] = true,	-- Fishing Pole
 		},
 	}
 end

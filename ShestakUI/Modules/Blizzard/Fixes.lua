@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 
 ----------------------------------------------------------------------------------------
 --	Fix blank tooltip
@@ -46,21 +46,13 @@ if T.client == "ruRU" then
 end
 
 ----------------------------------------------------------------------------------------
---	Fix SearchLFGLeave() taint
+--	Fix Keybind taint
 ----------------------------------------------------------------------------------------
-if T.Mainline then
-	local TaintFix = CreateFrame("Frame")
-	TaintFix:SetScript("OnUpdate", function()
-		if LFRBrowseFrame.timeToClear then
-			LFRBrowseFrame.timeToClear = nil
-		end
-	end)
-end
+_G.SettingsPanel.TransitionBackOpeningPanel = _G.HideUIPanel
 
-------------------------------------------------------------------------
--- !!NoTaint2, first-aid addon for Dragon Flight action bars taint.
--- Code by warbaby 2022-11 http://abyui.top https://github.com/aby-ui
--------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+-- !!NoTaint2 (Code by warbaby 2022-11 http://abyui.top https://github.com/aby-ui)
+----------------------------------------------------------------------------------------
 if T.Mainline then
 	if IsAddOnLoaded("!!NoTaint2") then return end
 	if not NoTaint2_Proc_ResetActionButtonAction then
@@ -164,7 +156,7 @@ if T.Mainline then
 			local stack = debugstack(4)
 			--call from UIParent.lua if ( not frame or frame:IsShown() ) then
 			--different when hooked
-			if stack:find('[string "=[C]"]: in function `ShowUIPanel\'\n', 1, true) then
+			if stack and stack:find('[string "=[C]"]: in function `ShowUIPanel\'\n', 1, true) then
 				cleanAll()
 			end
 		end)

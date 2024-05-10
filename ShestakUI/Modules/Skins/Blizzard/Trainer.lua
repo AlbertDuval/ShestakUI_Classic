@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.skins.blizzard_frames ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -42,8 +42,8 @@ local function LoadSkin()
 	T.SkinCloseButton(ClassTrainerFrameCloseButton, ClassTrainerFrame)
 
 	T.SkinScrollBar(ClassTrainerFrame.ScrollBar)
-	ClassTrainerFrame.ScrollBar:SetPoint("TOPLEFT", ClassTrainerFrame.ScrollBox, "TOPRIGHT", 0, 3)
-	ClassTrainerFrame.ScrollBar:SetPoint("BOTTOMLEFT", ClassTrainerFrame.ScrollBox, "BOTTOMRIGHT", 0, -4)
+	ClassTrainerFrame.ScrollBar:SetPoint("TOPLEFT", ClassTrainerFrame.ScrollBox, "TOPRIGHT", 8, 2)
+	ClassTrainerFrame.ScrollBar:SetPoint("BOTTOMLEFT", ClassTrainerFrame.ScrollBox, "BOTTOMRIGHT", 8, -3)
 
 	ClassTrainerStatusBar:StripTextures()
 	ClassTrainerStatusBar:SetStatusBarTexture(C.media.texture)

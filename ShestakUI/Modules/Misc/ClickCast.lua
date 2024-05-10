@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.misc.click_cast ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ for _, v in pairs({
 end
 
 hooksecurefunc("CreateFrame", function(_, name, _, template)
-	if template and template:find("SecureUnitButtonTemplate") then
+	if template and name and template:find("SecureUnitButtonTemplate") then
 		ClickCastFrames[_G[name]] = true
 	end
 end)
@@ -60,7 +60,7 @@ hooksecurefunc("CompactUnitFrame_SetUpFrame", function(frame)
 	ClickCastFrames[frame] = true
 end)
 
-local ScrollSpells = CreateFrame("ScrollFrame", "SpellBinderScrollFrameSpellList", _G["SpellBinderInset"], "UIPanelScrollFrameTemplate")
+local ScrollSpells = CreateFrame("ScrollFrame", "SpellBinderScrollFrameSpellList", _G["SpellBinderInset"], "ScrollFrameTemplate")
 ScrollSpells:SetPoint("TOPLEFT", _G["SpellBinderInset"], "TOPLEFT", 0, -5)
 ScrollSpells:SetPoint("BOTTOMRIGHT", _G["SpellBinderInset"], "BOTTOMRIGHT", -30, 5)
 ScrollSpells.child = CreateFrame("Frame", "SpellBinderScrollFrameSpellListChild", ScrollSpells)
@@ -86,7 +86,7 @@ SpellBinder.makeSpellsList = function(_, delete)
 	for i, spell in ipairs(DB.spells) do
 		local v = spell.spell
 		if v then
-			local bf = _G["SpellBinder"..i.."_cbs"] or CreateFrame("Button", "SpellBinder"..i.."_cbs", scroll, BackdropTemplateMixin and "BackdropTemplate" or nil)
+			local bf = _G["SpellBinder"..i.."_cbs"] or CreateFrame("Button", "SpellBinder"..i.."_cbs", scroll, BackdropTemplateMixin and "BackdropTemplate")
 			spell.checked = spell.checked or false
 
 			if i == 1 then
@@ -322,7 +322,7 @@ SpellBinder:RegisterEvent("PLAYER_ENTERING_WORLD")
 SpellBinder:RegisterEvent("GROUP_ROSTER_UPDATE")
 SpellBinder:RegisterEvent("ZONE_CHANGED")
 SpellBinder:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-if T.Classic and not T.Wrath then
+if T.Vanilla or T.TBC then
 	SpellBinder:RegisterEvent("CHARACTER_POINTS_CHANGED")
 else
 	SpellBinder:RegisterEvent("PLAYER_TALENT_UPDATE")
@@ -403,7 +403,7 @@ if IsAddOnLoaded("Aurora") then
 	F.CreateBG(SpellBinder.OpenButton)
 	F.CreateBD(SpellBinder)
 	F.ReskinClose(SpellBinderCloseButton)
-	F.ReskinScroll(SpellBinderScrollFrameSpellListScrollBar)
+	F.ReskinScroll(SpellBinderScrollFrameSpellList.ScrollBar)
 elseif C.skins.blizzard_frames == true then
 	SpellBinder:StripTextures()
 	SpellBinder:CreateBackdrop("Transparent")
@@ -431,7 +431,7 @@ elseif C.skins.blizzard_frames == true then
 	SpellBinderScrollFrameSpellList.backdrop:SetPoint("BOTTOMRIGHT", 2, -3)
 	T.SkinCloseButton(SpellBinderCloseButton)
 
-	SpellBinderScrollFrameSpellListScrollBar:SetPoint("TOPLEFT", SpellBinderScrollFrameSpellList, "TOPRIGHT", 6, -13)
-	SpellBinderScrollFrameSpellListScrollBar:SetPoint("BOTTOMLEFT", SpellBinderScrollFrameSpellList, "BOTTOMRIGHT", 6, 13)
-	T.SkinScrollBar(SpellBinderScrollFrameSpellListScrollBar)
+	SpellBinderScrollFrameSpellList.ScrollBar:SetPoint("TOPLEFT", SpellBinderScrollFrameSpellList, "TOPRIGHT", 9, 3)
+	SpellBinderScrollFrameSpellList.ScrollBar:SetPoint("BOTTOMLEFT", SpellBinderScrollFrameSpellList, "BOTTOMRIGHT", 9, -4)
+	T.SkinScrollBar(SpellBinderScrollFrameSpellList.ScrollBar)
 end

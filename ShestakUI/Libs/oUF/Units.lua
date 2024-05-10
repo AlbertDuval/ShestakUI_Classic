@@ -48,7 +48,7 @@ local function updateArenaPreparationElements(self, event, elementName, specID)
 			-- this section just replicates the color options available to the Health and Power elements
 			local r, g, b, color, _
 			-- if(element.colorPower and elementName == 'Power') then
-				-- FIXME: no idea if we can get power type here without the unit
+			-- FIXME: no idea if we can get power type here without the unit
 			if(element.colorClass) then
 				local _, _, _, _, _, class = GetSpecializationInfoByID(specID)
 				color = self.colors.class[class]
@@ -185,7 +185,7 @@ function oUF:HandleUnit(object, unit)
 		object:RegisterEvent('UNIT_TARGETABLE_CHANGED', object.UpdateAllElements)
 	elseif(unit:match('arena%d?$')) then
 		object:RegisterEvent('ARENA_OPPONENT_UPDATE', object.UpdateAllElements, true)
-		if(not oUF:IsClassic()) then
+		if(oUF:IsMainline()) then
 			object:RegisterEvent('ARENA_PREP_OPPONENT_SPECIALIZATIONS', updateArenaPreparation, true)
 		end
 		object:SetAttribute('oUF-enableArenaPrep', true)

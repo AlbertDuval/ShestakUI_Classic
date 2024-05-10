@@ -1,4 +1,4 @@
-﻿local T, C, L, _ = unpack(select(2, ...))
+﻿local T, C, L = unpack(ShestakUI)
 if C.tooltip.enable ~= true or C.tooltip.mount ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -44,4 +44,8 @@ local function MountSourceTooltip(self, ...)
 	end
 end
 
-hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", MountSourceTooltip)
+if T.Classic then
+	hooksecurefunc(GameTooltip, "SetUnitAura", MountSourceTooltip)
+else
+	hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", MountSourceTooltip)
+end

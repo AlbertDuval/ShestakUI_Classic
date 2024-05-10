@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.announcements.says_thanks ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -9,45 +9,30 @@ local function SpellName(id)
 	if name then
 		return name
 	else
-		if T.Classic then
-			print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to EsreverWoW.|r")
-		else
-			print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to Shestak.|r")
-		end
+		print("|cffff0000ShestakUI: spell ID ["..tostring(id).."] no longer exists!|r")
 		return "Empty"
 	end
 end
 
-local spells = {}
-if T.Wrath then
-	spells = {
-		[SpellName(20484)] = true,		-- Rebirth
-		[SpellName(61999)] = true,		-- Raise Ally
-		[SpellName(20707)] = true,		-- Soulstone
-		[SpellName(50769)] = true,		-- Revive
-		[SpellName(2006)] = true,		-- Resurrection
-		[SpellName(7328)] = true,		-- Redemption
-		[SpellName(2008)] = true,		-- Ancestral Spirit
-	}
-elseif T.Vanilla or T.TBC then
-	spells = {
-		[SpellName(20484)] = true,		-- Rebirth
-		[SpellName(20707)] = true,		-- Soulstone
-		[SpellName(2006)] = true,		-- Resurrection
-		[SpellName(7328)] = true,		-- Redemption
-		[SpellName(2008)] = true,		-- Ancestral Spirit
-	}
-else
-	spells = {
-		[SpellName(20484)] = true,		-- Rebirth
-		[SpellName(61999)] = true,		-- Raise Ally
-		[SpellName(20707)] = true,		-- Soulstone
-		[SpellName(50769)] = true,		-- Revive
-		[SpellName(2006)] = true,		-- Resurrection
-		[SpellName(7328)] = true,		-- Redemption
-		[SpellName(2008)] = true,		-- Ancestral Spirit
-		[SpellName(115178)] = true,		-- Resuscitate
-	}
+local spells = {
+	[SpellName(20484)] = true,			-- Rebirth
+	[SpellName(20707)] = true,			-- Soulstone
+	[SpellName(2006)] = true,			-- Resurrection
+	[SpellName(7328)] = true,			-- Redemption
+	[SpellName(2008)] = true,			-- Ancestral Spirit
+}
+
+if T.SoD then
+	spells[SpellName(430318)] = true	-- Reintegration [Season of Discovery]
+end
+
+if T.toc >= 30000 then
+	spells[SpellName(61999)] = true		-- Raise Ally
+	spells[SpellName(50769)] = true		-- Revive
+end
+
+if T.toc >= 50000 then
+	spells[SpellName(115178)] = true	-- Resuscitate
 end
 
 local frame = CreateFrame("Frame")

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.nameplate.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ local function SpellName(id)
 	if name then
 		return name
 	else
-		print("|cffff0000WARNING: spell ID ["..tostring(id).."] no longer exists! Report this to EsreverWoW.|r")
+		print("|cffff0000ShestakUI: spell ID ["..tostring(id).."] no longer exists!|r")
 		return "Empty"
 	end
 end
@@ -109,12 +109,10 @@ T.DebuffWhiteList = {
 	[SpellName(6136)] = true,	-- Chilled (Frost Armor)
 	-- [SpellName(7321)] = true,	-- Chilled (Ice Armor)
 	[SpellName(120)] = true,	-- Cone of Cold
-	[SpellName(18469)] = true,	-- Counterspell - Silenced
 	[SpellName(44572)] = true,	-- Deep Freeze
 	[SpellName(31661)] = true,	-- Dragon's Breath
 	[SpellName(64346)] = true,	-- Fiery Payback
 	[SpellName(133)] = true,	-- Fireball
-	[SpellName(22959)] = true,	-- Fire Vulnerability (Improved Scorch)
 	[SpellName(2120)] = true,	-- Flamestrike
 	[SpellName(122)] = true,	-- Frost Nova
 	[SpellName(12494)] = true,	-- Frostbite
@@ -122,18 +120,22 @@ T.DebuffWhiteList = {
 	[SpellName(44614)] = true,	-- Frostfire Bolt
 	[SpellName(12654)] = true,	-- Ignite
 	[SpellName(12355)] = true,	-- Impact
+	[SpellName(22959)] = true,	-- Improved Scorch
 	[SpellName(44457)] = true,	-- Living Bomb
 	[SpellName(68391)] = true,	-- Permafrost
 	[SpellName(118)] = true,	-- Polymorph
 	[SpellName(11366)] = true,	-- Pyroblast
+	[SpellName(55080)] = true,	-- Shattered Barrier
+	[SpellName(18469)] = true,	-- Silenced - Improved Counterspell
 	[SpellName(31589)] = true,	-- Slow
 	[SpellName(12579)] = true,	-- Winter's Chill
 
 	-- Paladin
 	[SpellName(31935)] = true,	-- Avenger's Shield
-	[SpellName(53742)] = true,	-- Blood Corruption
-	-- [SpellName(26573)] = true,	-- Consecration
+	[SpellName(356110)] = true,	-- Blood Corruption
+	[SpellName(26573)] = true,	-- Consecration
 	[SpellName(853)] = true,	-- Hammer of Justice
+	[SpellName(62124)] = true,	-- Hand of Reckoning
 	[SpellName(21183)] = true,	-- Heart of the Crusader
 	[SpellName(31803)] = true,	-- Holy Vengeance
 	[SpellName(2812)] = true,	-- Holy Wrath
@@ -141,7 +143,6 @@ T.DebuffWhiteList = {
 	[SpellName(20185)] = true,	-- Judgement of Light
 	[SpellName(68055)] = true,	-- Judgements of the Just
 	[SpellName(20186)] = true,	-- Judgement of Wisdom
-	[SpellName(21183)] = true,	-- Judgement of the Crusader
 	[SpellName(20066)] = true,	-- Repentance
 	[SpellName(61840)] = true,	-- Righteous Vengeance
 	[SpellName(53659)] = true,	-- Sacred Cleansing
@@ -174,30 +175,32 @@ T.DebuffWhiteList = {
 	[SpellName(3409)] = true,	-- Crippling Poison
 	[SpellName(2818)] = true,	-- Deadly Poison
 	[SpellName(26679)] = true,	-- Deadly Throw
-	[SpellName(32747)] = true,	-- Deadly Throw Interrupt
 	[SpellName(51722)] = true,	-- Dismantle
 	[SpellName(8647)] = true,	-- Expose Armor
 	[SpellName(703)] = true,	-- Garrote
 	[SpellName(1330)] = true,	-- Garrote - Silence
 	[SpellName(1776)] = true,	-- Gouge
 	[SpellName(16511)] = true,	-- Hemorrhage
-	[SpellName(18425)] = true,	-- Silenced - Improved Kick
+	[SpellName(32747)] = true,	-- Interrupt
 	[SpellName(408)] = true,	-- Kidney Shot
 	[SpellName(5760)] = true,	-- Mind-numbing Poison
 	[SpellName(14251)] = true,	-- Riposte
 	[SpellName(1943)] = true,	-- Rupture
 	[SpellName(6770)] = true,	-- Sap
 	[SpellName(58684)] = true,	-- Savage Combat
+	[SpellName(18425)] = true,	-- Silenced - Improved Kick
 	[SpellName(51693)] = true,	-- Waylay
 	[SpellName(13218)] = true,	-- Wound Poison
 
 	-- Shaman
 	[SpellName(58861)] = true,	-- Bash (Spirit Wolf)
+	[SpellName(53019)] = true,	-- Earth's Grasp
 	[SpellName(3600)] = true,	-- Earthbind
 	[SpellName(64930)] = true,	-- Electrified (Worldbreaker Garb)
 	[SpellName(8050)] = true,	-- Flame Shock
 	[SpellName(8056)] = true,	-- Frost Shock
 	[SpellName(8034)] = true,	-- Frostbrand Attack
+	[SpellName(51514)] = true,	-- Hex
 	[SpellName(39796)] = true,	-- Stoneclaw Totem
 	[SpellName(17364)] = true,	-- Stormstrike
 	[SpellName(58857)] = true,	-- Twin Howl
@@ -227,7 +230,7 @@ T.DebuffWhiteList = {
 	[SpellName(48181)] = true,	-- Haunt
 	[SpellName(5484)] = true,	-- Howl of Terror
 	[SpellName(348)] = true,	-- Immolate
-	[SpellName(30153)] = true,	-- Intercept Stun (Felguard)
+	[SpellName(30153)] = true,	-- Intercept (Felguard)
 	-- [SpellName(5740)] = true,	-- Rain of Fire
 	[SpellName(27243)] = true,	-- Seed of Corruption
 	[SpellName(6358)] = true,	-- Seduction (Succubus)
@@ -252,7 +255,7 @@ T.DebuffWhiteList = {
 	[SpellName(58373)] = true,	-- Glyph of Hamstring
 	[SpellName(1715)] = true,	-- Hamstring
 	[SpellName(23694)] = true,	-- Improved Hamstring
-	[SpellName(20253)] = true,	-- Intercept Stun
+	[SpellName(20253)] = true,	-- Intercept
 	[SpellName(20511)] = true,	-- Intimidating Shout (Cower)
 	[SpellName(5246)] = true,	-- Intimidating Shout (Fear)
 	[SpellName(694)] = true,	-- Mocking Blow
@@ -263,6 +266,7 @@ T.DebuffWhiteList = {
 	[SpellName(46968)] = true,	-- Shockwave
 	[SpellName(18498)] = true,	-- Silenced - Gag Order
 	[SpellName(7386)] = true,	-- Sunder Armor
+	[SpellName(355)] = true,	-- Taunt
 	[SpellName(6343)] = true,	-- Thunder Clap
 	[SpellName(46856)] = true,	-- Trauma
 	[SpellName(64849)] = true,	-- Unrelenting Assault
@@ -361,6 +365,7 @@ T.BuffWhiteList = {
 	[SpellName(58914)] = true,	-- Kill Command (Pet)
 	[SpellName(56453)] = true,	-- Lock and Load
 	[SpellName(34833)] = true,	-- Master Tactician
+	[SpellName(62305)] = true,	-- Master's Call
 	[SpellName(136)] = true,	-- Mend Pet
 	-- [SpellName(24450)] = true,	-- Prowl (Cat)
 	[SpellName(6150)] = true,	-- Quick Shots
@@ -409,8 +414,8 @@ T.BuffWhiteList = {
 	[SpellName(1463)] = true,	-- Mana Shield
 	[SpellName(55342)] = true,	-- Mirror Image
 	[SpellName(44401)] = true,	-- Missile Barrage
-	[SpellName(130)] = true,	-- Slow Fall
 	[SpellName(12043)] = true,	-- Presence of Mind
+	[SpellName(130)] = true,	-- Slow Fall
 
 	-- Paladin
 	[SpellName(31884)] = true,	-- Avenging Wrath
@@ -534,6 +539,7 @@ T.BuffWhiteList = {
 	[SpellName(8178)] = true,	-- Grounding Totem Effect
 	-- [SpellName(5672)] = true,	-- Healing Stream
 	[SpellName(32182)] = true,	-- Heroism
+	[SpellName(65264)] = true,	-- Lava Flows
 	[SpellName(324)] = true,	-- Lightning Shield
 	[SpellName(53817)] = true,	-- Maelstrom Weapon
 	-- [SpellName(5677)] = true,	-- Mana Spring Totem
@@ -592,8 +598,8 @@ T.BuffWhiteList = {
 	-- [SpellName(5500)] = true,	-- Sense Demons
 	[SpellName(17941)] = true,	-- Shadow Trance
 	[SpellName(6229)] = true,	-- Shadow Ward
-	[SpellName(20707)] = true,	-- Soulstone Resurrection
 	[SpellName(25228)] = true,	-- Soul Link
+	[SpellName(20707)] = true,	-- Soulstone Resurrection
 
 	-- Warrior
 	[SpellName(6673)] = true,	-- Battle Shout
@@ -656,16 +662,16 @@ T.PlateBlacklist = {
 	-- Raid
 }
 
-T.InterruptCast = {
+T.InterruptCast = { -- Yellow border for interruptible cast
 	-- [SpellID] = true,	-- Spell Name
 }
 
-T.ImportantCast = {
+T.ImportantCast = { -- Red border for non-interruptible cast
 	-- [SpellID] = true,	-- Spell Name
 }
 
 local color = C.nameplate.mob_color
-local color2 = {0, 0.7, 0.6}
+local color_alt = {0, 0.7, 0.6}
 T.ColorPlate = {
 	-- PvP
 		["5925"] = color,		-- Grounding Totem
@@ -689,6 +695,15 @@ T.ColorPlate = {
 		["25370"] = color,		-- Sunblade Dusk Priest
 		-- Naxxramas
 		["16385"] = color,		-- Lightning Totem
+		-- Ulduar
+		["33836"] = color,		-- Bomb Bot
+		-- TOC / TOGC
+		["5925"] = color,		-- Grounding Totem
+		["34686"] = color,		-- Healing Stream Totem
+		["34687"] = color,		-- Searing Totem
+		["31129"] = color,		-- Strength of Earth Totem VIII
+		["5913"] = color,		-- Tremor Totem
+		["6112"] = color,		-- Windfury Totem
 	-- Dungeons
 		-- Hellfire Ramparts
 		["17478"] = color,		-- Bleeding Hollow Scryer
@@ -712,7 +727,7 @@ T.ColorPlate = {
 		-- Sethekk Halls
 		["18325"] = color,		-- Sethekk Prophet
 		["18327"] = color,		-- Time-Lost Controller
-		["20343"] = color2,		-- Charming Totem
+		["20343"] = color_alt,		-- Charming Totem
 		-- Old Hillsbrad Foothills
 		["17833"] = color,		-- Durnholde Warden
 		["18934"] = color,		-- Durnholde Mage
@@ -737,13 +752,4 @@ T.ColorPlate = {
 		["19509"] = color,		-- Sunseeker Harvester
 		["19633"] = color,		-- Bloodwarder Mender
 		-- Magisters' Terrace
-		-- Ulduar
-		["33836"] = color,		-- Bomb Bot
-		-- TOC / TOGC
-		["5925"] = color,		-- Grounding Totem
-		["34686"] = color,		-- Healing Stream Totem
-		["34687"] = color,		-- Searing Totem
-		["31129"] = color,		-- Strength of Earth Totem VIII
-		["5913"] = color,		-- Tremor Totem
-		["6112"] = color,		-- Windfury Totem
 }

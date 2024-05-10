@@ -1,10 +1,11 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.aura.player_auras ~= true then return end
 
 ----------------------------------------------------------------------------------------
 --	Style player buff(by Tukz)
 ----------------------------------------------------------------------------------------
 local rowbuffs = 16
+local alpha = 0
 
 local GetFormattedTime = function(s)
 	if s >= 86400 then
@@ -22,21 +23,14 @@ BuffsAnchor:SetPoint(unpack(C.position.player_buffs))
 BuffsAnchor:SetSize((15 * C.aura.player_buff_size) + 42, (C.aura.player_buff_size * 2) + 3)
 
 local function UpdateDuration(aura, timeLeft)
+	local duration = aura.Duration
 	if timeLeft and C.aura.show_timer == true then
-		aura.duration:SetVertexColor(1, 1, 1)
-		aura.duration:SetFormattedText(GetFormattedTime(timeLeft))
+		duration:SetVertexColor(1, 1, 1)
+		duration:SetFormattedText(GetFormattedTime(timeLeft))
 	else
-		aura.duration:Hide()
+		duration:Hide()
 	end
 end
-
-hooksecurefunc(BuffButtonMixin, "UpdateDuration", function(aura, timeLeft)
-	UpdateDuration(aura, timeLeft)
-end)
-
-hooksecurefunc(TempEnchantButtonMixin, "UpdateDuration", function(aura, timeLeft)
-	UpdateDuration(aura, timeLeft)
-end)
 
 hooksecurefunc(BuffFrame.AuraContainer, "UpdateGridLayout", function(self, auras)
 	local previousBuff, aboveBuff
@@ -44,16 +38,18 @@ hooksecurefunc(BuffFrame.AuraContainer, "UpdateGridLayout", function(self, auras
 		aura:SetSize(C.aura.player_buff_size, C.aura.player_buff_size)
 		aura:SetTemplate("Default")
 
-		if aura.Border then
-			aura.Border:SetAlpha(0)
+		aura.TempEnchantBorder:SetAlpha(0)
+		hooksecurefunc(aura.TempEnchantBorder, "Show", function(self)
 			aura:SetBackdropBorderColor(0.6, 0.1, 0.6)
-		else
+		end)
+
+		hooksecurefunc(aura.TempEnchantBorder, "Hide", function(self)
 			if C.aura.classcolor_border == true then
 				aura:SetBackdropBorderColor(unpack(C.media.classborder_color))
 			else
 				aura:SetBackdropBorderColor(unpack(C.media.border_color))
 			end
-		end
+		end)
 
 		aura:ClearAllPoints()
 		if (index > 1) and (mod(index, rowbuffs) == 1) then
@@ -71,21 +67,49 @@ hooksecurefunc(BuffFrame.AuraContainer, "UpdateGridLayout", function(self, auras
 		aura.Icon:CropIcon()
 		aura.Icon:SetDrawLayer("BORDER")
 
-		aura.duration:ClearAllPoints()
-		aura.duration:SetPoint("CENTER", 2, 1)
-		aura.duration:SetDrawLayer("ARTWORK")
-		aura.duration:SetFont(C.font.auras_font, C.font.auras_font_size, C.font.auras_font_style)
-		aura.duration:SetShadowOffset(C.font.auras_font_shadow and 1 or 0, C.font.auras_font_shadow and -1 or 0)
+		local duration = aura.Duration
+		duration:ClearAllPoints()
+		duration:SetPoint("CENTER", 2, 1)
+		duration:SetDrawLayer("ARTWORK")
+		duration:SetFont(C.font.auras_font, C.font.auras_font_size, C.font.auras_font_style)
+		duration:SetShadowOffset(C.font.auras_font_shadow and 1 or 0, C.font.auras_font_shadow and -1 or 0)
 
-		if aura.count then -- fix error in EditMode
-			aura.count:ClearAllPoints()
-			aura.count:SetPoint("BOTTOMRIGHT", 2, 0)
-			aura.count:SetDrawLayer("ARTWORK")
-			aura.count:SetFont(C.font.auras_font, C.font.auras_font_size, C.font.auras_font_style)
-			aura.count:SetShadowOffset(C.font.auras_font_shadow and 1 or 0, C.font.auras_font_shadow and -1 or 0)
+		if not aura.hook then
+			hooksecurefunc(aura, "UpdateDuration", function(aura, timeLeft)
+				UpdateDuration(aura, timeLeft)
+			end)
+			if C.aura.player_buff_mouseover then
+				aura:SetParent(BuffsAnchor)
+				aura:HookScript("OnEnter", function()
+					BuffsAnchor:SetAlpha(1)
+				end)
+				aura:HookScript("OnLeave", function()
+					BuffsAnchor:SetAlpha(alpha)
+				end)
+			end
+			aura.hook = true
+		end
+
+		if aura.Count then -- need to check exist to prevent error in EditMode
+			aura.Count:ClearAllPoints()
+			aura.Count:SetPoint("BOTTOMRIGHT", 2, 0)
+			aura.Count:SetDrawLayer("ARTWORK")
+			aura.Count:SetFont(C.font.auras_font, C.font.auras_font_size, C.font.auras_font_style)
+			aura.Count:SetShadowOffset(C.font.auras_font_shadow and 1 or 0, C.font.auras_font_shadow and -1 or 0)
 		end
 	end
 end)
+
+-- Mouseover
+if C.aura.player_buff_mouseover then
+	BuffsAnchor:SetAlpha(alpha)
+	BuffsAnchor:HookScript("OnEnter", function()
+		BuffsAnchor:SetAlpha(1)
+	end)
+	BuffsAnchor:HookScript("OnLeave", function()
+		BuffsAnchor:SetAlpha(alpha)
+	end)
+end
 
 -- Hide collapse button
 BuffFrame.CollapseAndExpandButton:Kill()

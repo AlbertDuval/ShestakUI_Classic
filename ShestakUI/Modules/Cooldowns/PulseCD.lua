@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.pulsecooldown.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -13,7 +13,7 @@ local anchor = CreateFrame("Frame", "PulseCDAnchor", UIParent)
 anchor:SetSize(C.pulsecooldown.size, C.pulsecooldown.size)
 anchor:SetPoint(unpack(C.position.pulse_cooldown))
 
-local frame = CreateFrame("Frame", "PulseCDFrame", anchor, BackdropTemplateMixin and "BackdropTemplate" or nil)
+local frame = CreateFrame("Frame", "PulseCDFrame", anchor, BackdropTemplateMixin and "BackdropTemplate")
 frame:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
 frame:SetBackdrop({
 	bgFile = C.media.blank, edgeFile = C.media.blank, edgeSize = T.noscalemult,
@@ -88,16 +88,7 @@ local function OnUpdate(_, update)
                     end)
 				elseif v[2] == "item" then
 					getCooldownDetails = memoize(function()
-                        local start, duration, enabled
-						if T.Classic then
-							if v[4] == "action" then
-								start, duration, enabled = GetActionCooldown(v[5])
-							elseif v[4] == "inventory" then
-								start, duration, enabled = GetInventoryItemCooldown("player", v[5])
-							elseif v[4] == "container" then
-								start, duration, enabled = C_Container.GetContainerItemCooldown(v[5], v[6])
-							end
-						end
+						local start, duration, enabled = C_Container.GetItemCooldown(i)
                         return {
                             name = GetItemInfo(i),
                             texture = v[3],
@@ -122,7 +113,7 @@ local function OnUpdate(_, update)
 				end
 				if getCooldownDetails then
 					local cooldown = getCooldownDetails()
-					if T.pulse_ignored_spells[cooldown.name] then
+					if (C.pulsecooldown.whitelist and not T.pulse_ignored_spells[cooldown.name]) or (not C.pulsecooldown.whitelist and T.pulse_ignored_spells[cooldown.name]) then
 						watching[i] = nil
 					else
 						if cooldown.enabled ~= 0 then
@@ -139,11 +130,13 @@ local function OnUpdate(_, update)
 		end
 		for i, getCooldownDetails in pairs(cooldowns) do
             local cooldown = getCooldownDetails()
-            local remaining = cooldown.duration - (GetTime() - cooldown.start)
-            if remaining <= 0 then
-                tinsert(animating, {cooldown.texture, cooldown.isPet, cooldown.name})
-                cooldowns[i] = nil
-            end
+			if cooldown then
+				local remaining = cooldown.duration - (GetTime() - cooldown.start)
+				if remaining <= 0.2 then
+					tinsert(animating, {cooldown.texture, cooldown.isPet, cooldown.name})
+					cooldowns[i] = nil
+				end
+			end
         end
 
 		elapsed = 0
@@ -211,12 +204,9 @@ end
 frame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player", "")
 
 function frame:COMBAT_LOG_EVENT_UNFILTERED()
-	local _, eventType, _, _, _, sourceFlags, _, _, _, _, _, spellID, spellName = CombatLogGetCurrentEventInfo()
+	local _, eventType, _, _, _, sourceFlags, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
 	if eventType == "SPELL_CAST_SUCCESS" then
 		if (bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PET) == COMBATLOG_OBJECT_TYPE_PET and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE) then
-			if T.Vanilla then
-				spellID = T.GetSpellID(spellName)
-			end
 			local name = GetSpellInfo(spellID)
 			local index = GetPetActionIndexByName(name)
 			if index and not select(7, GetPetActionInfo(index)) then
@@ -247,7 +237,7 @@ hooksecurefunc("UseAction", function(slot)
 	if actionType == "item" then
 		local texture = GetActionTexture(slot)
 		if texture == 136235 then return end -- prevent temp icon
-		watching[itemID] = {GetTime(), "item", texture, "action", slot}
+		watching[itemID] = {GetTime(), "item", texture}
 	end
 end)
 
@@ -256,18 +246,20 @@ hooksecurefunc("UseInventoryItem", function(slot)
 	if itemID then
 		local texture = GetInventoryItemTexture("player", slot)
 		if texture == 136235 then return end -- prevent temp icon
-		watching[itemID] = {GetTime(), "item", texture, "inventory", slot}
+		watching[itemID] = {GetTime(), "item", texture}
 	end
 end)
 
-hooksecurefunc("UseContainerItem", function(bag, slot)
-	local itemID = GetContainerItemID(bag, slot)
-	if itemID then
-		local texture = select(10, GetItemInfo(itemID))
-		if texture == 136235 then return end -- prevent temp icon
-		watching[itemID] = {GetTime(), "item", texture, "container", bag, slot}
-	end
-end)
+if T.Classic then
+	hooksecurefunc(_G.C_Container, "UseContainerItem", function(bag, slot)
+		local itemID = C_Container.GetContainerItemID(bag, slot)
+		if itemID then
+			local texture = select(10, GetItemInfo(itemID))
+			if texture == 136235 then return end -- prevent temp icon
+			watching[itemID] = {GetTime(), "item", texture}
+		end
+	end)
+end
 
 SlashCmdList.PulseCD = function()
 	tinsert(animating, {GetSpellTexture(87214)})

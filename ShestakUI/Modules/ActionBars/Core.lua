@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.actionbar.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -7,9 +7,7 @@ if C.actionbar.enable ~= true then return end
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:SetScript("OnEvent", function()
-	if T.Classic then
-		MainMenuBar:SetScale(0.00001)
-	end
+	MainMenuBar:SetScale(0.00001)
 	MainMenuBar:EnableMouse(false)
 
 	if T.Classic then
@@ -22,7 +20,7 @@ frame:SetScript("OnEvent", function()
 		StanceBar:UnregisterAllEvents()
 	end
 
-	if T.Mainline or T.Wrath then
+	if T.Wrath or T.Cata or T.Mainline then
 		OverrideActionBar:SetScale(0.00001)
 		OverrideActionBar:EnableMouse(false)
 	end
@@ -32,6 +30,16 @@ frame:SetScript("OnEvent", function()
 		MicroButtonAndBagsBar:EnableMouse(false)
 		MicroButtonAndBagsBar:ClearAllPoints()
 		MicroButtonAndBagsBar:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, -99) -- Prevent scaling for right panels
+		BagsBar:Hide()
+		BagsBar:UnregisterAllEvents()
+	end
+
+	if T.Mainline then
+		if not C.actionbar.micromenu then
+			MicroMenu:Hide()
+			TalentMicroButton:ClearAllPoints()
+			TalentMicroButton:SetPoint("TOP", UIParent, "TOP", 0, 100) -- hide missing talent alert
+		end
 	end
 
 	MainMenuBar:SetMovable(true)
@@ -62,7 +70,7 @@ frame:SetScript("OnEvent", function()
 		element:SetAlpha(0)
 	end
 
-	if T.Mainline or T.Wrath then
+	if T.Wrath or T.Cata or T.Mainline then
 		for i = 1, 6 do
 			local b = _G["OverrideActionBarButton"..i]
 			b:UnregisterAllEvents()
@@ -79,7 +87,7 @@ frame:SetScript("OnEvent", function()
 		hooksecurefunc("TalentFrame_LoadUI", function()
 			if T.Classic then
 				PlayerTalentFrame:UnregisterEvent("CHARACTER_POINTS_CHANGED")
-				if T.Wrath then
+				if T.Wrath or T.Cata then
 					PlayerTalentFrame:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 				end
 			else
@@ -87,6 +95,10 @@ frame:SetScript("OnEvent", function()
 			end
 		end)
 	end
+
+	-- Fixed SetPointBase and ShowBase taints after finish Pet Battle, entering new combat and summon Hunter pet.
+	ActionBarController:UnregisterEvent("UPDATE_VEHICLE_ACTIONBAR")
+	ActionBarController:UnregisterEvent("UPDATE_OVERRIDE_ACTIONBAR")
 end)
 
 ----------------------------------------------------------------------------------------
@@ -354,7 +366,7 @@ EventSpiral:SetScript("OnEvent", function()
 	end
 
 	if C.actionbar.stancebar_mouseover == true and C.actionbar.stancebar_horizontal == true and C.actionbar.stancebar_hide ~= true then
-		StanceBarMouseOver(0)
+		StanceBarMouseOver(C.actionbar.stancebar_mouseover_alpha)
 	end
 
 	if C.actionbar.bottombars_mouseover then
@@ -453,7 +465,7 @@ if T.Classic then
 				ActionButton_ShowGrid(button, reason)
 				button:SetAttribute("statehidden", true)
 
-				if T.Wrath then
+				if T.Wrath or T.Cata then
 					if _G["VehicleMenuBarActionButton"..i] then
 						_G["VehicleMenuBarActionButton"..i]:SetAttribute("statehidden", true)
 					end
@@ -464,53 +476,68 @@ if T.Classic then
 		end
 	end)
 else
-	--local actionFrame = {
-	--	MultiBarBottomLeft,
-	--	MultiBarLeft,
-	--	MultiBarRight,
-	--	MultiBarBottomRight,
-	--	MultiBar5,
-	--	MultiBar6,
-	--	MultiBar7,
-	--}
-	--
-	--EditModeUtil.GetRightContainerAnchor = T.dummy -- Prevent error with offset
-	--
-	--local frame = CreateFrame("Frame")
-	--frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-	--frame:SetScript("OnEvent", function(self)
-	--	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	--
-	--	-- Fix errors from EditMode
-	--	for i = 1, #actionFrame do
-	--		actionFrame[i].SetPointBase = T.dummy
-	--		actionFrame[i].SetScaleBase = T.dummy
-	--		actionFrame[i].ShowBase = T.dummy
-	--		actionFrame[i].HideBase = T.dummy
-	--	end
-	--	if C.actionbar.show_grid == true then
-	--		SetCVar("alwaysShowActionBars", 1)
-	--	else
-	--		SetCVar("alwaysShowActionBars", 0)
-	--		for i = 1, 12 do
-	--			local button = _G[format("MultiBarRightButton%d", i)]
-	--			button:SetAttribute("showgrid", 0)
-	--
-	--			button = _G[format("MultiBarBottomRightButton%d", i)]
-	--			button:SetAttribute("showgrid", 0)
-	--
-	--			button = _G[format("MultiBarLeftButton%d", i)]
-	--			button:SetAttribute("showgrid", 0)
-	--
-	--			button = _G[format("MultiBarBottomLeftButton%d", i)]
-	--			button:SetAttribute("showgrid", 0)
-	--		end
-	--		local reason = ACTION_BUTTON_SHOW_GRID_REASON_EVENT
-	--		for i = 1, #actionFrame do
-	--			actionFrame[i]:SetShowGrid(false, reason)
-	--		end
-	--	end
-	--end)
+	if not C.actionbar.show_grid then
+		local allButtons = {}
+		for i = 1, 12 do
+			local button = _G[format("ActionButton%d", i)]
+			tinsert(allButtons, button)
+
+			local button = _G[format("MultiBarRightButton%d", i)]
+			tinsert(allButtons, button)
+
+			button = _G[format("MultiBarBottomRightButton%d", i)]
+			tinsert(allButtons, button)
+
+			button = _G[format("MultiBarLeftButton%d", i)]
+			tinsert(allButtons, button)
+
+			button = _G[format("MultiBarBottomLeftButton%d", i)]
+			tinsert(allButtons, button)
+
+			button = _G[format("MultiBar5Button%d", i)]
+			tinsert(allButtons, button)
+
+			button = _G[format("MultiBar6Button%d", i)]
+			tinsert(allButtons, button)
+
+			button = _G[format("MultiBar7Button%d", i)]
+			tinsert(allButtons, button)
+		end
+
+		local frame = CreateFrame("Frame")
+		frame:RegisterEvent("ACTIONBAR_SHOWGRID")
+		frame:RegisterEvent("ACTIONBAR_HIDEGRID")
+		frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+		frame:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
+		frame:RegisterEvent("ACTIONBAR_UPDATE_STATE")
+		frame:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
+		frame:SetScript("OnEvent", function(self, event)
+			if event == "ACTIONBAR_SHOWGRID" then
+				for i = 1, #allButtons do
+					allButtons[i]:SetAlpha(1)
+				end
+			elseif event == "ACTIONBAR_PAGE_CHANGED" or event == "ACTIONBAR_UPDATE_STATE" or event == "UPDATE_VEHICLE_ACTIONBAR" then
+				C_Timer.After(0.02, function()
+					for i = 1, #allButtons do
+						local button = allButtons[i]
+						button:SetAlpha(1)
+						if not button:HasAction() then
+							button:SetAlpha(0)
+						end
+					end
+				end)
+			else
+				C_Timer.After(0.05, function()
+					for i = 1, #allButtons do
+						local button = allButtons[i]
+						if not button:HasAction() then
+							button:SetAlpha(0)
+						end
+					end
+				end)
+			end
+		end)
+	end
 end
 
 ----------------------------------------------------------------------------------------
@@ -541,8 +568,6 @@ T.ShiftBarUpdate = function()
 			if isActive then
 				if T.Classic then
 					StanceBarFrame.lastSelected = button:GetID()
-				else
-					--BETA StanceBar.lastSelected = button:GetID()
 				end
 				button:SetChecked(true)
 			else

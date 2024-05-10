@@ -5,8 +5,12 @@ local L = ns
 ----------------------------------------------------------------------------------------
 --	GUI for ShestakUI(by Haleth, Solor)
 ----------------------------------------------------------------------------------------
+local function IsMainlineBuild()
+	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE
+end
+
 local function IsClassicBuild()
-	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC or _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC or _G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC
+	return _G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_MAINLINE
 end
 
 local function IsVanillaBuild()
@@ -19,6 +23,10 @@ end
 
 local function IsWrathBuild()
 	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC
+end
+
+local function IsCataBuild()
+	return _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CATACLYSM_CLASSIC
 end
 
 local function HideOptions(list)
@@ -80,16 +88,6 @@ OkayButton:Disable()
 tinsert(ns.buttons, CloseButton)
 tinsert(ns.buttons, OkayButton)
 
-local ProfileBox = CreateFrame("CheckButton", nil, options, "InterfaceOptionsCheckButtonTemplate")
-ProfileBox:SetPoint("TOPRIGHT", -6, -6)
-
-local label = ProfileBox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-label:SetText(L_GUI_SET_SAVED_SETTTINGS)
-label:SetPoint("RIGHT", ProfileBox, "LEFT")
-
-ProfileBox.tooltipText = L_GUI_SET_SAVED_SETTTINGS_DESC
-options.ProfileBox = ProfileBox
-
 local reloadText = options:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
 reloadText:SetPoint("BOTTOM", 0, 11)
 reloadText:SetText("|cffff2735"..L_GUI_NEED_RELOAD.."|r")
@@ -101,8 +99,9 @@ StaticPopupDialogs.SHESTAKUI_RESET_PERCHAR = {
 	button1 = ACCEPT,
 	button2 = CANCEL,
 	OnAccept = function()
-		ShestakUIOptionsPerChar = {}
-		C.options = ShestakUIOptionsPerChar
+		local i = tostring(ShestakUIOptionsGlobal[realm]["Current_Profile"][name])
+		ShestakUIOptionsPerChar[i] = {}
+		C.options = ShestakUIOptionsPerChar[i]
 		ReloadUI()
 	end,
 	whileDead = true,
@@ -115,8 +114,9 @@ StaticPopupDialogs.SHESTAKUI_RESET = {
 	button1 = ACCEPT,
 	button2 = CANCEL,
 	OnAccept = function()
-		ShestakUIOptions = {}
-		C.options = ShestakUIOptions
+		local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+		ShestakUIOptions[i] = {}
+		C.options = ShestakUIOptions[i]
 		ReloadUI()
 	end,
 	whileDead = true,
@@ -250,7 +250,7 @@ SpellList.title = _G["SpellListTitle"] or SpellList:CreateFontString("SpellListT
 SpellList.title:SetPoint("TOP", _G["SpellList"], "TOP", 0, -5)
 SpellList.title:SetText(L_GUI_SPELL_LIST)
 
-local ScrollSpells = CreateFrame("ScrollFrame", "SpellListScrollFrameSpellList", _G["SpellListInset"], "UIPanelScrollFrameTemplate")
+local ScrollSpells = CreateFrame("ScrollFrame", "SpellListScrollFrameSpellList", _G["SpellListInset"], "ScrollFrameTemplate")
 ScrollSpells:SetPoint("TOPLEFT", _G["SpellListInset"], "TOPLEFT", -10, 19)
 ScrollSpells:SetPoint("BOTTOMRIGHT", _G["SpellListInset"], "BOTTOMRIGHT", -30, 40)
 ScrollSpells.child = CreateFrame("Frame", "SpellListScrollFrameSpellListChild", ScrollSpells)
@@ -279,7 +279,7 @@ SpellList.makeSpellsList = function(_, db, double)
 			if not isFilger or isFilger and spell[2] == T.class then
 				local sp = (double or ShestakUIOptionsPanelfilger:IsShown()) and spell[1] or spell
 				local name, _, icon = GetSpellInfo(sp)
-				local bf = _G["SpellList"..i.."_cbs"] or CreateFrame("Button", "SpellList"..i.."_cbs", scroll, BackdropTemplateMixin and "BackdropTemplate" or nil)
+				local bf = _G["SpellList"..i.."_cbs"] or CreateFrame("Button", "SpellList"..i.."_cbs", scroll, BackdropTemplateMixin and "BackdropTemplate")
 
 				if i == 1 then
 					bf:SetPoint("TOPLEFT", scroll, "TOPLEFT", 10, -5)
@@ -343,6 +343,12 @@ SpellList.makeSpellsList = function(_, db, double)
 				bf:Show()
 				oldb = bf
 				i = i + 1
+
+				-- Remove outdated spells
+				if not name then
+					tremove(db, k)
+					SpellList:makeSpellsList(db, double)
+				end
 			end
 		end
 	end
@@ -436,6 +442,7 @@ InputArg:Hide()
 
 local curOption
 local function BuildSpellList(option, double, hiding)
+	if ProfileList:IsVisible() then ProfileList:Hide() end
 	if not hiding and SpellList:IsVisible() then SpellList:Hide() return end
 	curOption = option
 	doubleInput = double
@@ -528,7 +535,7 @@ do
 	GithubButton:SetSize(100, 23)
 	GithubButton:SetText("Github")
 	GithubButton:SetWidth(GithubButton.Text:GetWidth() + 15)
-	local url = IsClassicBuild() and "https://github.com/EsreverWoW/ShestakUI_Classic" or "https://github.com/Shestak/ShestakUI"
+	local url = IsClassicBuild() and "https://github.com/EsreverWoW/ShestakUI_Classic" or "https://github.com/Wetxius/ShestakUI"
 	GithubButton:SetScript("OnClick", function()
 		StaticPopup_Show("LINK_URL", _, _, url)
 	end)
@@ -545,7 +552,7 @@ do
 	subtitle2:SetWidth(750)
 	subtitle2:SetPoint("TOPLEFT", title2, "BOTTOMLEFT", 0, -8)
 	subtitle2:SetJustifyH("LEFT")
-	subtitle2:SetText((GetAddOnMetadata or C_AddOns.GetAddOnMetadata)("ShestakUI", "X-Credits"))
+	subtitle2:SetText(C_AddOns.GetAddOnMetadata("ShestakUI", "X-Credits"))
 
 	local title3 = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 	title3:SetPoint("TOPLEFT", subtitle2, "BOTTOMLEFT", 0, -16)
@@ -555,7 +562,7 @@ do
 	subtitle3:SetWidth(750)
 	subtitle3:SetPoint("TOPLEFT", title3, "BOTTOMLEFT", 0, -8)
 	subtitle3:SetJustifyH("LEFT")
-	subtitle3:SetText((GetAddOnMetadata or C_AddOns.GetAddOnMetadata)("ShestakUI", "X-Translation"))
+	subtitle3:SetText(C_AddOns.GetAddOnMetadata("ShestakUI", "X-Translation"))
 
 	local title4 = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 	title4:SetPoint("TOPLEFT", subtitle3, "BOTTOMLEFT", 0, -16)
@@ -565,7 +572,7 @@ do
 	subtitle4:SetWidth(750)
 	subtitle4:SetPoint("TOPLEFT", title4, "BOTTOMLEFT", 0, -8)
 	subtitle4:SetJustifyH("LEFT")
-	subtitle4:SetText((GetAddOnMetadata or C_AddOns.GetAddOnMetadata)("ShestakUI", "X-Thanks"))
+	subtitle4:SetText(C_AddOns.GetAddOnMetadata("ShestakUI", "X-Thanks"))
 
 	local CancelButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 	CancelButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10)
@@ -579,7 +586,7 @@ do
 	tinsert(ns.buttons, CancelButton)
 
 	StaticPopupDialogs.LINK_URL = {
-		text = "Help",
+		text = COMMUNITIES_INVITE_MANAGER_COPY,
 		button1 = OKAY,
 		timeout = 0,
 		whileDead = true,
@@ -618,19 +625,19 @@ do
 
 	local editBox = CreateFrame("EditBox", "ShestakUIProfileFrameEditBox", frame)
 	editBox:SetMultiLine(true)
-	editBox:SetMaxLetters(99999)
+	editBox:SetMaxLetters(0)
 	editBox:SetAutoFocus(true)
 	editBox:SetFontObject(ChatFontNormal)
 	editBox:SetWidth(620)
 	editBox:SetHeight(500)
 	editBox:SetScript("OnEscapePressed", function() frame:Hide() end)
 
-	local scrollArea = CreateFrame("ScrollFrame", "ShestakUIProfileFrameScroll", frame, "UIPanelScrollFrameTemplate")
+	local scrollArea = CreateFrame("ScrollFrame", "ShestakUIProfileFrameScroll", frame, "ScrollFrameTemplate")
 	scrollArea:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -10)
 	scrollArea:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -29, 34)
 	scrollArea:SetScrollChild(editBox)
-	ShestakUIProfileFrameScrollScrollBar:SetPoint("TOPLEFT", ShestakUIProfileFrameScroll, "TOPRIGHT", 8, -12)
-	ShestakUIProfileFrameScrollScrollBar:SetPoint("BOTTOMLEFT", ShestakUIProfileFrameScroll, "BOTTOMRIGHT", 8, 12)
+	ShestakUIProfileFrameScroll.ScrollBar:SetPoint("TOPLEFT", ShestakUIProfileFrameScroll, "TOPRIGHT", 11, 4)
+	ShestakUIProfileFrameScroll.ScrollBar:SetPoint("BOTTOMLEFT", ShestakUIProfileFrameScroll, "BOTTOMRIGHT", 11, -5)
 
 	local CancelButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 	CancelButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -4, 4)
@@ -661,6 +668,20 @@ do
 	end)
 
 	tinsert(ns.buttons, SaveButton)
+
+	local WikiPage = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+	WikiPage:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 6, 4)
+	WikiPage:SetSize(100, 23)
+	WikiPage:SetText("Wiki")
+	WikiPage:SetWidth(WikiPage.Text:GetWidth() + 15)
+
+	local url = "https://github.com/Wetxius/ShestakUI_Profile/wiki/"
+	WikiPage:SetScript("OnClick", function()
+		editBox:ClearFocus()
+		StaticPopup_Show("LINK_URL", _, _, url)
+	end)
+
+	tinsert(ns.buttons, WikiPage)
 end
 
 -- Category
@@ -673,7 +694,7 @@ ns.addCategory("raidframe", RAID_FRAMES_LABEL, L_GUI_UF_RAIDFRAMES_SUBTEXT, 2)
 ns.addCategory("aura", BUFFOPTIONS_LABEL, BUFFOPTIONS_SUBTEXT)
 ns.addCategory("actionbar", L_GUI_ACTIONBAR, ACTIONBARS_SUBTEXT, IsClassicBuild() and 2 or 3)
 ns.addCategory("tooltip", L.tooltip, L.tooltip_subtext)
-ns.addCategory("chat", SOCIALS, L_GUI_CHAT_SUBTEXT)
+ns.addCategory("chat", SOCIALS, L.chat_subtext)
 ns.addCategory("nameplate", UNIT_NAMEPLATES, L_GUI_NAMEPLATE_SUBTEXT, 2)
 ns.addCategory("combattext", L_GUI_COMBATTEXT, COMBATTEXT_SUBTEXT.." "..L_GUI_COMBATTEXT_SUBTEXT, 2)
 ns.addCategory("bag", L_GUI_BAGS, L_GUI_BAGS_SUBTEXT)
@@ -685,7 +706,7 @@ ns.addCategory("automation", L_GUI_AUTOMATION, L_GUI_AUTOMATION_SUBTEXT)
 ns.addCategory("reminder", L_GUI_REMINDER, L_GUI_REMINDER_SUBTEXT)
 ns.addCategory("raidcooldown", L_GUI_COOLDOWN_RAID, L_GUI_COOLDOWN_RAID_SUBTEXT)
 ns.addCategory("enemycooldown", L_GUI_COOLDOWN_ENEMY, L_GUI_COOLDOWN_ENEMY_SUBTEXT)
-ns.addCategory("pulsecooldown", L_GUI_COOLDOWN_PULSE, L_GUI_COOLDOWN_PULSE_SUBTEXT)
+ns.addCategory("pulsecooldown", L.pulsecooldown, L.pulsecooldown_subtext)
 ns.addCategory("threat", L_GUI_THREAT, L_GUI_THREAT_SUBTEXT)
 ns.addCategory("toppanel", L_GUI_TOP_PANEL, L_GUI_TOP_PANEL_SUBTEXT)
 ns.addCategory("stats", L_GUI_STATS, L_GUI_STATS_SUBTEXT)
@@ -737,9 +758,6 @@ do
 
 	local hide_talking_head = ns.CreateCheckBox(parent, "hide_talking_head")
 	hide_talking_head:SetPoint("TOPLEFT", hide_banner, "BOTTOMLEFT", 0, 0)
-
-	local hide_maw_buffs = ns.CreateCheckBox(parent, "hide_maw_buffs")
-	hide_maw_buffs:SetPoint("TOPLEFT", hide_talking_head, "BOTTOMLEFT", 0, 0)
 
 	local InfoButton = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
 	InfoButton:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -20, 5)
@@ -812,11 +830,8 @@ do
 	LuaButton:SetWidth(LuaButton.Text:GetWidth() + 15)
 	LuaButton:SetScript("OnClick", function()
 		ShestakUIProfileFrameEditBox:SetText(C.media.profile)
-		C_Timer.After(0.01, function()
-			local _, max = ShestakUIProfileFrameScrollScrollBar:GetMinMaxValues()
-			for _ = 1, max do
-				ScrollFrameTemplate_OnMouseWheel(ShestakUIProfileFrameScroll, -1)
-			end
+		C_Timer.After(0, function()
+			ShestakUIProfileFrameScroll:SetVerticalScroll(ShestakUIProfileFrameScroll:GetVerticalScrollRange() or 0)
 		end)
 		ShestakUIProfileFrame:Show()
 	end)
@@ -836,21 +851,429 @@ do
 		vehicle_mouseover,
 		hide_banner,
 		hide_talking_head,
-		hide_maw_buffs
 	}
 
 	local wrath = {
 		hide_banner,
 		hide_talking_head,
-		hide_maw_buffs
 	}
 
-	if IsClassicBuild() and not IsWrathBuild() then
+	if IsVanillaBuild() or IsTBCBuild() then
 		HideOptions(classic)
 		move_blizzard:SetPoint("TOPLEFT", vehicle_mouseover, "BOTTOMLEFT", 16, 0)
 	elseif IsWrathBuild() then
 		HideOptions(wrath)
 	end
+
+	-- Profile list frame
+	local ProfileList = CreateFrame("Frame", "ProfileList", ShestakUIOptionsPanel, "ButtonFrameTemplate")
+	ProfileList:SetPoint("TOPLEFT", ShestakUIOptionsPanel, "TOPRIGHT", 22, 0)
+	ProfileList:SetSize(290, 420)
+	ProfileList:Hide()
+	ProfileListPortrait:SetAlpha(0)
+
+	ProfileList.title = ProfileList:CreateFontString("ProfileListTitle", "OVERLAY", "GameFontNormal")
+	ProfileList.title:SetPoint("TOP", _G["ProfileList"], "TOP", 0, -5)
+	ProfileList.title:SetText(L.profile_title)
+
+	local ProfileButton = CreateFrame("Button", "ShestakUIOptionsPanelProfileButton", options, "UIPanelButtonTemplate")
+	ProfileButton:SetPoint("TOPRIGHT", -10, -8)
+	ProfileButton:SetSize(100, 23)
+	ProfileButton:SetText(L.profile)
+	ProfileButton:SetScript("OnClick", function()
+		if SpellList:IsVisible() then SpellList:Hide() end
+		if ProfileList:IsVisible() then ProfileList:Hide() return end
+		ProfileList:Show()
+	end)
+
+	tinsert(ns.buttons, ProfileButton)
+
+	local ProfileListPanel = CreateFrame("Frame", "ProfileListPanel", _G["ProfileListInset"])
+	ProfileListPanel:SetPoint("TOPLEFT", _G["ProfileListInset"], "TOPLEFT", -10, 20)
+	ProfileListPanel:SetPoint("BOTTOMRIGHT", _G["ProfileListInset"], "BOTTOMRIGHT", -6, -5)
+
+	local ProfileBox = CreateFrame("CheckButton", nil, ProfileList, "InterfaceOptionsCheckButtonTemplate")
+	ProfileBox:SetPoint("TOPLEFT", ProfileList, "TOPLEFT", 1, -78)
+	ProfileBox.tooltipText = L_GUI_SET_SAVED_SETTTINGS_DESC
+	ProfileBox:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0)
+		GameTooltip:SetText(self.tooltipText, nil, nil, nil, nil, true)
+	end)
+
+	ProfileBox:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+	options.ProfileBox = ProfileBox
+
+	local label = ProfileBox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	label:SetText(L_GUI_SET_SAVED_SETTTINGS)
+	label:SetTextColor(1, 1, 1)
+	label:SetPoint("LEFT", ProfileBox, "RIGHT", 10, 0)
+	label:SetWordWrap(false)
+	label:SetWidth(230)
+
+	local profileName
+	StaticPopupDialogs.SHESTAKUI_RENAME_PROFILE = {
+		text = PET_RENAME.." "..strlower(L.profile),
+		button1 = ACCEPT,
+		button2 = CANCEL,
+		hasEditBox = true,
+		editBoxWidth = 350,
+		OnShow = function(self, text)
+			self.editBox:SetMaxLetters(0)
+			self.editBox:SetText(text)
+			self.editBox:HighlightText()
+			profileName = text
+		end,
+		EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
+		EditBoxOnTextChanged = function(self)
+			profileName = self:GetText()
+		end,
+		OnAccept = function()
+			if not profileName or profileName == "" then return end
+			if ShestakUIOptionsGlobal[realm][name] then
+				local i = tostring(ShestakUIOptionsGlobal[realm]["Current_Profile"][name])
+				if ShestakUIOptionsPerChar[i] then
+					if not ShestakUIOptionsPerChar[i]["general"] then
+						ShestakUIOptionsPerChar[i]["general"] = {}
+					end
+					ShestakUIOptionsPerChar[i]["general"]["profile_name"] = profileName
+				end
+			else
+				local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+				if ShestakUIOptions[i] then
+					if not ShestakUIOptions[i]["general"] then
+						ShestakUIOptions[i]["general"] = {}
+					end
+					ShestakUIOptions[i]["general"]["profile_name"] = profileName
+				end
+			end
+			UIDropDownMenu_SetText(ShestakUIOptionsPanelgeneralchoose_profileDropDown, profileName)
+		end,
+		whileDead = true,
+		hideOnEscape = true,
+	}
+
+	local RenameButton = CreateFrame("Button", "ProfileListPaneRenameButton", ProfileList, "UIPanelButtonTemplate")
+	RenameButton:SetPoint("TOPLEFT", ProfileBox, "TOPLEFT", 4, -34)
+	RenameButton:SetSize(100, 23)
+	RenameButton:SetText(PET_RENAME)
+	RenameButton:SetWidth(RenameButton.Text:GetWidth() + 15)
+	RenameButton:SetScript("OnClick", function()
+		if ShestakUIOptionsGlobal then
+			if ShestakUIOptionsGlobal[realm][name] then
+				local i = tostring(ShestakUIOptionsGlobal[realm]["Current_Profile"][name])
+				profileName = ShestakUIOptionsPerChar[i] and ShestakUIOptionsPerChar[i]["general"] and ShestakUIOptionsPerChar[i]["general"]["profile_name"] or i
+			else
+				local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+				profileName = ShestakUIOptions[i] and ShestakUIOptions[i]["general"] and ShestakUIOptions[i]["general"]["profile_name"] or i
+			end
+			StaticPopup_Show("SHESTAKUI_RENAME_PROFILE", _, _, profileName)
+		end
+	end)
+	tinsert(ns.buttons, RenameButton)
+
+	local status = ProfileListPanel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+	status:SetPoint("BOTTOM", ProfileListPanel, "BOTTOM", 0, 35)
+	status:SetWidth(200)
+	status:SetTextColor(0.8, 0.2, 0)
+
+	local selfTextExport
+	StaticPopupDialogs.SHESTAKUI_EXPORT_PROFILE = {
+		text = L.profile_export,
+		button1 = OKAY,
+		timeout = 0,
+		whileDead = true,
+		hasEditBox = true,
+		editBoxWidth = 350,
+		OnShow = function(self, text)
+			self.editBox:SetMaxLetters(0)
+			self.editBox:SetText(text)
+			self.editBox:HighlightText()
+			selfTextExport = text
+		end,
+		EditBoxOnEnterPressed = function(self) self:GetParent():Hide() end,
+		EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
+		EditBoxOnTextChanged = function(self)
+			if self:GetText():len() < 1 then
+				self:GetParent():Hide()
+			else
+				self:SetText(selfTextExport)
+				self:HighlightText()
+			end
+		end,
+		preferredIndex = 5,
+	}
+
+	local profileVar = "General"
+	local function startExport()
+		local Prefix = "ShestakUI:Profile:"
+		local LibDeflate = LibStub:GetLibrary("LibDeflate")
+		local LibSerialize = LibStub("LibSerialize")
+
+		local Serialized
+		if profileVar == "General" then
+			local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+			Serialized = LibSerialize:Serialize(ShestakUIOptions[i])
+		elseif profileVar == "Personal" then
+			local i = tostring(ShestakUIOptionsGlobal[realm]["Current_Profile"][name])
+			Serialized = LibSerialize:Serialize(ShestakUIOptionsPerChar[i])
+		elseif profileVar == "Mover" then
+			local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+			Serialized = LibSerialize:Serialize(ShestakUIPositions[i])
+		elseif profileVar == "Mover_Personal" then
+			local i = tostring(ShestakUIOptionsGlobal[realm]["Current_Profile"][name])
+			Serialized = LibSerialize:Serialize(ShestakUIPositionsPerChar[i])
+		end
+
+		local Compressed = LibDeflate:CompressDeflate(Serialized)
+		local Encoded = LibDeflate:EncodeForPrint(Compressed)
+		local Result = Prefix..Encoded
+		StaticPopup_Show("SHESTAKUI_EXPORT_PROFILE", _, _, Result)
+	end
+
+	local selfTextImport
+	local importVar = "General"
+	StaticPopupDialogs.SHESTAKUI_IMPORT_PROFILE = {
+		text = L.profile_import,
+		button1 = ACCEPT,
+		button2 = CANCEL,
+		timeout = 0,
+		whileDead = true,
+		hasEditBox = true,
+		editBoxWidth = 350,
+		EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
+		EditBoxOnTextChanged = function(self)
+			selfTextImport = self:GetText()
+		end,
+		OnAccept = function(self)
+			local Code = selfTextImport
+			local Prefix = "ShestakUI:Profile:"
+			local LibDeflate = LibStub:GetLibrary("LibDeflate")
+			local LibSerialize = LibStub("LibSerialize")
+
+			local LibCode = string.gsub(Code, Prefix, "")
+			local Decoded = LibDeflate:DecodeForPrint(LibCode)
+
+			if Decoded then
+				local Decompressed = LibDeflate:DecompressDeflate(Decoded)
+				local Success, Table = LibSerialize:Deserialize(Decompressed)
+				if Success then
+					if profileVar == "General" then
+						local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+						ShestakUIOptions[i] = Table
+					elseif profileVar == "Personal" then
+						local i = tostring(ShestakUIOptionsGlobal[realm]["Current_Profile"][name])
+						ShestakUIOptionsPerChar[i] = Table
+					elseif profileVar == "Mover" then
+						local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+						ShestakUIPositions[i] = Table
+					elseif profileVar == "Mover_Personal" then
+						local i = tostring(ShestakUIOptionsGlobal[realm]["Current_Profile"][name])
+						ShestakUIPositionsPerChar[i] = Table
+					end
+					ReloadUI()
+				else
+					status:SetText(L.profile_error_code)
+				end
+			else
+				status:SetText(L.profile_error_code)
+			end
+		end,
+		preferredIndex = 5,
+	}
+
+	local subheader = ProfileListPanel:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+	subheader:SetPoint("TOPLEFT", RenameButton, 15, -40)
+	subheader:SetText(L.profile_options)
+	subheader:SetTextColor(179/255, 211/255, 243/255)
+
+	local ExportButton = CreateFrame("Button", "ProfileListPanelExportButton", ProfileList, "UIPanelButtonTemplate")
+	ExportButton:SetPoint("TOPLEFT", subheader, 10, -20)
+	ExportButton:SetSize(100, 23)
+	ExportButton:SetText(L.profile_export)
+	ExportButton:SetScript("OnClick", function()
+		profileVar = ShestakUIOptionsGlobal[realm][name] and "Personal" or "General"
+		startExport()
+	end)
+
+	tinsert(ns.buttons, ExportButton)
+
+	local ImportButton = CreateFrame("Button", "ProfileListPaneImportButton", ProfileList, "UIPanelButtonTemplate")
+	ImportButton:SetPoint("LEFT", ExportButton, "RIGHT", 10, 0)
+	ImportButton:SetSize(100, 23)
+	ImportButton:SetText(L.profile_import)
+	ImportButton:SetScript("OnClick", function()
+		profileVar = ShestakUIOptionsGlobal[realm][name] and "Personal" or "General"
+		StaticPopup_Show("SHESTAKUI_IMPORT_PROFILE")
+	end)
+
+	tinsert(ns.buttons, ImportButton)
+
+	local subheader = ProfileListPanel:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+	subheader:SetPoint("TOPLEFT", ExportButton, -10, -35)
+	subheader:SetText(L.profile_movers)
+	subheader:SetTextColor(179/255, 211/255, 243/255)
+
+	local ExportMoveButton = CreateFrame("Button", "ProfileListPanelExportMoveButton", ProfileList, "UIPanelButtonTemplate")
+	ExportMoveButton:SetPoint("TOPLEFT", subheader, 10, -20)
+	ExportMoveButton:SetSize(100, 23)
+	ExportMoveButton:SetText(L.profile_export)
+	ExportMoveButton:SetScript("OnClick", function()
+		profileVar = ShestakUIOptionsGlobal[realm][name] and "Mover_Personal" or "Mover"
+		startExport()
+	end)
+
+	tinsert(ns.buttons, ExportMoveButton)
+
+	local ImportMoveButton = CreateFrame("Button", "ProfileListPaneImportMoveButton", ProfileList, "UIPanelButtonTemplate")
+	ImportMoveButton:SetPoint("LEFT", ExportMoveButton, "RIGHT", 10, 0)
+	ImportMoveButton:SetSize(100, 23)
+	ImportMoveButton:SetText(L.profile_import)
+	ImportMoveButton:SetScript("OnClick", function()
+		profileVar = ShestakUIOptionsGlobal[realm][name] and "Mover_Personal" or "Mover"
+		StaticPopup_Show("SHESTAKUI_IMPORT_PROFILE")
+	end)
+
+	tinsert(ns.buttons, ImportMoveButton)
+
+	C_Timer.After(0.3, function() -- need to grab SavedVariables and loaded libraries
+		local LibDeflate = LibStub and LibStub:GetLibrary("LibDeflate", true)
+		local LibSerialize = LibStub and LibStub:GetLibrary("LibSerialize", true)
+		local LibsExist = LibDeflate and LibSerialize
+
+		if not LibsExist then
+			ExportButton:Disable()
+			ImportButton:Disable()
+			ExportMoveButton:Disable()
+			ImportMoveButton:Disable()
+			status:SetText(L.profile_error_lib)
+		end
+
+		-- Use existing function in Core.lua to create dropdown with name via SavedVariables
+		local function SaveValue(f, value)
+			if not C.options[f.group] then C.options[f.group] = {} end
+			if not C.options[f.group][f.option] then C.options[f.group][f.option] = {} end
+
+			C.options[f.group][f.option] = value -- these are the saved variables
+			C[f.group][f.option] = value -- and this is from the lua options
+		end
+
+		local old = {}
+		local function checkIsReloadNeeded()
+			for frame, value in pairs(old) do
+				if C[frame.group][frame.option] ~= value then
+					ns.setReloadNeeded(true)
+					return
+				end
+			end
+
+			ns.setReloadNeeded(false)
+		end
+
+		local function GetProfileName(key)
+			if ShestakUIOptionsGlobal[realm][name] then
+				local i = tostring(key)
+				if ShestakUIOptionsPerChar[i] and ShestakUIOptionsPerChar[i]["general"] and ShestakUIOptionsPerChar[i]["general"]["profile_name"] then
+					return ShestakUIOptionsPerChar[i]["general"]["profile_name"]
+				end
+			else
+				local i = tostring(key)
+				if ShestakUIOptions[i] and ShestakUIOptions[i]["general"] and ShestakUIOptions[i]["general"]["profile_name"] then
+					return ShestakUIOptions[i]["general"]["profile_name"]
+				end
+			end
+		end
+
+		local CreateDropDown = function(parent, option, needsReload, text, tableValue)
+			local f = CreateFrame("Frame", parent:GetName()..option.."DropDown", parent, "UIDropDownMenuTemplate")
+			UIDropDownMenu_SetWidth(f, 110)
+
+			UIDropDownMenu_Initialize(f, function(self)
+				local info = UIDropDownMenu_CreateInfo()
+				info.func = self.SetValue
+				for key, value in pairs(tableValue) do
+					info.text = GetProfileName(key) or value
+					info.arg1 = value
+					info.arg2 = key
+					info.checked = value == f.selectedValue
+
+					if isFont then
+						local fObject = CreateFont(info.text)
+						fObject:SetFont(value, 12, "")
+						info.fontObject = fObject
+					end
+					UIDropDownMenu_AddButton(info)
+				end
+			end)
+
+			function f:SetValue(newValue, newkey)
+				f.selectedValue = newValue
+				local text = GetProfileName(newkey) or newValue
+				UIDropDownMenu_SetText(f, text)
+				if ShestakUIOptionsGlobal[realm][name] then
+					ShestakUIOptionsGlobal[realm]["Current_Profile"][name] = newValue
+				else
+					ShestakUIOptionsGlobal["Current_Profile"] = newValue
+				end
+				SaveValue(f, newValue)
+				old[f] = f.oldValue
+				checkIsReloadNeeded()
+				CloseDropDownMenus()
+			end
+
+			local label = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+			if text then
+				label:SetText(text)
+			else
+				label:SetText(ns[parent.tag.."_"..option])
+			end
+			label:SetHeight(20)
+			label:SetJustifyH("LEFT")
+			label:SetPoint("LEFT", 160, 4)
+			f.label = label
+
+			f.tooltipText = ns[parent.tag.."_"..option.."_desc"]
+			if f.tooltipText then
+				f:SetScript("OnEnter", function()
+					GameTooltip:SetOwner(f, "ANCHOR_RIGHT", 0, 0)
+					GameTooltip:SetText(f.tooltipText, nil, nil, nil, nil, true)
+				end)
+
+				f:SetScript("OnLeave", function()
+					GameTooltip:Hide()
+				end)
+			end
+
+			f.group = parent.tag
+			f.option = option
+
+			f.needsReload = needsReload
+
+			parent[option] = f
+
+			return f
+		end
+
+		local choose_profile = CreateDropDown(ShestakUIOptionsPanel.general, "choose_profile", true, L.profile_choose, {1, 2, 3})
+		choose_profile:SetPoint("TOPLEFT", ProfileList, "TOPLEFT", -15, -46)
+		choose_profile:SetParent(ProfileListPanel)
+
+		local value = ShestakUIOptionsGlobal[realm][name] and ShestakUIOptionsGlobal[realm]["Current_Profile"][name] or ShestakUIOptionsGlobal["Current_Profile"]
+		choose_profile.selectedValue = value
+		choose_profile.oldValue = value
+
+		local text
+		if ShestakUIOptionsGlobal[realm][name] then
+			local i = tostring(ShestakUIOptionsGlobal[realm]["Current_Profile"][name])
+			text = ShestakUIOptionsPerChar[i] and ShestakUIOptionsPerChar[i]["general"] and ShestakUIOptionsPerChar[i]["general"]["profile_name"]
+		else
+			local i = tostring(ShestakUIOptionsGlobal["Current_Profile"])
+			text = ShestakUIOptions[i] and ShestakUIOptions[i]["general"] and ShestakUIOptions[i]["general"]["profile_name"]
+		end
+		text = text or value
+		UIDropDownMenu_SetText(choose_profile, text)
+	end)
 end
 
 -- Font
@@ -1102,6 +1525,9 @@ do
 
 	local bubble_font_size = ns.CreateNumberSlider(parent, "bubble_font_size", nil, nil, 10, 24, 1, true, CHAT_BUBBLES_TEXT)
 	bubble_font_size:SetPoint("TOPLEFT", tooltip_header_font_size, "BOTTOMLEFT", 0, -20)
+
+	local quest_tracker_font_mult = ns.CreateNumberSlider(parent, "quest_tracker_font_mult", nil, nil, 1, 1.7, 0.05, true)
+	quest_tracker_font_mult:SetPoint("LEFT", bubble_font_size, "RIGHT", 120, 0)
 end
 
 -- Skins
@@ -1111,7 +1537,7 @@ do
 	local blizzard_frames = ns.CreateCheckBox(parent, "blizzard_frames", L_GUI_SKINS_BLIZZARD)
 	blizzard_frames:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, 0)
 
-	local bubbles = ns.CreateCheckBox(parent, "bubbles", L_GUI_CHAT_SKIN_BUBBLE)
+	local bubbles = ns.CreateCheckBox(parent, "bubbles")
 	bubbles:SetPoint("TOPLEFT", blizzard_frames, "BOTTOMLEFT", 0, 0)
 
 	local minimap_buttons = ns.CreateCheckBox(parent, "minimap_buttons", L_GUI_SKINS_MINIMAP_BUTTONS)
@@ -1144,6 +1570,7 @@ do
 			-- {"nug_running"}, -- needs work
 			{"omen"},
 			{"opie"},
+			{"plater"},
 			{"postal"},
 			{"recount"},
 			{"skada"},
@@ -1170,6 +1597,7 @@ do
 			{"omen"},
 			{"opie"},
 			{"ovale"},
+			{"plater"},
 			{"postal"},
 			{"recount"},
 			{"rematch"},
@@ -1238,7 +1666,7 @@ do
 
 	-- Cast bars
 	local subheader = ns.addSubCategory(parent, L_GUI_UF_SUBHEADER_CAST)
-	subheader:SetPoint("TOPLEFT", IsClassicBuild() and bar_color_happiness or player_name, "BOTTOMLEFT", 0, -16)
+	subheader:SetPoint("TOPLEFT", (IsClassicBuild() and not IsCataBuild()) and bar_color_happiness or player_name, "BOTTOMLEFT", 0, -16)
 
 	local unit_castbar = ns.CreateCheckBox(parent, "unit_castbar", L_GUI_UF_UNIT_CASTBAR)
 	unit_castbar:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -8)
@@ -1252,9 +1680,12 @@ do
 	local castbar_ticks = ns.CreateCheckBox(parent, "castbar_ticks", L_GUI_UF_CASTBAR_TICKS)
 	castbar_ticks:SetPoint("TOPLEFT", castbar_latency, "BOTTOMLEFT", 0, 0)
 
+	local castbar_focus_type = ns.CreateDropDown(parent, "castbar_focus_type", true, L.unitframe_castbar_focus_type, {"ICON", "BAR", "NONE"})
+	castbar_focus_type:SetPoint("TOPLEFT", castbar_ticks, "BOTTOMLEFT", -16, -2)
+
 	-- Frames
 	local subheader = ns.addSubCategory(parent, L_GUI_UF_SUBHEADER_FRAMES)
-	subheader:SetPoint("TOPLEFT", castbar_ticks, "BOTTOMLEFT", 0, -16)
+	subheader:SetPoint("TOPLEFT", castbar_focus_type, "BOTTOMLEFT", 16, -11)
 
 	local show_pet = ns.CreateCheckBox(parent, "show_pet", L_GUI_UF_SHOW_PET)
 	show_pet:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -8)
@@ -1264,12 +1695,14 @@ do
 
 	local show_target_target = ns.CreateCheckBox(parent, "show_target_target", L_GUI_UF_SHOW_TOT)
 	show_target_target:SetPoint("LEFT", show_focus, "RIGHT", 248, 0)
+	show_target_target.Text:SetWidth(270)
 
 	local show_boss = ns.CreateCheckBox(parent, "show_boss", L_GUI_UF_SHOW_BOSS)
 	show_boss:SetPoint("TOPLEFT", show_focus, "BOTTOMLEFT", 0, 0)
 
 	local boss_on_right = ns.CreateCheckBox(parent, "boss_on_right", L_GUI_UF_BOSS_RIGHT)
 	boss_on_right:SetPoint("LEFT", show_boss, "RIGHT", 248, 0)
+	boss_on_right.Text:SetWidth(270)
 
 	local show_arena = ns.CreateCheckBox(parent, "show_arena", L_GUI_UF_SHOW_ARENA)
 	show_arena:SetPoint("TOPLEFT", show_boss, "BOTTOMLEFT", 0, 0)
@@ -1404,7 +1837,13 @@ do
 		plugins_absorbs
 	}
 
-	local retail = {
+	local cata = {
+		bar_color_happiness,
+		plugins_enemy_spec,
+		plugins_absorbs
+	}
+
+	local mainline = {
 		bar_color_happiness,
 		plugins_power_spark
 	}
@@ -1414,8 +1853,10 @@ do
 		show_target_target:SetPoint("LEFT", show_pet, "RIGHT", 248, 0)
 	elseif IsTBCBuild() or IsWrathBuild() then
 		HideOptions(classic)
+	elseif IsCataBuild() then
+		HideOptions(cata)
 	else
-		HideOptions(retail)
+		HideOptions(mainline)
 	end
 end
 
@@ -1443,8 +1884,11 @@ do
 	local essence = ns.CreateCheckBox(parent, "essence")
 	essence:SetPoint("TOPLEFT", chi, "BOTTOMLEFT", 0, 0)
 
+	local eclipse = ns.CreateCheckBox(parent, "eclipse", L_GUI_UF_PLUGINS_ECLIPSE_BAR)
+	eclipse:SetPoint("TOPLEFT", essence, "BOTTOMLEFT", IsCataBuild() and -20 or 0, 0)
+
 	local stagger = ns.CreateCheckBox(parent, "stagger", L_GUI_UF_PLUGINS_STAGGER_BAR)
-	stagger:SetPoint("TOPLEFT", essence, "BOTTOMLEFT", 0, 0)
+	stagger:SetPoint("TOPLEFT", eclipse, "BOTTOMLEFT", 0, 0)
 
 	local holy = ns.CreateCheckBox(parent, "holy", L_GUI_UF_PLUGINS_HOLY_BAR)
 	holy:SetPoint("TOPLEFT", stagger, "BOTTOMLEFT", 0, 0)
@@ -1453,7 +1897,7 @@ do
 	shard:SetPoint("TOPLEFT", holy, "BOTTOMLEFT", 0, 0)
 
 	local rune = ns.CreateCheckBox(parent, "rune", L_GUI_UF_PLUGINS_RUNE_BAR)
-	rune:SetPoint("TOPLEFT", shard, "BOTTOMLEFT", 0, 0)
+	rune:SetPoint("TOPLEFT", shard, "BOTTOMLEFT", IsWrathBuild() and -20 or 0, 0)
 
 	local totem = ns.CreateCheckBox(parent, "totem", L_GUI_UF_PLUGINS_TOTEM_BAR)
 	totem:SetPoint("TOPLEFT", rune, "BOTTOMLEFT", 0, 0)
@@ -1468,6 +1912,7 @@ do
 		chi,
 		essence,
 		stagger,
+		eclipse,
 		holy,
 		shard,
 		rune,
@@ -1477,17 +1922,35 @@ do
 	local wrath = {
 		arcane,
 		chi,
+		essence,
 		stagger,
+		eclipse,
 		holy,
 		shard,
 		totem_other
 	}
 
-	if IsClassicBuild() and not IsWrathBuild() then
+	local cata = {
+		arcane,
+		chi,
+		essence,
+		stagger,
+		totem_other
+	}
+
+	local mainline = {
+		eclipse
+	}
+
+	if IsVanillaBuild() or IsTBCBuild() then
 		HideOptions(classic)
 		totem:SetPoint("TOPLEFT", rune, "BOTTOMLEFT", -20, 0)
 	elseif IsWrathBuild() then
 		HideOptions(wrath)
+	elseif IsCataBuild() then
+		HideOptions(cata)
+	elseif IsMainlineBuild() then
+		HideOptions(mainline)
 	end
 end
 
@@ -1515,6 +1978,7 @@ do
 
 	local raid_tanks_tt = ns.CreateCheckBox(parent, "raid_tanks_tt", L_GUI_UF_SHOW_TANK_TT)
 	raid_tanks_tt:SetPoint("LEFT", raid_tanks, "RIGHT", 248, 0)
+	raid_tanks_tt.Text:SetWidth(270)
 
 	local solo_mode = ns.CreateCheckBox(parent, "solo_mode", L_GUI_UF_SOLO_MODE)
 	solo_mode:SetPoint("TOPLEFT", raid_tanks, "BOTTOMLEFT", 0, 0)
@@ -1688,7 +2152,19 @@ do
 		plugins_over_heal_absorb,
 	}
 
-	if IsClassicBuild() then
+	local wrath = {
+		by_role,
+		icons_phase,
+		plugins_over_absorb,
+		plugins_over_heal_absorb,
+	}
+
+	local cata = {
+		plugins_over_absorb,
+		plugins_over_heal_absorb,
+	}
+
+	if IsVanillaBuild() or IsTBCBuild() then
 		HideOptions(classic)
 		icons_raid_mark:SetPoint("TOPLEFT", icons_role, "BOTTOMLEFT", 0, -8)
 		icons_ready_check:ClearAllPoints()
@@ -1698,6 +2174,11 @@ do
 		icons_sumon:SetPoint("LEFT", icons_leader, "RIGHT", 248, 0)
 		icons_phase:SetPoint("TOPLEFT", icons_leader, "BOTTOMLEFT", 0, 0)
 		plugins_auto_resurrection:SetPoint("TOPLEFT", plugins_over_heal_absorb, "BOTTOMLEFT", 0, 0)
+	elseif IsWrathBuild() then
+		HideOptions(wrath)
+		plugins_auto_resurrection:SetPoint("TOPLEFT", plugins_over_heal_absorb, "BOTTOMLEFT", 0, 0)
+	elseif IsCataBuild() then
+		HideOptions(cata)
 	end
 end
 
@@ -1721,6 +2202,9 @@ do
 	local player_auras = ns.CreateCheckBox(parent, "player_auras", L_GUI_AURA_PLAYER_AURAS)
 	player_auras:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -10)
 
+	local player_buff_mouseover = ns.CreateCheckBox(parent, "player_buff_mouseover")
+	player_buff_mouseover:SetPoint("LEFT", player_auras, "RIGHT", 320, 0)
+
 	local classcolor_border = ns.CreateCheckBox(parent, "classcolor_border", L_GUI_AURA_CLASSCOLOR_BORDER)
 	classcolor_border:SetPoint("TOPLEFT", player_auras, "BOTTOMLEFT", 0, 0)
 
@@ -1736,18 +2220,20 @@ do
 
 	local tot_debuffs = ns.CreateCheckBox(parent, "tot_debuffs", L_GUI_AURA_TOT_DEBUFFS)
 	tot_debuffs:SetPoint("LEFT", target_auras, "RIGHT", 320, 0)
+	tot_debuffs.Text:SetWidth(200)
 
 	local focus_debuffs = ns.CreateCheckBox(parent, "focus_debuffs", L_GUI_AURA_FOCUS_DEBUFFS)
 	focus_debuffs:SetPoint("TOPLEFT", target_auras, "BOTTOMLEFT", 0, 0)
 
 	local fot_debuffs = ns.CreateCheckBox(parent, "fot_debuffs", L_GUI_AURA_FOT_DEBUFFS)
 	fot_debuffs:SetPoint("LEFT", focus_debuffs, "RIGHT", 320, 0)
+	fot_debuffs.Text:SetWidth(200)
 
 	local pet_debuffs = ns.CreateCheckBox(parent, "pet_debuffs", L_GUI_AURA_PET_DEBUFFS)
 	pet_debuffs:SetPoint("TOPLEFT", focus_debuffs, "BOTTOMLEFT", 0, 0)
 
 	local player_aura_only = ns.CreateCheckBox(parent, "player_aura_only", L_GUI_AURA_PLAYER_AURA_ONLY)
-	player_aura_only:SetPoint("TOPLEFT", boss_buffs, "BOTTOMLEFT", 0, 0)
+	player_aura_only:SetPoint("TOPLEFT", pet_debuffs, "BOTTOMLEFT", 0, 0)
 
 	local debuff_color_type = ns.CreateCheckBox(parent, "debuff_color_type", L_GUI_AURA_DEBUFF_COLOR_TYPE)
 	debuff_color_type:SetPoint("TOPLEFT", player_aura_only, "BOTTOMLEFT", 0, 0)
@@ -1843,6 +2329,9 @@ do
 
 	local stancebar_mouseover = ns.CreateCheckBox(parent, "stancebar_mouseover", L_GUI_ACTIONBAR_STANCEBAR_MOUSEOVER)
 	stancebar_mouseover:SetPoint("TOPLEFT", stancebar_horizontal, "BOTTOMLEFT", 20, 0)
+
+	local stancebar_mouseover_alpha = ns.CreateNumberSlider(parent, "stancebar_mouseover_alpha", nil, nil, 0, 0.7, 0.1, true, L.nameplate_alpha)
+	stancebar_mouseover_alpha:SetPoint("LEFT", stancebar_mouseover, "RIGHT", 224, 0)
 
 	-- stancebar_horizontal.children = {stancebar_mouseover}
 
@@ -2042,27 +2531,28 @@ do
 
 	local realm = ns.CreateCheckBox(parent, "realm")
 	realm:SetPoint("LEFT", title, "RIGHT", 320, 0)
+	realm.Text:SetWidth(200)
 
 	local target = ns.CreateCheckBox(parent, "target")
 	target:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, 0)
+	target.Text:SetWidth(300)
 
 	local rank = ns.CreateCheckBox(parent, "rank")
 	rank:SetPoint("LEFT", target, "RIGHT", 320, 0)
-
-	local talents = ns.CreateCheckBox(parent, "talents")
-	talents:SetPoint("TOPLEFT", target, "BOTTOMLEFT", 0, 0)
+	rank.Text:SetWidth(200)
 
 	local average_lvl = ns.CreateCheckBox(parent, "average_lvl", STAT_AVERAGE_ITEM_LEVEL)
-	average_lvl:SetPoint("LEFT", talents, "RIGHT", 320, 0)
+	average_lvl:SetPoint("TOPLEFT", target, "BOTTOMLEFT", 0, 0)
 
 	local show_shift = ns.CreateCheckBox(parent, "show_shift")
-	show_shift:SetPoint("TOPLEFT", talents, "BOTTOMLEFT", 20, 0)
+	show_shift:SetPoint("TOPLEFT", average_lvl, "BOTTOMLEFT", 20, 0)
 
 	local raid_icon = ns.CreateCheckBox(parent, "raid_icon")
 	raid_icon:SetPoint("TOPLEFT", show_shift, "BOTTOMLEFT", -20, 0)
 
 	local unit_role = ns.CreateCheckBox(parent, "unit_role")
 	unit_role:SetPoint("LEFT", raid_icon, "RIGHT", 320, 0)
+	unit_role.Text:SetWidth(200)
 
 	local who_targetting = ns.CreateCheckBox(parent, "who_targetting")
 	who_targetting:SetPoint("TOPLEFT", raid_icon, "BOTTOMLEFT", 0, 0)
@@ -2086,34 +2576,25 @@ do
 	mount:SetPoint("TOPLEFT", instance_lock, "BOTTOMLEFT", 0, 0)
 
 	local classic = {
-		talents,
-		show_shift,
 		unit_role,
 		achievements,
 		mount
 	}
 
 	local wrath = {
-		talents,
-		show_shift,
-		unit_role,
 		mount
 	}
 
-	local retail = {
+	local mainline = {
 		vendor_price
 	}
 
 	if IsVanillaBuild() or IsTBCBuild() then
 		HideOptions(classic)
-		average_lvl:SetPoint("TOPLEFT", show_shift, "BOTTOMLEFT", 0, 0)
-		raid_icon:SetPoint("TOPLEFT", average_lvl, "BOTTOMLEFT", 0, -24)
 	elseif IsWrathBuild() then
 		HideOptions(wrath)
-		average_lvl:SetPoint("TOPLEFT", show_shift, "BOTTOMLEFT", 0, 0)
-		raid_icon:SetPoint("TOPLEFT", average_lvl, "BOTTOMLEFT", 0, -24)
-	else
-		HideOptions(retail)
+	elseif IsMainlineBuild() then
+		HideOptions(mainline)
 	end
 end
 
@@ -2121,19 +2602,19 @@ end
 do
 	local parent = ShestakUIOptionsPanel.chat
 
-	local enable = ns.CreateCheckBox(parent, "enable", L_GUI_CHAT_ENABLE)
+	local enable = ns.CreateCheckBox(parent, "enable")
 	enable:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, 0)
 
-	local width = ns.CreateNumberSlider(parent, "width", nil, nil, 0, 750, 1, true, L_GUI_CHAT_WIDTH)
+	local width = ns.CreateNumberSlider(parent, "width", nil, nil, 0, 750, 1, true)
 	width:SetPoint("TOPLEFT", enable, "BOTTOMLEFT", 0, -20)
 
-	local height = ns.CreateNumberSlider(parent, "height", nil, nil, 0, 300, 1, true, L_GUI_CHAT_HEIGHT)
+	local height = ns.CreateNumberSlider(parent, "height", nil, nil, 0, 300, 1, true)
 	height:SetPoint("LEFT", width, "RIGHT", 120, 0)
 
-	local background = ns.CreateCheckBox(parent, "background", L_GUI_CHAT_BACKGROUND)
+	local background = ns.CreateCheckBox(parent, "background")
 	background:SetPoint("TOPLEFT", width, "BOTTOMLEFT", 0, -10)
 
-	local background_alpha = ns.CreateNumberSlider(parent, "background_alpha", nil, nil, 0, 1, 0.05, true, L_GUI_CHAT_BACKGROUND_ALPHA)
+	local background_alpha = ns.CreateNumberSlider(parent, "background_alpha", nil, nil, 0, 1, 0.05, true)
 	background_alpha:SetPoint("TOPLEFT", background, "BOTTOMLEFT", 0, -20)
 
 	local filter = ns.CreateCheckBox(parent, "filter")
@@ -2147,27 +2628,27 @@ do
 	spam_list:SetWidth(200)
 	spam_list:SetMaxLetters(40)
 
-	local chat_bar = ns.CreateCheckBox(parent, "chat_bar", L_GUI_CHAT_BAR)
+	local chat_bar = ns.CreateCheckBox(parent, "chat_bar")
 	chat_bar:SetPoint("TOPLEFT", spam_list, "BOTTOMLEFT", -6, -10)
 
-	local chat_bar_mouseover = ns.CreateCheckBox(parent, "chat_bar_mouseover", L_GUI_CHAT_BAR_MOUSEOVER)
+	local chat_bar_mouseover = ns.CreateCheckBox(parent, "chat_bar_mouseover")
 	chat_bar_mouseover:SetPoint("TOPLEFT", chat_bar, "BOTTOMLEFT", 20, 0)
 
 	chat_bar.children = {chat_bar_mouseover}
 
-	local whisp_sound = ns.CreateCheckBox(parent, "whisp_sound", L_GUI_CHAT_WHISP)
+	local whisp_sound = ns.CreateCheckBox(parent, "whisp_sound")
 	whisp_sound:SetPoint("TOPLEFT", chat_bar_mouseover, "BOTTOMLEFT", -20, 0)
 
-	local combatlog = ns.CreateCheckBox(parent, "combatlog", L_GUI_CHAT_CL_TAB)
+	local combatlog = ns.CreateCheckBox(parent, "combatlog")
 	combatlog:SetPoint("TOPLEFT", whisp_sound, "BOTTOMLEFT", 0, 0)
 
-	local tabs_mouseover = ns.CreateCheckBox(parent, "tabs_mouseover", L_GUI_CHAT_TABS_MOUSEOVER)
+	local tabs_mouseover = ns.CreateCheckBox(parent, "tabs_mouseover")
 	tabs_mouseover:SetPoint("TOPLEFT", combatlog, "BOTTOMLEFT", 0, 0)
 
-	local sticky = ns.CreateCheckBox(parent, "sticky", L_GUI_CHAT_STICKY)
+	local sticky = ns.CreateCheckBox(parent, "sticky")
 	sticky:SetPoint("TOPLEFT", tabs_mouseover, "BOTTOMLEFT", 0, 0)
 
-	local damage_meter_spam = ns.CreateCheckBox(parent, "damage_meter_spam", L_GUI_CHAT_DAMAGE_METER_SPAM)
+	local damage_meter_spam = ns.CreateCheckBox(parent, "damage_meter_spam")
 	damage_meter_spam:SetPoint("TOPLEFT", sticky, "BOTTOMLEFT", 0, 0)
 
 	local loot_icons = ns.CreateCheckBox(parent, "loot_icons")
@@ -2192,7 +2673,7 @@ do
 		role_icons,
 	}
 
-	if IsClassicBuild() then
+	if IsVanillaBuild() or IsTBCBuild() then
 		HideOptions(classic)
 	end
 end
@@ -2247,6 +2728,7 @@ do
 
 	local track_debuffs = ns.CreateCheckBox(parent, "track_debuffs", L_GUI_NAMEPLATE_SHOW_DEBUFFS)
 	track_debuffs:SetPoint("TOPLEFT", clamp, "BOTTOMLEFT", 0, 0)
+	track_debuffs.Text:SetWidth(350)
 
 	local ListButton = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
 	ListButton:SetPoint("LEFT", track_debuffs, "RIGHT", 400, 0)
@@ -2323,8 +2805,12 @@ do
 	local low_health_value = ns.CreateNumberSlider(parent, "low_health_value", nil, nil, 0.1, 1, 0.05, true)
 	low_health_value:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, -20)
 
+	local low_health_color = ns.CreateColourPicker(parent, "low_health_color", true)
+	low_health_color:SetPoint("LEFT", low_health_value, "RIGHT", 85, 0)
+
 	local low_health = ns.CreateCheckBox(parent, "low_health")
-	low_health:SetPoint("LEFT", low_health_value, "RIGHT", 70, 0)
+	low_health:SetPoint("LEFT", low_health_color, "RIGHT", 15, 0)
+	low_health.Text:SetWidth(250)
 
 	local cast_color = ns.CreateCheckBox(parent, "cast_color")
 	cast_color:SetPoint("TOPLEFT", low_health_value, "BOTTOMLEFT", 0, -8)
@@ -2363,16 +2849,22 @@ do
 		extra_color,
 	}
 
-	local classic = {
+	local tbc = {
 		quests,
 		offtank_color,
 		extra_color,
 	}
 
+	local wrath = {
+		quests
+	}
+
 	if IsVanillaBuild() then
 		HideOptions(vanilla)
-	elseif IsClassicBuild() then
-		HideOptions(classic)
+	elseif IsTBCBuild() then
+		HideOptions(tbc)
+	elseif IsWrathBuild() then
+		HideOptions(wrath)
 	end
 end
 
@@ -2444,7 +2936,6 @@ do
 	ListButton:SetSize(100, 23)
 	ListButton:SetText(ADD)
 	ListButton:SetWidth(ListButton.Text:GetWidth() + 15)
-	ListButton.tooltipText = "|cffFFD100"..L_GUI_RESET_SPELLS_DESC.."|r"
 	ListButton:SetScript("OnClick", function()
 		if not C.options["combattext"] then
 			C.options["combattext"] = {}
@@ -2467,8 +2958,11 @@ do
 	local merge_melee = ns.CreateCheckBox(parent, "merge_melee", L_GUI_COMBATTEXT_MERGE_MELEE)
 	merge_melee:SetPoint("TOPLEFT", merge_aoe_spam, "BOTTOMLEFT", 20, 0)
 
+	local merge_all = ns.CreateCheckBox(parent, "merge_all")
+	merge_all:SetPoint("TOPLEFT", merge_melee, "BOTTOMLEFT", 0, 0)
+
 	local direction = ns.CreateCheckBox(parent, "direction", L_GUI_COMBATTEXT_DIRECTION)
-	direction:SetPoint("TOPLEFT", merge_melee, "BOTTOMLEFT", -20, 0)
+	direction:SetPoint("TOPLEFT", merge_all, "BOTTOMLEFT", -20, 0)
 
 	-- Panel 2
 	local parent = ShestakUIOptionsPanel.combattext2
@@ -2498,7 +2992,7 @@ do
 		dk_runes
 	}
 
-	if IsClassicBuild() and not IsWrathBuild() then
+	if IsVanillaBuild() or IsTBCBuild() then
 		HideOptions(classic)
 	end
 end
@@ -2602,14 +3096,14 @@ do
 	local auto_confirm_de = ns.CreateCheckBox(parent, "auto_confirm_de", L_GUI_LOOT_AUTODE)
 	auto_confirm_de:SetPoint("TOPLEFT", auto_greed, "BOTTOMLEFT", 0, 0)
 
-	local retail = {
+	local mainline = {
 		rolllootframe,
 		auto_greed,
 		auto_confirm_de,
 	}
 
 	if not IsClassicBuild() then
-		HideOptions(retail)
+		HideOptions(mainline)
 	end
 end
 
@@ -2717,7 +3211,7 @@ do
 	local ListButton = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
 	ListButton:SetPoint("LEFT", spells, "RIGHT", 400, 0)
 	ListButton:SetSize(100, 23)
-	ListButton:SetText(">>")
+	ListButton:SetText(ADD)
 	ListButton:SetWidth(ListButton.Text:GetWidth() + 15)
 	ListButton:SetScript("OnClick", function()
 		if not C.options["announcements"] then
@@ -2733,7 +3227,10 @@ do
 	local function toggleListButton()
 		local shown = spells:GetChecked()
 		ListButton:SetEnabled(shown)
-		if not T.announce_spells then ListButton:Disable() return end
+		if not T.announce_spells then
+			ListButton.tooltipText = "|cffFFD100"..REQUIRES_RELOAD.."|r"
+			ListButton:SetScript("OnClick", nil)
+		end
 	end
 
 	spells:HookScript("OnClick", toggleListButton)
@@ -2793,7 +3290,7 @@ do
 	}
 
 	if IsVanillaBuild() then
-		HideOptions(classic)
+		HideOptions(vanilla)
 		pull_countdown:ClearAllPoints()
 		pull_countdown:SetPoint("TOPLEFT", flask_food_auto, "BOTTOMLEFT", -20, 0)
 	elseif IsClassicBuild() then
@@ -2877,14 +3374,21 @@ do
 		auto_role
 	}
 
-	local retail = {
+	local cata = {
+		screenshot,
+		auto_role
+	}
+
+	local mainline = {
 		dismount_stand,
 	}
 
-	if IsClassicBuild() then
+	if IsClassicBuild() and not IsCataBuild() then
 		HideOptions(classic)
+	elseif IsCataBuild() then
+		HideOptions(cata)
 	else
-		HideOptions(retail)
+		HideOptions(mainline)
 	end
 end
 
@@ -2964,11 +3468,15 @@ do
 		end
 		if not C.options["raidcooldown"]["spells_list"] then
 			C.options["raidcooldown"]["spells_list"] = T.raid_spells
-			C.options.raidcooldown.spells_list_ver = 3
+			C.options.raidcooldown.spells_list_ver = 4
 		end
 		if IsControlKeyDown() then
 			C.options["raidcooldown"]["spells_list"] = nil
 			ns.setReloadNeeded(true)
+			ListButton.tooltipText = "|cffFFD100"..REQUIRES_RELOAD.."|r"
+			ListButton:SetScript("OnClick", nil)
+			GameTooltip:Hide()
+			SpellList:Hide()
 			return
 		end
 		BuildSpellList(C.options["raidcooldown"]["spells_list"], true)
@@ -3038,6 +3546,10 @@ do
 		if IsControlKeyDown() then
 			C.options["enemycooldown"]["spells_list"] = nil
 			ns.setReloadNeeded(true)
+			ListButton.tooltipText = "|cffFFD100"..REQUIRES_RELOAD.."|r"
+			ListButton:SetScript("OnClick", nil)
+			GameTooltip:Hide()
+			SpellList:Hide()
 			return
 		end
 		BuildSpellList(C.options["enemycooldown"]["spells_list"], true)
@@ -3066,23 +3578,46 @@ end
 do
 	local parent = ShestakUIOptionsPanel.pulsecooldown
 
-	local enable = ns.CreateCheckBox(parent, "enable", L_GUI_COOLDOWN_PULSE_ENABLE)
+	local enable = ns.CreateCheckBox(parent, "enable")
 	enable:SetPoint("TOPLEFT", parent.subText, "BOTTOMLEFT", 0, 0)
 
-	local size = ns.CreateNumberSlider(parent, "size", nil, nil, 0, 150, 1, true, L_GUI_COOLDOWN_ENEMY_SIZE)
+	local size = ns.CreateNumberSlider(parent, "size", nil, nil, 0, 150, 1, true)
 	size:SetPoint("TOPLEFT", enable, "BOTTOMLEFT", 0, -20)
 
-	local sound = ns.CreateCheckBox(parent, "sound", L_GUI_COOLDOWN_PULSE_SOUND)
+	local sound = ns.CreateCheckBox(parent, "sound")
 	sound:SetPoint("TOPLEFT", size, "BOTTOMLEFT", 0, -10)
 
-	local anim_scale = ns.CreateNumberSlider(parent, "anim_scale", nil, nil, 0, 3, 0.05, true, L_GUI_COOLDOWN_PULSE_ANIM_SCALE)
+	local anim_scale = ns.CreateNumberSlider(parent, "anim_scale", nil, nil, 0, 3, 0.05, true)
 	anim_scale:SetPoint("TOPLEFT", sound, "BOTTOMLEFT", 0, -20)
 
-	local hold_time = ns.CreateNumberSlider(parent, "hold_time", nil, nil, 0, 5, 1, true, L_GUI_COOLDOWN_PULSE_HOLD_TIME)
+	local hold_time = ns.CreateNumberSlider(parent, "hold_time", nil, nil, 0, 5, 1, true)
 	hold_time:SetPoint("TOPLEFT", anim_scale, "BOTTOMLEFT", 0, -20)
 
-	local threshold = ns.CreateNumberSlider(parent, "threshold", nil, nil, 0, 15, 1, true, L_GUI_COOLDOWN_PULSE_THRESHOLD, L_GUI_COOLDOWN_PULSE_THRESHOLD_DESC)
+	local threshold = ns.CreateNumberSlider(parent, "threshold", nil, nil, 0, 15, 1, true)
 	threshold:SetPoint("TOPLEFT", hold_time, "BOTTOMLEFT", 0, -20)
+
+	-- Filtering list
+	local subheader = ns.addSubCategory(parent, L.pulsecooldown_subheader_whitelist)
+	subheader:SetPoint("TOPLEFT", threshold, "BOTTOMLEFT", 0, -10)
+
+	local ListButton = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+	ListButton:SetPoint("TOPLEFT", subheader, "BOTTOMLEFT", 0, -15)
+	ListButton:SetSize(100, 23)
+	ListButton:SetText(ADD)
+	ListButton:SetWidth(ListButton.Text:GetWidth() + 15)
+	ListButton:SetScript("OnClick", function()
+		if not C.options["pulsecooldown"] then
+			C.options["pulsecooldown"] = {}
+		end
+		if not C.options["pulsecooldown"]["spells_list"] then
+			C.options["pulsecooldown"]["spells_list"] = {}
+		end
+		BuildSpellList(C.options["pulsecooldown"]["spells_list"])
+	end)
+	tinsert(ns.buttons, ListButton)
+
+	local whitelist = ns.CreateCheckBox(parent, "whitelist")
+	whitelist:SetPoint("LEFT", ListButton, "RIGHT", 40, 0)
 end
 
 -- Threat
@@ -3172,7 +3707,7 @@ do
 		currency:SetPoint("TOPLEFT", bottom_line, "BOTTOMLEFT", 0, -16)
 	else
 		currency = CreateFrame("Frame", nil, ShestakUIOptionsPanel)
-		EXPANSION_NAME8 = EXPANSION_NAME8 or "Shadowlands"
+		EXPANSION_NAME9 = EXPANSION_NAME9 or "Dragonflight"
 	end
 
 	local currency_archaeology = ns.CreateCheckBox(parent, "currency_archaeology", L_GUI_STATS_CURRENCY_ARCHAEOLOGY)
@@ -3184,8 +3719,19 @@ do
 	local currency_raid = ns.CreateCheckBox(parent, "currency_raid", L_GUI_STATS_CURRENCY_RAID)
 	currency_raid:SetPoint("TOPLEFT", currency_cooking, "BOTTOMLEFT", 0, 0)
 
-	local currency_misc = ns.CreateCheckBox(parent, "currency_misc", CURRENCY.. " "..EXPANSION_NAME8)
+	local currency_misc = ns.CreateCheckBox(parent, "currency_misc", CURRENCY.. " "..EXPANSION_NAME9)
 	currency_misc:SetPoint("TOPLEFT", currency_raid, "BOTTOMLEFT", 0, 0)
+
+	local ResetGoldButton = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+	ResetGoldButton:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -20, 5)
+	ResetGoldButton:SetSize(100, 23)
+	ResetGoldButton:SetText(RESET.." "..strlower(WORLD_QUEST_REWARD_FILTERS_GOLD))
+	ResetGoldButton:SetWidth(ResetGoldButton.Text:GetWidth() + 15)
+	ResetGoldButton:SetScript("OnClick", function()
+		StaticPopup_Show("RESET_STATS")
+	end)
+
+	tinsert(ns.buttons, ResetGoldButton)
 
 	local classic = {
 		talents,
@@ -3200,7 +3746,7 @@ do
 		currency_archaeology
 	}
 
-	if IsClassicBuild() and not IsWrathBuild() then
+	if IsVanillaBuild() or IsTBCBuild() then
 		HideOptions(classic)
 	elseif IsWrathBuild() then
 		HideOptions(wrath)
@@ -3243,10 +3789,16 @@ do
 		archaeology
 	}
 
-	if IsClassicBuild() and not IsWrathBuild() then
+	local cata = {
+		profession_tabs -- TODO: Fix for Classic
+	}
+
+	if IsVanillaBuild() or IsTBCBuild() then
 		HideOptions(classic)
 	elseif IsWrathBuild() then
 		HideOptions(wrath)
+	elseif IsCataBuild() then
+		HideOptions(cata)
 	end
 end
 
@@ -3283,14 +3835,11 @@ do
 	local chars_currency = ns.CreateCheckBox(parent, "chars_currency")
 	chars_currency:SetPoint("TOPLEFT", click_cast_filter, "BOTTOMLEFT", -20, 0)
 
-	local hide_raid_button = ns.CreateCheckBox(parent, "hide_raid_button")
-	hide_raid_button:SetPoint("TOPLEFT", chars_currency, "BOTTOMLEFT", 0, 0)
-
 	local classic = {
 		chars_currency
 	}
 
-	if IsClassicBuild() and not IsWrathBuild() then
+	if IsVanillaBuild() or IsTBCBuild() then
 		HideOptions(classic)
 	end
 end
@@ -3315,20 +3864,35 @@ f:SetScript("OnEvent", function()
 	SpellListScrollFrameSpellList.backdrop:SetPoint("BOTTOMRIGHT", 2, -3)
 	T.SkinCloseButton(SpellListCloseButton)
 
-	SpellListScrollFrameSpellListScrollBar:SetPoint("TOPLEFT", SpellListScrollFrameSpellList, "TOPRIGHT", 6, -13)
-	SpellListScrollFrameSpellListScrollBar:SetPoint("BOTTOMLEFT", SpellListScrollFrameSpellList, "BOTTOMRIGHT", 6, 13)
-	T.SkinScrollBar(SpellListScrollFrameSpellListScrollBar)
+	SpellListScrollFrameSpellList.ScrollBar:SetPoint("TOPLEFT", SpellListScrollFrameSpellList, "TOPRIGHT", 9, 3)
+	SpellListScrollFrameSpellList.ScrollBar:SetPoint("BOTTOMLEFT", SpellListScrollFrameSpellList, "BOTTOMRIGHT", 9, -4)
+	T.SkinScrollBar(SpellListScrollFrameSpellList.ScrollBar)
 
 	T.SkinEditBox(SpellListTextInput)
 	T.SkinEditBox(SpellListTextInput2)
 
+	ProfileList:StripTextures()
+	ProfileList:CreateBackdrop("Transparent")
+	ProfileList.backdrop:SetPoint("TOPLEFT", -18, 0)
+	ProfileList.backdrop:SetPoint("BOTTOMRIGHT", 0, 9)
+	T.SkinCloseButton(ProfileListCloseButton)
+
+	ProfileListPanel:CreateBackdrop("Overlay")
+
 	ShestakUIInfoFrame:SetTemplate("Overlay")
 
 	ShestakUIProfileFrame:SetTemplate("Transparent")
-	T.SkinScrollBar(ShestakUIProfileFrameScrollScrollBar)
+	T.SkinScrollBar(ShestakUIProfileFrameScroll.ScrollBar)
 	ShestakUIProfileFrameScroll:CreateBackdrop("Overlay")
 	ShestakUIProfileFrameScroll.backdrop:SetPoint("TOPLEFT", -4, 4)
 	ShestakUIProfileFrameScroll.backdrop:SetPoint("BOTTOMRIGHT", 4, -4)
+
+	C_Timer.After(3, function()
+		local dropdown = ShestakUIOptionsPanelgeneralchoose_profileDropDown
+		if dropdown then
+			T.SkinDropDownBox(dropdown)
+		end
+	end)
 end)
 
 ----------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.actionbar.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -14,40 +14,8 @@ else
 	bar:SetAllPoints(ActionBarAnchor)
 end
 
-local NumPerRows = C.actionbar.bar1_row
-local NextRowButtonAnchor = _G["ActionButton1"]
-for i = 1, 12 do
-	local b = _G["ActionButton"..i]
-	b:SetSize(C.actionbar.button_size, C.actionbar.button_size)
-	b:ClearAllPoints()
-	-- b:SetParent(Bar1Holder)
-	if C.actionbar.editor then
-		if i <= C.actionbar.bar1_num then
-			if i == 1 then
-				b:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
-			elseif i == NumPerRows + 1 then
-				b:SetPoint("TOPLEFT", NextRowButtonAnchor, "BOTTOMLEFT", 0, -C.actionbar.button_space)
-
-				NumPerRows = NumPerRows + C.actionbar.bar1_row
-				NextRowButtonAnchor = _G["ActionButton"..i]
-			else
-				b:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", T.Scale(C.actionbar.button_space), 0)
-			end
-		else
-			b:SetPoint("TOP", UIParent, "TOP", 0, 200)
-		end
-	else
-		if i == 1 then
-			b:SetPoint("BOTTOMLEFT", Bar1Holder, 0, 0)
-		else
-			local previous = _G["ActionButton"..i-1]
-			b:SetPoint("LEFT", previous, "RIGHT", T.Scale(C.actionbar.button_space), 0)
-		end
-	end
-end
-
 local Page = {}
-if T.Wrath341 then
+if T.Classic then
 	Page = {
 		["DRUID"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
 		["WARRIOR"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9;",
@@ -55,31 +23,13 @@ if T.Wrath341 then
 		["ROGUE"] = "[bonusbar:1] 7; [form:3] 7;",
 		["WARLOCK"] = "[form:2] 10;",
 		["DEFAULT"] = "[possessbar] 16; [shapeshift] 17; [overridebar] 18; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar: 5] 11;",
-	}
-elseif T.Wrath then
-	Page = {
-		["DRUID"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
-		["WARRIOR"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9;",
-		["PRIEST"] = "[bonusbar:1] 7;",
-		["ROGUE"] = "[bonusbar:1] 7; [form:3] 7;",
-		["WARLOCK"] = "[form:2] 10;",
-		["DEFAULT"] = "[possessbar] 12; [shapeshift] 13; [overridebar] 14; [vehicleui] 12; [bonusbar:5] 11; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6;",
-	}
-elseif T.Vanilla or T.TBC then
-	Page = {
-		["DRUID"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
-		["WARRIOR"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9;",
-		["PRIEST"] = "[bonusbar:1] 7;",
-		["ROGUE"] = "[bonusbar:1] 7; [form:3] 7;",
-		["WARLOCK"] = "[form:2] 10;",
-		["DEFAULT"] = "[bonusbar:5] 11; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6;",
 	}
 else
 	Page = {
 		["DRUID"] = "[bonusbar:1,nostealth] 7; [bonusbar:1,stealth] 8; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
 		["EVOKER"] = "[bonusbar:1] 7;",
 		["ROGUE"] = "[bonusbar:1] 7;",
-		["DEFAULT"] = "[possessbar] 16; [shapeshift] 17; [overridebar] 18; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar: 5] 11;",
+		["DEFAULT"] = "[possessbar] 16; [shapeshift] 17; [overridebar] 18; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar:5] 11;",
 	}
 end
 
@@ -95,16 +45,44 @@ local function GetBar()
 end
 
 bar:RegisterEvent("PLAYER_LOGIN")
-if T.Mainline or T.Wrath then
-	bar:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
-	bar:RegisterEvent("UPDATE_OVERRIDE_ACTIONBAR")
-end
+bar:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
+bar:RegisterEvent("UPDATE_OVERRIDE_ACTIONBAR")
+bar:RegisterEvent("UNIT_ENTERED_VEHICLE")
+bar:RegisterEvent("UNIT_EXITED_VEHICLE")
 bar:SetScript("OnEvent", function(self, event)
 	if event == "PLAYER_LOGIN" then
-		for i = 1, NUM_ACTIONBAR_BUTTONS do
-			local button = _G["ActionButton"..i]
-			self:SetFrameRef("ActionButton"..i, button)
-			button:SetParent(Bar1Holder)
+		local NumPerRows = C.actionbar.bar1_row
+		local NextRowButtonAnchor = _G["ActionButton1"]
+		for i = 1, 12 do
+			local b = _G["ActionButton"..i]
+			b:SetSize(C.actionbar.button_size, C.actionbar.button_size)
+			b:ClearAllPoints()
+			if C.actionbar.editor then
+				if i <= C.actionbar.bar1_num then
+					if i == 1 then
+						b:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
+					elseif i == NumPerRows + 1 then
+						b:SetPoint("TOPLEFT", NextRowButtonAnchor, "BOTTOMLEFT", 0, -C.actionbar.button_space)
+
+						NumPerRows = NumPerRows + C.actionbar.bar1_row
+						NextRowButtonAnchor = _G["ActionButton"..i]
+					else
+						b:SetPoint("LEFT", _G["ActionButton"..i-1], "RIGHT", T.Scale(C.actionbar.button_space), 0)
+					end
+				else
+					b:SetPoint("TOP", UIParent, "TOP", 0, 200)
+				end
+			else
+				if i == 1 then
+					b:SetPoint("BOTTOMLEFT", Bar1Holder, 0, 0)
+				else
+					local previous = _G["ActionButton"..i-1]
+					b:SetPoint("LEFT", previous, "RIGHT", T.Scale(C.actionbar.button_space), 0)
+				end
+			end
+
+			self:SetFrameRef("ActionButton"..i, b)
+			b:SetParent(Bar1Holder)
 		end
 
 		self:Execute([[
@@ -139,6 +117,18 @@ bar:SetScript("OnEvent", function(self, event)
 					end
 				end
 			end
+		end
+	elseif event == "UNIT_ENTERED_VEHICLE" then
+		if UnitHasVehicleUI("player") then
+			for i = 1, NUM_ACTIONBAR_BUTTONS do
+				local button = _G["ActionButton"..i]
+				button:GetCheckedTexture():SetAlpha(0)
+			end
+		end
+	elseif event == "UNIT_EXITED_VEHICLE" then
+		for i = 1, NUM_ACTIONBAR_BUTTONS do
+			local button = _G["ActionButton"..i]
+			button:GetCheckedTexture():SetAlpha(1)
 		end
 	end
 end)

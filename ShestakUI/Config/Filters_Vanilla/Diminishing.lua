@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.unitframe.enable ~= true or C.unitframe.show_arena ~= true or C.unitframe.plugins_diminishing ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -11,6 +11,7 @@ T.DiminishingSpells = {
 	[5211] = {"stun"},				-- Bash
 	[9005] = {"stun"},				-- Pounce
 	[24394] = {"stun"},				-- Intimidation
+	[428739] = {"stun"},				-- Deep Freeze [Season of Discovery]
 	[853] = {"stun"},				-- Hammer of Justice
 	[1833] = {"stun"},				-- Cheap Shot
 	[22703] = {"stun"},				-- Inferno Effect
@@ -49,7 +50,6 @@ T.DiminishingSpells = {
 	--]]
 
 	-- Disorients
-	[22570] = {"disorient"},		-- Mangle
 	[118] = {"disorient"},			-- Polymorph
 	[28272] = {"disorient"},		-- Polymorph: Pig
 	[28271] = {"disorient"},		-- Polymorph: Turtle
@@ -78,6 +78,9 @@ T.DiminishingSpells = {
 	-- Horrors
 	[6789] = {"horror"},			-- Death Coil
 
+	-- Unstable Affliction
+	[427719] = {"ua"},				-- Unstable Affliction (Silence) [Season of Discovery]
+
 	-- Roots
 	-- [19675] = {"root"},				-- Feral Charge Effect
 	[339] = {"root"},				-- Entangling Roots
@@ -92,6 +95,7 @@ T.DiminishingSpells = {
 
 	--[[
 	-- Disarms
+	[409495] = {"disarm"},			-- Chimera Shot - Scorpid [Season of Discovery]
 	[14251] = {"disarm"},			-- Riposte
 	[676] = {"disarm"},				-- Disarm
 	--]]
@@ -128,6 +132,7 @@ T.DiminishingSpells = {
 	--]]
 
 	-- Kidney Shot
+	[400009] = {"kidneyshot"},		-- Between the Eyes [Season of Discovery]
 	[408] = {"kidneyshot"},			-- Kidney Shot
 
 	-- Frost Shock

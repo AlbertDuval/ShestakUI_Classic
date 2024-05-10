@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local T, C, L = unpack(ShestakUI)
 if C.raidcooldown.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
@@ -300,17 +300,13 @@ local OnEvent = function(self, event)
 		end
 	end
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		local _, eventType, _, _, sourceName, sourceFlags, _, _, _, _, _, spellId, spellName = CombatLogGetCurrentEventInfo()
+		local _, eventType, _, _, sourceName, sourceFlags, _, _, _, _, _, spellId = CombatLogGetCurrentEventInfo()
 		if band(sourceFlags, filter) == 0 then return end
 		if eventType == "SPELL_RESURRECT" or eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_AURA_APPLIED" then
 			if sourceName then
 				sourceName = sourceName:gsub("-.+", "")
 			else
 				return
-			end
-
-			if T.Vanilla then
-				spellId = T.GetSpellID(spellName)
 			end
 
 			if T.RaidSpells[spellId] and show[select(2, IsInInstance())] and IsInGroup() then
@@ -326,9 +322,9 @@ local OnEvent = function(self, event)
 		for _, v in pairs(bars) do
 			v.endTime = 0
 		end
-	elseif event == "ENCOUNTER_END" and select(2, IsInInstance()) == "raid" and (T.Mainline or T.Wrath) then
+	elseif event == "ENCOUNTER_END" and select(2, IsInInstance()) == "raid" and (T.Wrath or T.Cata or T.Mainline) then
 		for _, v in pairs(bars) do
-			if T.Mainline or not v.duration or (T.Wrath and v.duration >= 120 and v.duration < 600) then
+			if T.Mainline or not v.duration or ((T.Wrath or T.Cata) and v.duration >= 120 and v.duration < 600) then
 				v.endTime = 0
 			end
 		end
@@ -338,11 +334,7 @@ end
 for spell in pairs(T.RaidSpells) do
 	local name = GetSpellInfo(spell)
 	if not name then
-		if T.Classic then
-			print("|cffff0000WARNING: spell ID ["..tostring(spell).."] no longer exists! Report this to EsreverWoW.|r")
-		else
-			print("|cffff0000WARNING: spell ID ["..tostring(spell).."] no longer exists! Report this to Shestak.|r")
-		end
+		print("|cffff0000ShestakUI: spell ID ["..tostring(spell).."] no longer exists!|r")
 	end
 end
 
